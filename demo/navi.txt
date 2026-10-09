@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知覚導線ナビ v13 — 設計図ジェネレーター</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+:root{
+  --bg:#0B0D13; --bg2:#10131C; --card:rgba(255,255,255,.032); --card2:rgba(255,255,255,.055);
+  --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.16);
+  --ink:#F1F3FA; --ink2:#8A92A8;
+  --g1a:#FF5A3C; --g1b:#FFB03A; --g2a:#3A7BFF; --g2b:#35C3E8;
+  --g3a:#4B5FD6; --g3b:#8B9BF0; --g4a:#8B4DFF; --g4b:#D06BF2;
+  --g5a:#0FBE85; --g5b:#5FE8A0; --g6a:#FF5A8F; --g6b:#FFA0B8;
+  --ca:#3A7BFF; --cb:#35C3E8; --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scrollbar-color:rgba(255,255,255,.18) transparent}
+body{
+  font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;line-height:1.6;overflow-x:hidden;
+}
+::selection{background:var(--ca);color:#fff}
+
+/* ---- ambient aurora (axis-reactive) ---- */
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.aurora::before{content:'';position:absolute;inset:0;background:
+  radial-gradient(60% 50% at 12% -10%, color-mix(in srgb, var(--ca) 16%, transparent), transparent 70%),
+  radial-gradient(55% 45% at 95% 105%, color-mix(in srgb, var(--cb) 13%, transparent), transparent 70%),
+  var(--bg);
+  transition:background 1.2s ease}
+.aurora::after{content:'';position:absolute;inset:0;opacity:.5;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .04 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+.wrap{max-width:1120px;margin:0 auto;padding:34px 20px 110px}
+
+/* ---- entrance ---- */
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+header{animation:rise .6s .05s both}
+.grid>div:first-child .step{animation:rise .6s both}
+.grid>div:first-child .step:nth-of-type(1){animation-delay:.12s}
+.grid>div:first-child .step:nth-of-type(2){animation-delay:.18s}
+.grid>div:first-child .step:nth-of-type(3){animation-delay:.24s}
+.grid>div:first-child .step:nth-of-type(4){animation-delay:.30s}
+.grid>div:first-child .step:nth-of-type(5){animation-delay:.36s}
+.grid>div:first-child .step:nth-of-type(n+6){animation-delay:.42s}
+.panel .stage{animation:rise .7s .3s both}
+
+/* ---- header ---- */
+header{margin-bottom:26px}
+.eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.34em;color:var(--ink2)}
+h1{font-size:clamp(28px,5vw,44px);font-weight:900;letter-spacing:-.02em;line-height:1.22;margin-top:6px}
+h1 .grad{background:linear-gradient(100deg,var(--ca),var(--cb),var(--ca));background-size:200% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 6s linear infinite}
+@keyframes shimmer{to{background-position:200% 0}}
+.lede{font-size:13px;color:var(--ink2);margin-top:8px;max-width:60ch}
+
+/* ---- progress rail ---- */
+.rail{display:flex;align-items:center;gap:0;margin-top:20px;max-width:520px}
+.rail .dot{display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;flex:1}
+.rail .dot i{width:10px;height:10px;border-radius:50%;background:var(--bg2);border:1.5px solid var(--line2);transition:.45s;position:relative;z-index:1}
+.rail .dot span{font-size:9.5px;font-weight:700;letter-spacing:.08em;color:var(--ink2);transition:.4s}
+.rail .dot:not(:last-child)::after{content:'';position:absolute;top:4.5px;left:calc(50% + 8px);right:calc(-50% + 8px);height:1.5px;background:var(--line);transition:.6s}
+.rail .dot.done i{background:linear-gradient(135deg,var(--ca),var(--cb));border-color:transparent;box-shadow:0 0 12px -2px var(--ca)}
+.rail .dot.done span{color:var(--ink)}
+.rail .dot.done:not(:last-child)::after{background:linear-gradient(90deg,var(--ca),var(--line))}
+
+/* ---- layout ---- */
+.grid{display:grid;grid-template-columns:1fr 380px;gap:22px;align-items:start;margin-top:26px}
+@media(max-width:880px){.grid{grid-template-columns:1fr}}
+
+/* ---- steps ---- */
+.step{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:18px 20px;margin-bottom:14px;transition:opacity .45s,transform .45s,border-color .3s;backdrop-filter:blur(6px)}
+.step.locked{opacity:.28;transform:translateY(4px) scale(.995);pointer-events:none;filter:saturate(.5)}
+#s1::after,#s2::after,#s3::after,#s4::after,#s5::after{
+  position:absolute;right:10px;top:-14px;font-size:74px;font-weight:900;letter-spacing:-.04em;
+  color:rgba(255,255,255,.045);pointer-events:none;line-height:1}
+#s1::after{content:'01'}#s2::after{content:'02'}#s3::after{content:'03'}#s4::after{content:'04'}#s5::after{content:'05'}
+.step-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap;position:relative}
+.step-num{font-size:10px;font-weight:700;letter-spacing:.22em;color:var(--ink2)}
+.step-title{font-size:15px;font-weight:900}
+.step-hint{font-size:11px;color:var(--ink2);margin-left:auto}
+
+/* ---- chips ---- */
+.chips{display:flex;flex-wrap:wrap;gap:8px;position:relative}
+.chip{border:1.5px solid var(--line);background:var(--card2);border-radius:999px;padding:8px 15px;
+  font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;color:var(--ink);text-align:left;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),border-color .25s,box-shadow .3s,background .25s}
+.chip small{display:block;font-size:10px;color:var(--ink2);font-weight:400;line-height:1.3}
+.chip:hover{transform:translateY(-2px);border-color:var(--line2);box-shadow:0 8px 20px -10px rgba(0,0,0,.8)}
+.chip:active{transform:translateY(0) scale(.97)}
+.chip.on{border-color:transparent;font-weight:700;
+  background:linear-gradient(var(--bg2),var(--bg2)) padding-box,linear-gradient(92deg,var(--ca),var(--cb)) border-box;
+  box-shadow:0 0 22px -8px var(--ca)}
+.chip:focus-visible,.axis:focus-visible,.btn:focus-visible,.row:focus-visible,.mech:focus-visible{outline:2px solid var(--ca);outline-offset:2px}
+
+/* ---- axis cards ---- */
+.axes{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+.axis{position:relative;border:1.5px solid var(--line);background:var(--card2);border-radius:14px;
+  padding:14px 12px 12px;text-align:left;cursor:pointer;font-family:inherit;overflow:hidden;color:var(--ink);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .3s,border-color .25s}
+.axis::before{content:'';position:absolute;inset:0 0 auto 0;height:4px;
+  background:linear-gradient(90deg,var(--xa),var(--xb));transform:scaleX(0);transform-origin:left;transition:transform .35s}
+.axis::after{content:'';position:absolute;inset:0;opacity:0;transition:opacity .35s;
+  background:radial-gradient(120% 90% at 50% -20%,color-mix(in srgb,var(--xa) 22%,transparent),transparent 70%)}
+.axis:hover{transform:translateY(-3px);box-shadow:0 14px 30px -14px rgba(0,0,0,.9)}
+.axis:hover::before,.axis:hover::after{transform:scaleX(1);opacity:1}
+.axis.on{border-color:var(--xa);box-shadow:0 0 28px -8px var(--xa)}
+.axis.on::before{transform:scaleX(1)}
+.axis.on::after{opacity:1}
+.ax-name{font-size:14.5px;font-weight:900;position:relative;z-index:1}
+.ax-sub{font-size:11px;color:var(--ink2);position:relative;z-index:1}
+
+/* ---- preview stage ---- */
+.panel{position:sticky;top:16px}
+@media(max-width:880px){.panel{position:static}}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;
+  display:flex;flex-direction:column;backdrop-filter:blur(6px)}
+.stage-label{font-size:10px;font-weight:700;letter-spacing:.28em;color:var(--ink2);margin-bottom:12px}
+.canvas{display:flex;align-items:center;justify-content:center;min-height:270px;perspective:900px}
+.sheet{position:relative;background:#fff;border-radius:8px;overflow:hidden;
+  width:var(--w,190px);height:var(--h,250px);
+  transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transition:width .55s cubic-bezier(.4,0,.2,1),height .55s cubic-bezier(.4,0,.2,1),transform .18s ease-out,box-shadow .5s;
+  animation:floaty 6.5s ease-in-out infinite;
+  box-shadow:0 30px 70px -25px rgba(0,0,0,.95), 0 0 60px -20px color-mix(in srgb,var(--ca) 40%,transparent)}
+@keyframes floaty{0%,100%{translate:0 0}50%{translate:0 -6px}}
+.sheet.empty{border:1.5px dashed var(--line2);box-shadow:none;background:transparent;display:flex;align-items:center;justify-content:center;animation:none}
+.sheet.empty span{font-size:11px;color:var(--ink2)}
+.wash{position:absolute;inset:0;background:linear-gradient(150deg,var(--ca),var(--cb));opacity:0;transition:opacity .6s}
+.sheet.lit .wash{opacity:.10}
+.el{position:absolute;opacity:0;transform:translateY(10px) scale(.96)}
+.sheet.lit .el{animation:pop .55s cubic-bezier(.3,.9,.35,1.25) forwards;animation-delay:var(--d,0s)}
+@keyframes pop{to{opacity:1;transform:none}}
+.stage-note{font-size:11.5px;color:var(--ink2);margin-top:12px;min-height:2.6em}
+
+/* ---- blueprint ---- */
+.bp{margin-top:6px}
+.bp-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.bp-title{font-size:18px;font-weight:900;letter-spacing:-.01em}
+.bp-meta{font-size:11px;color:var(--ink2)}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btn{position:relative;overflow:hidden;font-family:inherit;font-size:12px;font-weight:700;border:none;border-radius:999px;
+  padding:9px 17px;cursor:pointer;color:#fff;background:linear-gradient(92deg,var(--ca),var(--cb));
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .3s}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.35) 50%,transparent 60%);
+  transform:translateX(-120%);transition:transform .6s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 26px -10px var(--ca)}
+.btn:hover::after{transform:translateX(120%)}
+.btn:active{transform:translateY(0) scale(.97)}
+.btn.ghost{background:var(--card2);color:var(--ink);border:1.5px solid var(--line)}
+.btn.ghost:hover{box-shadow:0 10px 24px -12px rgba(0,0,0,.8);border-color:var(--line2)}
+.btn.img{background:linear-gradient(92deg,#7B4DFF,#C94DF0)}
+.promptbar{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:14px}
+@media(max-width:680px){.promptbar{grid-template-columns:1fr}}
+.promptbar input,#glossSearch{font-family:inherit;font-size:12.5px;padding:9px 15px;border:1.5px solid var(--line);
+  border-radius:999px;background:var(--bg2);color:var(--ink);min-width:0;transition:border-color .25s,box-shadow .3s}
+.promptbar input:focus,#glossSearch:focus{outline:none;border-color:var(--ca);box-shadow:0 0 16px -8px var(--ca)}
+.promptbar input::placeholder,#glossSearch::placeholder{color:var(--ink2)}
+#glossSearch{background:var(--bg2)!important}
+
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10.5px;color:var(--ink2);margin-bottom:12px;align-items:center}
+.legend .tap{font-weight:700;color:var(--ink)}
+.ev{display:inline-block;font-size:9.5px;font-weight:700;padding:1.5px 8px;border-radius:999px;letter-spacing:.04em;vertical-align:1px}
+.ev.a{background:rgba(30,200,120,.14);color:#5FE8A5}
+.ev.b{background:rgba(70,130,255,.16);color:#8FB4FF}
+.ev.c{background:rgba(250,190,60,.13);color:#F5C860}
+
+.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 0;margin-bottom:12px;
+  opacity:0;transform:translateY(14px)}
+.bp.show .sec{animation:pop .55s cubic-bezier(.3,.9,.35,1.12) forwards;animation-delay:var(--d,0s)}
+.sec-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:900;letter-spacing:.12em;padding:14px 18px 8px}
+.sec-title::before{content:'';width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--ca),var(--cb));box-shadow:0 0 10px -2px var(--ca)}
+.row{display:grid;grid-template-columns:118px 1fr 20px;gap:4px 14px;padding:11px 18px;border-top:1px solid rgba(255,255,255,.05);
+  align-items:baseline;cursor:pointer;transition:background .2s}
+.row:hover{background:rgba(255,255,255,.03)}
+.row-label{font-size:11.5px;font-weight:700;color:var(--ink2)}
+.row-val{font-size:14.5px;font-weight:900;font-feature-settings:'tnum'}
+.row-val .u{font-size:11px;font-weight:700;color:var(--ink2)}
+.row-why{grid-column:2;font-size:11px;color:var(--ink2);line-height:1.55}
+.chev{grid-column:3;grid-row:1;align-self:center;justify-self:end;width:8px;height:8px;
+  border-right:1.5px solid var(--ink2);border-bottom:1.5px solid var(--ink2);transform:rotate(45deg);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.row.open .chev,.mech.open .chev{transform:rotate(-135deg)}
+.detail{grid-column:1/-1;max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}
+.row.open .detail,.mech.open .detail{max-height:560px}
+.detail-in{padding:10px 0 4px;display:grid;gap:8px}
+.d-block{font-size:11.5px;line-height:1.75;color:var(--ink);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:10px 13px}
+.d-block b{font-size:10px;font-weight:900;letter-spacing:.12em;color:var(--ink2);display:block;margin-bottom:3px}
+@media(max-width:520px){.row{grid-template-columns:1fr 20px}.row-why{grid-column:1}.chev{grid-column:2}}
+
+.mech{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-bottom:8px;
+  display:grid;grid-template-columns:auto 1fr 20px;gap:4px 12px;align-items:start;
+  opacity:0;transform:translateY(10px);cursor:pointer;transition:background .2s,border-color .25s,transform .25s}
+.mech:hover{background:rgba(255,255,255,.045);border-color:var(--line2)}
+.bp.show .mech{animation:pop .5s cubic-bezier(.3,.9,.35,1.15) forwards;animation-delay:var(--d,0s)}
+.layer{flex:none;font-size:10px;font-weight:700;letter-spacing:.06em;color:#fff;padding:3px 10px;border-radius:999px;margin-top:2px;
+  background:linear-gradient(92deg,var(--ca),var(--cb))}
+.mech.sub .layer{background:var(--card2);color:var(--ink2);border:1px solid var(--line)}
+.mech-name{font-size:13.5px;font-weight:700}
+.mech-name .sublabel{font-size:10px;font-weight:700;color:var(--ink2);margin-left:6px}
+.mech-tip{font-size:12px;color:var(--ink2)}
+.mech .chev{grid-row:1;margin-top:8px}
+.mech .detail{grid-column:1/-1}
+
+#fateSec .mech,#craftSec .mech{opacity:0;animation:pop .5s cubic-bezier(.3,.9,.35,1.15) forwards;animation-delay:var(--d,0s)}
+#fateSec .layer{background:var(--bg2);color:var(--ink);border:1px solid var(--line2)}
+#craftSec .layer{background:var(--card2);color:var(--ink2);border:1px solid var(--line)}
+#fateText{background:rgba(255,255,255,.05)!important;border-left-color:var(--ca)!important;border-radius:0 10px 10px 0!important}
+.essence{display:grid;gap:8px;margin-bottom:12px}
+.essence .erow{display:grid;grid-template-columns:86px 1fr;gap:10px;align-items:start;
+  background:linear-gradient(92deg,color-mix(in srgb,var(--ca) 9%,transparent),transparent 70%);
+  border:1px solid rgba(255,255,255,.06);border-left:3px solid var(--ca);border-radius:0 10px 10px 0;padding:10px 13px}
+.essence .ek{font-size:10px;font-weight:900;letter-spacing:.14em;color:var(--ink);padding-top:2px;
+  background:linear-gradient(92deg,var(--ca),var(--cb));-webkit-background-clip:text;background-clip:text;color:transparent}
+.essence .ev2{font-size:12px;line-height:1.7;color:var(--ink)}
+@media(max-width:520px){.essence .erow{grid-template-columns:1fr}}
+.craft-group{font-size:12px;font-weight:900;letter-spacing:.12em;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.craft-group::before{content:'';width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,var(--ca),var(--cb))}
+.term{padding:10px 4px;border-top:1px solid rgba(255,255,255,.05);font-size:12px;line-height:1.65}
+.term b{display:block;font-size:12.5px}
+.term span{color:var(--ink2)}
+.gcat{font-size:11px;font-weight:900;letter-spacing:.14em;color:var(--ink2);margin:16px 0 2px}
+
+.caution{border:1px solid rgba(250,190,60,.3);background:rgba(250,190,60,.08);border-radius:14px;padding:11px 15px;
+  font-size:12px;color:#F5C860;margin-bottom:8px;opacity:0;transform:translateY(10px)}
+.bp.show .caution{animation:pop .5s forwards;animation-delay:var(--d,0s)}
+.rev{margin-top:12px;padding:13px 15px;border-radius:14px;font-size:12px;color:var(--ink2);
+  background:linear-gradient(92deg,color-mix(in srgb,var(--ca) 7%,transparent),color-mix(in srgb,var(--cb) 5%,transparent));
+  border:1px dashed rgba(255,255,255,.18)}
+.rev b{color:var(--ink)}
+.disc{font-size:10.5px;color:rgba(255,255,255,.32);margin-top:10px;line-height:1.6}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(60px);
+  background:var(--ink);color:#0B0D13;font-size:12.5px;font-weight:700;padding:11px 22px;border-radius:999px;
+  opacity:0;transition:.4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:9;box-shadow:0 12px 30px -10px rgba(0,0,0,.8)}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01s!important;transition-duration:.01s!important;animation-delay:0s!important}}
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">SHIKAKU DOSEN NAVI — v13.0 BLUEPRINT</div>
+    <h1>根拠のある<span class="grad">初期設計図</span>を、90秒で。</h1>
+    <p class="lede">媒体・ターゲット・トーン・目的を選ぶと、文字の大きさ・余白・色数などの「おすすめの初期値」を理由つきで出します。各項目をタップすると、やさしい解説と使い方が開きます。</p>
+    <div class="rail" id="rail">
+      <div class="dot" data-k="media"><i></i><span>媒体</span></div>
+      <div class="dot" data-k="target"><i></i><span>対象</span></div>
+      <div class="dot" data-k="tone"><i></i><span>トーン</span></div>
+      <div class="dot" data-k="axis"><i></i><span>目的</span></div>
+      <div class="dot" data-k="bp"><i></i><span>設計図</span></div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" id="guideBtn"> 包括ガイドJSONをコピー（全49テクニック＋計算式・選択不要）</button><button class="btn ghost" id="guideDlBtn"> .jsonファイルで保存</button></div>
+  </header>
+  <div class="grid">
+    <div>
+      <section class="step" id="s1"><div class="step-head"><span class="step-num">STEP 1</span><span class="step-title">媒体</span><span class="step-hint">どのくらい離れて見られるかが決まります</span></div><div class="chips" id="mediaChips"></div><div class="chips" id="formatChips" style="margin-top:8px"></div></section>
+      <section class="step" id="fateSec" hidden>
+        <div class="step-head"><span class="step-num" style="letter-spacing:.1em">◤ この媒体の本質と宿命</span><span class="step-title" id="fateName"></span></div>
+        <div id="essenceBox"></div>
+        <p id="fateText" style="font-size:12.5px;line-height:1.75;margin-bottom:12px;padding:11px 14px;background:linear-gradient(92deg,rgba(28,33,48,.05),rgba(28,33,48,.02));border-left:3px solid var(--ink);border-radius:6px"></p>
+        <div id="fateMechs"></div>
+      </section>
+      <section class="step locked" id="s2"><div class="step-head"><span class="step-num">STEP 2</span><span class="step-title">主ターゲット</span><span class="step-hint">必要な文字の大きさ・色の濃さが決まります</span></div><div class="chips" id="targetChips"></div></section>
+      <section class="step locked" id="s3"><div class="step-head"><span class="step-num">STEP 3</span><span class="step-title">トーン</span><span class="step-hint">メリハリの強さ・余白の量が決まります</span></div><div class="chips" id="toneChips"></div><div style="margin-top:10px;font-size:11px;font-weight:700;color:var(--ink2)">情報量（載せる内容の多さ）</div><div class="chips" id="infoChips" style="margin-top:6px"></div></section>
+      <section class="step locked" id="s4"><div class="step-head"><span class="step-num">STEP 4</span><span class="step-title">主目的</span><span class="step-hint">レイアウトの型とテクニックが決まります</span></div><div class="axes" id="axisCards"></div></section>
+      <section class="step locked" id="s5"><div class="step-head"><span class="step-num">STEP 5</span><span class="step-title">副目的（任意）</span><span class="step-hint">テクニックを1〜2個だけ足します</span></div><div class="chips" id="subChips"></div></section>
+
+      <section class="step" id="craftSec">
+        <div class="step-head" style="cursor:pointer" id="craftToggle"><span class="step-num">LIBRARY</span><span class="step-title">職人の暗黙知</span><span class="step-hint" id="craftHint">タップで開く（選択不要・全24項目）</span></div>
+        <div id="craftBody" hidden></div>
+      </section>
+
+      <section class="step" id="glossSec">
+        <div class="step-head" style="cursor:pointer" id="glossToggle"><span class="step-num">DICTIONARY</span><span class="step-title">用語辞典</span><span class="step-hint" id="glossHint">タップで開く（全50語・検索可）</span></div>
+        <div id="glossBody" hidden>
+          <input type="text" id="glossSearch" placeholder="用語をさがす（例：ノセ、塗り足し、版面）" style="width:100%;font-family:inherit;font-size:12.5px;padding:9px 14px;border:1.5px solid var(--line);border-radius:999px;margin-bottom:6px">
+          <div id="glossList"></div>
+        </div>
+      </section>
+
+      <section class="bp" id="bp" hidden>
+        <div class="bp-head">
+          <div><div class="bp-title">設計図</div><div class="bp-meta" id="bpMeta"></div></div>
+          <div class="btns">
+            <button class="btn ghost" id="resetBtn">リセット</button>
+            <button class="btn ghost" id="jsonBtn">JSONコピー</button>
+            <button class="btn" id="copyBtn">テキストコピー</button>
+          </div>
+        </div>
+        <div class="promptbar">
+          <input type="text" id="subjectInput" placeholder="題材を入力（例：枕崎の鮮魚チラシ／医師会報の表紙）※画像生成プロンプトに反映">
+          <input type="text" id="catchInput" placeholder="キャッチコピー（任意・画像内に描画指示）">
+          <button class="btn img" id="imgPromptBtn"> 画像生成プロンプト（JSON）</button>
+        </div>
+        <div class="legend">
+          <span class="tap">▼ 各項目タップでやさしい解説</span>
+          <span>その理由はどのくらい確か？：</span>
+          <span><span class="ev a">◎ 何度も実験で確認ずみ</span></span>
+          <span><span class="ev b">○ 公式の基準・複数の研究あり</span></span>
+          <span><span class="ev c">△ プロの経験則</span></span>
+        </div>
+        <div id="specArea"></div>
+        <div class="rev" style="margin-top:2px"> <b>スペースが足りないとき、削る順番</b>：①文章を削る → ②写真の点数を減らす → ③フチの余白を詰める（短辺の6%が下限） → ④段数を増やす。<br>⛔ <b>最後まで触らない</b>：本文の文字サイズ・濃さの差・行間の下限。読めなくなった瞬間、全部が無意味になります。</div>
+        <div class="sec-title" style="padding-left:2px;margin-top:18px">レイアウトの型とテクニック</div>
+        <div id="mechList"></div>
+        <div class="rev">✦ 仕上げ前のチェック：紙面のすべての要素に「これは何のために置いた？」と聞いてみる。答えられない要素は消す候補。おすすめの数値からズラした場所は「なぜズラしたか」をメモに残す。</div>
+        <p class="disc">※ ここで出る数値は「まず間違いのないスタート地点」です。ブランドのルールや、実際に試した結果のほうを優先してください。特に「△ プロの経験則」の項目は、案件ごとの確認が前提です。</p>
+      </section>
+    </div>
+    <aside class="panel">
+      <div class="stage">
+        <div class="stage-label">PREVIEW — レイアウトの骨組み</div>
+        <div class="canvas"><div class="sheet empty" id="sheet"><span>媒体を選ぶと出現します</span></div></div>
+        <div class="stage-note" id="stageNote"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+<div class="toast" id="toast">コピーしました</div>
+
+<script>
+/* ================= data ================= */
+const MEDIA = [
+  {id:'flyer', name:'チラシ・A4', hint:'手元 30cm', w:190, h:252, print:true, dist:0.3,
+    body:{v:9,u:'pt'}, cap:7, lineLen:'25〜35', grid:'12分割グリッド／実質2〜3段', margin:[8,12,18],
+    formats:[{name:'A4',w:210,h:297},{name:'B5',w:182,h:257},{name:'A5',w:148,h:210},{name:'B4',w:257,h:364}],
+    tests:['束テスト：他のチラシ5枚と重ねて1秒めくり、何の広告か言えるか','裏面テスト：裏面だけ見て、行動（連絡先・地図）が完結するか','冷蔵庫テスト：3週間貼っておきたくなる理由があるか'],
+    note:'手に持ってじっくり読める媒体。情報を多めに入れられます。',
+    essence:{role:'新規客への告知と集客。認知から来店・問い合わせのきっかけ作りまでを1枚で担う。',convey:'①商品・サービス名と対象客 ②オファー（価格・特典・期間） ③問い合わせ・来店の方法。この3点で完結。企業理念や沿革は載せない。',ideal:'読んだ人が次の行動（電話・QR・来店）を迷わず取れること。専用QRやクーポン番号を入れて、反応率を測定できる状態にしておく。'},
+    fate:'出会いはポストの中、他のチラシとの束。約1秒で「要る／捨てる」に仕分けされる。ただし生き残れば手に持たれ、冷蔵庫に貼られ、家族にも回覧される。',
+    fmech:[
+      {name:'1秒仕分けを突破する', tip:'束の中でチラッと見えた部分で勝負が決まる', e:'c',
+        w:'ポストから出されたチラシは、束のまま数秒で仕分けされます。全面をちゃんと見てもらえる保証はなく、束からのぞいた端と最初の一瞥だけで「要る／捨てる」が決まります。',
+        h:'紙面のどこが最初に見えても「何の話か」が伝わるよう、手がかりを四隅と中央に分散させる。特に上端は、束から一番のぞきやすい特等席です。'},
+      {name:'捨てられない理由を作る', tip:'クーポン・地図・一覧表は「保存機能」', e:'b',
+        w:'チラシの本当の敵は「読まれないこと」より「その日のうちに捨てられること」。クーポン、地図、料金一覧、カレンダーなど「あとで使う機能」が付いたチラシは、冷蔵庫や引き出しの中で生き続けます。しかも先に役立つものをもらった恩は、お返しの気持ちも生みます。',
+        h:'広告面とは別に「保存されるお役立ち面」を設計する。ゴミ収集日カレンダー、サイズ早見表、非常時の連絡先など、業種に合った保存機能を1つ載せる。'},
+      {name:'表と裏は別の媒体', tip:'表で止め、裏で説得する', e:'c',
+        w:'チラシは必ず片面ずつ見られます。表は「束の中の1秒」を戦う媒体、裏は「手に持たれた30秒」を戦う媒体——同じ1枚の紙でも、宿命がまったく違います。',
+        h:'表はポスターのように（大きく・少なく・一瞬で）、裏はパンフのように（読ませる・説得する・行動させる）。表のノリで裏を作ると説得力不足に、裏のノリで表を作ると素通りされます。'},
+    ]},
+  {id:'booklet', name:'パンフ・冊子', hint:'手元 30cm', w:270, h:190, print:true, dist:0.3,
+    body:{v:9.5,u:'pt'}, cap:7, lineLen:'22〜28（2段組）', grid:'2段組＋12分割／綴じ側の余白+3mm', margin:[10,13,18],
+    formats:[{name:'A4冊子',w:210,h:297},{name:'B5冊子',w:182,h:257},{name:'A5冊子',w:148,h:210}],
+    tests:['目次テスト：目次だけ読んで、内容の全体像が言えるか','パラパラテスト：3秒でめくって、手が止まる見開きがあるか','最終見開きテスト：一番いい素材が最後に置かれているか'],
+    note:'ページをめくる＝時間の流れ。「最後の見開き」が一番記憶に残ります。',
+    essence:{role:'検討段階の見込み客向けの説明資料。営業トークの補完と、担当者不在時の代弁を担う。',convey:'①サービス内容と価格帯 ②導入・購入までの流れ ③実績・事例・よくある質問への回答。急がせる要素は不要。',ideal:'営業担当がその場にいなくても商談が前に進むこと。本人以外（上司・家族・決裁者）への説明資料としてそのまま使えること。'},
+    fate:'手に取られた時点で、相手にはもう興味がある。ページの順番＝読む時間の流れを、作り手が支配できる唯一の媒体。',
+    fmech:[
+      {name:'説得のステージが違う', tip:'「止める」は済んでいる。「深める」に全振り', e:'c',
+        w:'パンフを開いている人は、すでに何かのきっかけで興味を持った人です。通行人向けの「目を引く工夫」はもう不要で、必要なのは疑問に答え、信頼を積み、最後の一歩の背中を押すことです。',
+        h:'派手さより、知りたいことが知りたい順番に出てくる構成を。読者の頭に浮かぶ疑問（いくら？どんな流れ？実績は？）を先回りする目次設計が、この媒体での最大のおもてなしです。'},
+      {name:'めくる楽しみを演出する', tip:'見開き単位で1メッセージ。次の見開きを予告する', e:'b',
+        w:'ページをめくる動作には「隠れていたものが現れる」小さなワクワクがあります。そして読者は必ず見開き（左右2ページ）単位で世界を見ます。',
+        h:'1見開き＝1メッセージで設計し、右ページの端に「次が見たくなる」引きを置く。最後の見開きと裏表紙は記憶に一番残る特等席（山場と終わりの法則）——連絡先だけで終わらせるのはもったいない。'},
+    ]},
+  {id:'poster', name:'ポスター・B2', hint:'離れて見る（3m想定）', w:170, h:240, print:true, dist:3,
+    body:{v:12,u:'pt'}, cap:9, lineLen:'キャッチは1行13字以内', grid:'画面を3分割して主役を置く', margin:[15,20,30],
+    formats:[{name:'B2',w:515,h:728},{name:'A2',w:420,h:594},{name:'B1',w:728,h:1030},{name:'A1',w:594,h:841}],
+    tests:['3mテスト：3m離れて、キャッチと主役が判別できるか','撮影テスト：スマホで1枚撮って、情報が持ち帰れるか','グレーテスト：白黒にしても主役が目立つか'],
+    note:'一瞬で伝える媒体。「読ませる」より「目に入る」が勝負。',
+    essence:{role:'イベント・キャンペーンの告知。掲示期間中の認知獲得を担当する。',convey:'①催事名 ②日時・場所 ③参加方法かQR。キービジュアルで内容の雰囲気（楽しい・フォーマル等）を伝える。詳細説明は他媒体へ。',ideal:'3m先から何の告知か判別でき、近づいた人が日時と参加方法を持ち帰れること（撮影・QR）。'},
+    fate:'貼られた場所から動けない。動くのは読者のほう。遠くから近くへ距離が変わりながら見られるので、1枚の紙が「2つの距離」で読まれる。',
+    fmech:[
+      {name:'2段階で設計する', tip:'3m用と50cm用、2枚のポスターを1枚に', e:'b',
+        w:'ポスターは、遠くで「おっ」と思わせ、近づいてきた人に詳細を渡す媒体です。遠距離用（キャッチ＋ビジュアル）と近距離用（説明・日時・QR）では、必要な文字サイズも情報量もまったくの別物です。',
+        h:'まず3m離れて見える要素だけで1枚として成立させる。詳細は近づいた人へのごほうびとして下部へ。中間サイズの文字を増やすと、どちらの距離からも読めない紙面になります。'},
+      {name:'立ち止まりのコストを下げる', tip:'人前で立ち止まるのは、少し恥ずかしい', e:'c',
+        w:'ポスターの前で立ち止まってメモを取るのは、人目のある場所では小さな勇気が要ります。この「立ち止まりの気まずさ」が、せっかく生まれた興味を逃がします。',
+        h:'「撮影OK」の一言、大きめのQR、覚えやすい検索ワード。歩きながら3秒で持ち帰れる出口を必ず用意する。'},
+      {name:'貼られる場所が文脈になる', tip:'駅・トイレ・エレベーター、場所ごとに読者の状態が違う', e:'c',
+        w:'同じポスターでも、駅では急いでいる人に、トイレでは暇な人に、エレベーターでは数十秒閉じ込められた人に見られます。媒体は同じでも、読者の心の状態がまったく違うのです。',
+        h:'掲出場所を先に確認し、その場所での滞在時間に情報量を合わせる。トイレ・エレベーターは、長文がちゃんと読まれる数少ない場所です。'},
+    ]},
+  {id:'sign', name:'看板・のぼり', hint:'移動中に見る（10m想定）', w:290, h:96, print:true, dist:10,
+    body:{v:40,u:'pt'}, cap:24, lineLen:'1行3〜7語・ワンメッセージ', grid:'1メッセージのみ／文字は太く・少なく・大きく', margin:[20,30,40],
+    tests:['通過テスト：実際に車・徒歩で通過して、読み切れるか','白黒テスト：白黒コピーでも目立つか（視界のスミは明暗で見ている）','夜テスト：暗くなってからの見え方を確認したか'],
+    note:'読む気ゼロの移動中の人にしか会えない。そのかわり同じ人に毎日会える。',
+    essence:{role:'店舗・事業所の所在と業種の告知。長期掲出による地域内での認知の蓄積を担う。',convey:'①業種（何の店か） ②屋号 ③識別しやすい色・マーク。電話番号やメニューなど近距離情報は店頭サインに分担させる。',ideal:'通行者が「何の店がどこにあるか」を1秒で認識できること。数年掲出しても劣化・陳腐化しにくい設計になっていること。'},
+    fate:'見てくれるのは「読む気ゼロの移動中の人」だけ。持ち時間は0.5〜2秒。そのかわり、通勤・通学で同じ人に何百回も会える。1回で売る媒体ではなく、覚えさせる媒体。',
+    fmech:[
+      {name:'3〜7語しか読めない', tip:'歩く人で2秒、車なら1秒以下', e:'b',
+        w:'移動しながら読み取れる語数には、物理的な上限があります。歩行者で数語、車からなら店名＋ひとことが限界。載せたい情報の9割は、そもそも載せられない媒体です。',
+        h:'「何の店か＋ひとつの強み」まで削る。電話番号や営業時間など「立ち止まらないと読めない情報」は、店頭の近距離用サインに分担させる。'},
+      {name:'1回で売らず、何百回で覚えさせる', tip:'毎日会えることが最大の武器', e:'a',
+        w:'通勤路の看板は、同じ人と何百回も顔を合わせます。人は繰り返し見たものをそれだけで好きになり、いざ必要になった日にまっ先に思い出します。看板は「今日の売上」ではなく「必要になった日に一番に思い出される状態」を作る装置です。',
+        h:'凝ったコピーを毎回読ませようとせず、店名・色・マークを一貫させて刷り込む。「◯◯といえばあの看板」と言われる状態がゴールです。'},
+      {name:'風景になったら負け', tip:'見慣れた看板は、脳が消す', e:'b',
+        w:'どんなに目立つ看板も、毎日見るうちに「風景の一部」になり、意識に上らなくなります。脳は変化のないものを、省エネのために視界から消してしまうのです。',
+        h:'土台のデザインは変えずに、一部だけを定期的に更新する（季節のひとこと、のぼりの色替え・追加）。「あれ、変わった？」の瞬間に、看板は風景から広告に戻ります。'},
+      {name:'道しるべにしてもらう', tip:'「あの看板の角を右」と言われたら勝ち', e:'c',
+        w:'覚えやすい看板は、地域の道案内に使われ始めます。「あの黄色い看板の交差点ね」——こうなると、お客さんでない人まで毎日あなたの店を口にする、最強の宣伝装置になります。',
+        h:'遠くから一発でわかる色とシルエットを最優先。周囲の看板と同系色なら、あえて外す。夜の見え方（照明のあり／なし）は別の顔として設計する。'},
+    ]},
+  {id:'lp', name:'Webバナー・LP', hint:'画面 50cm', w:290, h:165, print:false, dist:0.5,
+    body:{v:16,u:'px'}, cap:12, lineLen:'35〜42字（本文幅 640〜720px）', grid:'1カラム／視線を分岐させない', margin:[16,24,40],
+    tests:['ファーストビューテスト：最初の画面のスクショだけで「誰の・何が・どうなる」が伝わるか','3秒テスト：開いて3秒で「自分に関係ある」と分かるか','親指テスト：スマホ実機で、ボタンが片手で押しやすいか'],
+    note:'スクロール＝時間の流れ。1画面につき伝えることは1つ。',
+    essence:{role:'広告流入から申込・購入・問い合わせ獲得までの導線。バナー＝流入獲得、LP＝コンバージョン獲得と役割を分ける。',convey:'①誰向けの何のサービスか ②利用後に何がどう良くなるか ③行動ボタン（CTA）。1ページ1ゴールを守る。',ideal:'成果地点（CV）が明確で計測可能なこと。公開後にデータを見て改善する前提で、差し替え・ABテストしやすい構造にしておくこと。'},
+    fate:'画面を1回スクロールするたびに「続きを読む／閉じる」の審判が下る。読者はいつでも0.1秒で立ち去れる。そして「広告っぽいもの」は見る前に消される。',
+    fmech:[
+      {name:'最初の画面が生死を分ける', tip:'開いて3秒で「自分に関係あるか」判定される', e:'b',
+        w:'ページを開いた人は、スクロールする前の最初の画面だけで「自分に関係ある／ない」を判定します。ここで負けると、その下にどんな傑作が続いていても、存在しないのと同じです。',
+        h:'最初の画面の中に「誰の・何が・どうなる」を完結させる。キャッチ＋対象の名指し＋ビジュアル＋最初の行動ボタンまでを1画面に収めます。'},
+      {name:'画面の終わりにフックを', tip:'スクロールの手が止まる前に、次の理由を渡す', e:'c',
+        w:'スクロールをやめるのは、たいてい「画面の区切りで気持ちが完結したとき」。裏を返せば、各画面の終わりに「続きが気になる仕掛け」があるかぎり、手は止まりません。',
+        h:'セクションの末尾に、次の内容の予告・答えを言わない問いかけ・チラ見せを置く。「きれいに完結した画面」は、実は離脱ポイントです。'},
+      {name:'広告と思われたら消される', tip:'「広告っぽい見た目」は脳が自動でスキップする', e:'b',
+        w:'ネットの読者は長年広告を浴びてきた結果、「広告の定型」（枠つきバッジ・煽り文字・キラキラ）を見た瞬間、無意識に視界から消す能力を身につけています。',
+        h:'バナーは広告の定型を外し、記事や役立つ情報の顔で作るほうが見られます。ただし、見た目のトーンを整えることと、広告であることを偽ることは別物——正体を偽るのはNGです。'},
+    ]},
+  {id:'video', name:'縦型動画・サムネ', hint:'スマホ 30cm', w:150, h:262, print:false, dist:0.3,
+    body:{v:5,u:'%H'}, cap:3.5, lineLen:'1行13字×2行まで', grid:'中央1カラム／上下12%・左右6%はアプリのボタンが重なるので空ける', margin:[6,9,12],
+    tests:['ミュートテスト：音なしで最後まで意味が通るか','1コマテスト：最初の1コマだけで「見る理由」があるか','小画面テスト：スマホ実寸でテロップが読めるか'],
+    note:'最初の1秒とラスト3秒がすべて。',
+    essence:{role:'SNS上での認知獲得と、フォロー・保存の獲得。継続接触の入口を作る。',convey:'①1本1メッセージ ②冒頭テロップで内容が分かること ③プロフィール・次の動画への導線。1本で売り切ろうとしない。',ideal:'音なしで内容が伝わり、視聴完了率・保存数・フォロー転換で評価できること。'},
+    fate:'スワイプ1回、0.5秒で消される世界。しかも大半は音のない状態で見られる。味方は「最初の1秒」と「テロップ」だけ。',
+    fmech:[
+      {name:'音がない前提で作る', tip:'テロップが本体、映像は挿絵', e:'b',
+        w:'電車内・職場・深夜——縦型動画の多くは、音を出せない状況で見られます。音声で説明する設計は、その時点で視聴者の大半を捨てています。',
+        h:'音がなくても100%伝わるテロップ設計を先に作り、音声は「音を出せる人へのおまけ」としてあとから足す。テロップの文字サイズとコントラストは、本文と同じ真剣さで設計します。'},
+      {name:'結論から始める', tip:'「最初の1秒」はつかみではなく、結論の置き場所', e:'c',
+        w:'スワイプの判断は0.5〜1秒。「もったいぶってから本題」の構成では、本題が始まる前に視聴者がいなくなります。',
+        h:'完成形・結果・一番いい瞬間を冒頭に置き、そのあとで経緯を見せる。サムネと最初の1コマは「続きを見る理由」そのものです。'},
+    ]},
+];
+const TARGETS = [
+  {id:'young', name:'若年層', hint:'10〜30代', coef:1.0, contrast:'4.5:1',
+    tnote:'視力は標準を想定。文字サイズは媒体の基準値のままでOK',
+    cwhy:'世界共通のWebの読みやすさ基準（WCAG）で決められた最低ライン'},
+  {id:'all', name:'ファミリー・全年齢', hint:'幅広い層', coef:1.15, contrast:'4.5:1以上',
+    tnote:'年齢の幅が広いときは「一番読みにくい人」に合わせて少し大きめに。これが誰でも使えるデザイン（ユニバーサルデザイン）の基本',
+    cwhy:'最低ラインの4.5:1より、少し余裕をもたせるのがおすすめ'},
+  {id:'senior', name:'シニア', hint:'60代以上', coef:1.4, contrast:'7:1',
+    tnote:'年齢とともに目のレンズが黄色く濁るため、若い人の約1.5倍の文字サイズが必要。青っぽい色と薄い色は見分けにくくなる',
+    cwhy:'基準の中でも一番厳しいレベル（7:1）を推奨。青×黒、薄いグレー×白の組み合わせは避ける'},
+  {id:'kids', name:'子ども含む', hint:'未就学〜小学生', coef:1.25, contrast:'4.5:1以上',
+    tnote:'まだ文字を読み慣れていないので、大きめの文字・短い文・具体的な言葉が届きやすい。漢字にはルビを',
+    cwhy:'世界共通のWebの読みやすさ基準（WCAG）の最低ライン'},
+];
+const TONES = [
+  {id:'quiet', name:'静謐・高級', hint:'余白で語る', jump:2.5, white:55, colors:'基調1色＋白黒グレー（計2）',
+    cwhy:'色が少ない＝「選び抜かれている」という印象。高級感は情報の少なさから生まれる',
+    jwhy:'文字サイズの差が小さいと、静かで上品な印象になる', scale:.85},
+  {id:'std', name:'スタンダード', hint:'バランス型', jump:4, white:40, colors:'3色（メイン70％／サブ25％／目立たせ役5％）',
+    cwhy:'3色を7:2.5:0.5の面積で使い分けるのが、まとまりを保つ定番の配分',
+    jwhy:'4倍くらいの差が「読みやすさ」と「目を引く力」のバランス点', scale:1},
+  {id:'loud', name:'躍動・大衆', hint:'元気に売る', jump:6, white:28, colors:'4色まで（メイン1＋目立たせ役1＋サブ2）',
+    cwhy:'色が多い＝にぎやかで元気な印象。ただし目立たせ役の色は1箇所だけの約束を守る',
+    jwhy:'文字サイズの差が大きいと、元気でお買い得な印象になる', scale:1.12},
+];
+
+/* mechs: tip=一言, w=解説, h=使い方, e=確かさ */
+const AXES = [
+  {id:1, name:'止める', sub:'注意を奪う', a:'--g1a', b:'--g1b', jmod:1.5, wmod:5,
+    note:'目立つ＝まわりと違うこと。ひとつだけ違うものに、目は勝手に吸い寄せられる。',
+    caution:'人の注意には限りがある。目立たせる要素は紙面に1つだけ。全部目立たせる＝何も目立たない。',
+    mechs:[
+      {layer:'色', name:'一点だけ色を刺す', tip:'全体の色をおさえて、1箇所だけ鮮やかに', e:'a',
+        w:'目は「色そのもの」ではなく「まわりとの違い」に反応します。赤が目立つと言われるのは、たいていの紙面に赤が少ないから。もし全面が赤なら、目立つのは青のほうです。',
+        h:'紙面全体の色をわざと地味にして、一番見せたい1箇所にだけ鮮やかな色を置く。2箇所目に使いたくなったら「どっちが大事か決めきれていない」サイン。どちらかをあきらめましょう。'},
+      {layer:'レイアウト', name:'ひとつだけ列を乱す', tip:'きれいに並べた中で、1個だけ傾ける・はみ出す', e:'a',
+        w:'同じものがきれいに並んでいる中に、ひとつだけ違うものがあると、そこに目が行き、記憶にも残ります（100年近く前から何度も実験で確認されている現象です）。まず「きれいに並べる」があるからこそ、乱した1箇所が効きます。',
+        h:'乱すのは紙面で1箇所だけ。傾けるなら3〜5度がおすすめ。1〜2度だと「印刷ミス？」に見え、10度を超えるとうるさくなります。'},
+      {layer:'写真', name:'顔と目線の力', tip:'人の顔は何よりも先に見られる', e:'a',
+        w:'人間の脳には「顔専用の処理エリア」があり、顔はどんな図形よりも先に目に入ります。さらに、写真の人物が見ている方向へ、見る人の視線もつられて動きます。これは赤ちゃんの頃からある、止めようのない反応です。',
+        h:'顔写真を使うなら、モデルの目線を読ませたいコピーや商品に向けましょう。カメラ目線には「見られている」感じを生む効果もあります。ただし顔は本文から注意を奪うほど強いので、置き場所は慎重に。'},
+      {layer:'コピー', name:'言い切らないコピー', tip:'「？」で終える。答えを見せない', e:'b',
+        w:'終わっていないこと・答えの出ていないことは、頭の中に残り続けます（テスト前に解けなかった問題ほど覚えているのと同じ）。疑問形のコピーは、読む人の頭に「答えの空席」を作り、それを埋めたくて本文へ視線が動きます。',
+        h:'キャッチを疑問形で止めて、答えを本文・裏面・Webに置く。ただし多用すると「じらされてる」と不快になるので、1紙面に1つまで。'},
+      {layer:'物性', name:'形やツヤで差をつける', tip:'型抜き・光る紙・変わったサイズ', e:'c', print:true,
+        w:'ポストや店頭には、同じような形の印刷物がたくさん並んでいます。その中で「形が違う」「光り方が違う」ものは、手に取る前から目立ちます。',
+        h:'加工代がかかるので、向いているのは「手に取ってもらえたら勝ち」の媒体（DMや店頭POP）。大量にまくチラシでは元が取れないことが多いです。'},
+      {layer:'視野', name:'視界のスミに引っかける', tip:'視界のはしっこは、色より「動き」と「明暗の差」に反応する', e:'b',
+        w:'人の視界は、真ん中はカラーで細かく見えますが、はしっこ（周辺視野）は白黒に近く、ぼんやりしています。そのかわり、はしっこは明暗の変化と動きにとても敏感。遠くの棚のPOPにふと気づくのは、色ではなく「明暗の差と形」のおかげです。',
+        h:'離れた場所から気づかせたい看板・POP・のぼりは、鮮やかな色より「地と図の明暗差」と「シルエットのわかりやすさ」で作る。一度白黒コピーしてみて、それでも目立つかどうかが良いテストです。'},
+      {layer:'写真', name:'「顔に見える」を仕込む', tip:'点2つと線1本で、人は顔を見つけてしまう', e:'b',
+        w:'コンセントの差込口や車のフロントが顔に見える——人の脳は顔を見つける力が強すぎて、顔ではないものにまで顔を見てしまいます。そして「顔に見えたもの」には、本物の顔と同じように注意が向かいます。',
+        h:'商品や図形の配置で、さりげなく「顔」を作ると目が止まります。キャラクター化までしなくても、丸2つ＋αの配置だけで働きます。露骨にやると安っぽくなるので、気づく人は気づく程度に。'},
+      {layer:'コピー', name:'「自分のことだ」と思わせる', tip:'ざわざわした中でも、自分の名前だけは聞こえる', e:'b',
+        w:'パーティーの騒がしさの中でも、自分の名前や自分に関係ある話題だけはスッと耳に入ってきます。目でも同じことが起きます。「皆様へ」の言葉は誰にも刺さらず、「自分向け」の言葉だけが視界に飛び込んでくるのです。',
+        h:'「皆様へ」ではなく「◯◯市で子育て中の方へ」「夜勤明けのあなたへ」。対象を狭く名指しするほど、その人への刺さり方は強くなります。狭めるのが怖いのは作り手だけで、読者は名指しされたほうが反応します。'},
+    ]},
+  {id:2, name:'読ませる', sub:'導線に乗せる', a:'--g2a', b:'--g2b', jmod:0, wmod:0,
+    note:'スラスラ読めるものは、それだけで「ちゃんとしてる・良さそう」と感じてもらえる。',
+    mechs:[
+      {layer:'視線', name:'視線はZの形に動く', tip:'左上に入口、右下に出口を置く', e:'b',
+        w:'人の視線の動きをカメラで計測すると、余白のある広告では「左上→右上→左下→右下」とZの形に、文字がぎっしりのページでは左端を縦になぞるFの形に動きやすいことがわかっています。絶対の法則ではありませんが、頼れる目安です。',
+        h:'左上に入口（キャッチ）、右下に出口（連絡先・ロゴ・行動ボタン）が基本の型。大事な情報は、この通り道の上に置く。道から外れた場所に置いた情報は、読まれない覚悟で。'},
+      {layer:'視線', name:'目線の誘導', tip:'写真の人の目線の先に、読ませたいものを置く', e:'a',
+        w:'人は、他人が見ている方向を反射的に見てしまいます。がまんできないレベルで自動的な反応です。',
+        h:'人物写真の目線の先に、読ませたい要素を置く。「正面顔の写真」と「商品」が離れた場所にあると、視線が商品まで届かず、もったいない配置になります。'},
+      {layer:'レイアウト', name:'余白でグループ分け', tip:'線で囲むより、余白で分けるほうが強い', e:'a',
+        w:'近くにあるもの同士は「仲間」に見えます。これは人間の目の、最も確実な性質のひとつです。つまり余白は「何もない場所」ではなく、「これとこれは別グループですよ」と伝える情報そのものです。',
+        h:'関係が強いものは近く、弱いものは遠く。囲み線を引きたくなったら、まず余白だけで分けられないか試す。「ここ空いてるから何か入れて」と言われたら——その余白はグループを分ける仕切りなので、埋めると意味が壊れます。'},
+      {layer:'レイアウト', name:'分類の魔法', tip:'30品より「6ジャンル×5品」', e:'b',
+        w:'同じ30品でも、ジャンル分けされていると「たくさんあるのに選びやすい」と感じられます。分類は、読む人の頭の中の整理を先回りして代行してあげる仕組みです。',
+        h:'メニュー・商品一覧・目次に。ジャンル名はお客さんの言葉で付けること（社内用語や業界用語では分類として働きません）。ジャンルの数は3〜5個に。'},
+      {layer:'タイポ', name:'読みやすさは信頼になる', tip:'本文はとことん読みやすく。注意書きはあえて少し読みにくく', e:'a',
+        w:'スラスラ読める文章は、内容が同じでも「正しそう・良さそう・安心」と評価されます。逆に少し読みにくいものは、ゆっくり注意して読まれる、という性質もあります。',
+        h:'本文・価格・売り文句は最大限読みやすく（この設計図の行の長さ・行間の数値はそのためのもの）。逆に、必ず読んでほしい注意書きや条件は、枠で囲む・書体を変えるなどで少しだけ「減速」させると読み飛ばされにくくなります。'},
+      {layer:'レイアウト', name:'左が過去、右が未来', tip:'ビフォーアフターは必ず左→右', e:'b',
+        w:'横書きの文化圏では、時間は「左から右へ」流れるものとして頭に入っています。だから左に置いたものは「前・古い」、右に置いたものは「後・新しい」と自動的に読まれます。',
+        h:'ビフォーアフター、手順、成長の物語は必ず左→右（または上→下）に並べる。逆に置くと読み手は無意識に混乱します。矢印を描き足す前に、まず並び順そのもので時間を語らせましょう。'},
+      {layer:'写真', name:'写真の並びが物語を作る', tip:'同じ写真でも、隣に何を置くかで意味が変わる', e:'b',
+        w:'まったく同じ無表情の顔写真でも、隣にスープの写真を置けば「お腹が空いた顔」に、棺の写真を置けば「悲しむ顔」に見える——映画づくりの実験で確認された現象です。人は、並んだ写真のあいだに勝手に物語を作ります。',
+        h:'見開きや並べる写真は「1枚ずつの良し悪し」でなく「組み合わせで何を語るか」で選ぶ。商品写真の隣に置く1枚（笑顔・風景・手元）が、その商品の意味を決めます。'},
+      {layer:'レイアウト', name:'似た見た目＝仲間', tip:'同じ色・形のものは、離れていてもグループに見える', e:'a',
+        w:'「近くにあるものは仲間に見える」と同じくらい強力なのが、「同じ見た目のものは仲間に見える」という目の性質です。離れた場所にあっても、色や形が同じなら「同じ種類の情報」として読まれます。',
+        h:'「価格は必ずこの色」「注意書きは必ずこの形」のように、情報の種類と見た目を1対1で対応させる。ルールを決めたら例外を作らないこと——例外がひとつあるだけで、読者の頭の中の対応表が壊れます。'},
+    ]},
+  {id:3, name:'信じさせる', sub:'信頼を底上げ', a:'--g3a', b:'--g3b', jmod:-1, wmod:5,
+    note:'「きちんとして見える」は、中身と関係なく信頼を底上げする。見た目は名刺代わり。',
+    mechs:[
+      {layer:'色', name:'濃い色は「重み」に見える', tip:'高級・大事なもの＝濃い色、気軽なもの＝薄い色', e:'b',
+        w:'黒っぽい箱は、白い箱より最大2倍近く「重そう」に見えることが実験でわかっています。そして「重さ」の感覚は「大事・高級・しっかりしている」という評価につながります。',
+        h:'価格が高い・信頼が命の案件ほど、濃い色の割合を増やす。気軽さや親しみを出したいなら明るい色に。レイアウトが同じでも、地色の濃さだけで「高そう／安そう」の印象が変わります。'},
+      {layer:'タイポ', name:'「公式っぽさ」の記号', tip:'明朝体・ハンコ風の赤丸・かしこまった言葉', e:'b',
+        w:'白衣を着た人が信頼されやすいのと同じで、明朝体・印鑑風のマーク・正式な言い回しは「公式・伝統・専門家」のしるしとして頭に刷り込まれています。だから中身と関係なく、信頼の底上げになります。',
+        h:'医療・行政・金融では明朝体の割合を増やす。ただし固すぎると距離ができるので、見出しだけゴシックにするなど「固さを何割抜くか」で親しみとのバランスを取ります。'},
+      {layer:'数字', name:'最初の数字が基準になる', tip:'定価→割引価格の順で見せる。プランは3段階', e:'a',
+        w:'人は、最初に見た数字を「ものさし」にして、あとの数字を判断します。¥98,000を見たあとの¥49,800は安く感じますが、いきなり¥49,800だけ見せられると判断に迷います。また、3段階の選択肢があると、極端を避けて真ん中を選びたくなります（松竹梅）。',
+        h:'値引きは必ず「元の価格→今の価格」の順で。プランは3つ用意して、売りたいものを真ん中に。高い順に並べると、真ん中がよりお得に見えます。'},
+      {layer:'写真', name:'数字より「一人の物語」', tip:'「10万人が困っている」より「この一人」', e:'a',
+        w:'不思議なことに、人の心は「大勢の統計」より「名前と顔のある一人」に動きます。数字が大きくなるほど、むしろ感情は麻痺していきます。募金の実験などで何度も確認されています。',
+        h:'まず一人の具体的な物語で心を動かし、そのあとに裏付けの数字を添える順番で。逆（数字→物語）にすると効きが落ちます。寄付・採用・地域の紹介など、人が主役の案件全般に。'},
+      {layer:'物性', name:'紙の手ざわりは中身の評価になる', tip:'厚い紙・マットな紙＝しっかりした会社に見える', e:'b', print:true,
+        w:'手で触った印象は、書いてある内容や発行元の評価にそのまま乗り移ります。厚くて重い会社案内を持つと「しっかりした会社だな」と感じる——あれは錯覚ではなく、確認されている心の働きです。',
+        h:'信頼・上質を出すなら厚めの紙でマット系。気軽さ・スピード感なら軽くてツヤのある紙。ただし効くのは「手に取られる」媒体だけ。'},
+      {layer:'コピー', name:'みんなが選んでいる', tip:'「売上No.1」「利用者◯万人」は最強の安心材料', e:'a',
+        w:'どれを選ぶべきか迷ったとき、人は「他のみんなが選んでいるもの」を選びます。行列のできる店に並びたくなるのと同じで、自分で判断しにくい場面ほど強く働きます。',
+        h:'実績数・受賞・お客様の声・「一番人気」のラベル。ただし必ず本当の数字で。出せる数字が小さいなら「地域で」「この分野で」と土俵をしぼれば一番になれます。'},
+      {layer:'構成', name:'一点豪華で全体が輝く', tip:'ひとつ良く見えると、全部良く見える', e:'a',
+        w:'ひとつ目立って良いところがあると、関係のない部分まで良く評価されます（「字がきれいな人は仕事もできそう」と感じてしまうアレです）。怖いのは逆も起きること——たった1箇所の誤字が、内容全体の信頼を削ります。',
+        h:'全部を平均70点にするより、一番見られる1箇所（表紙・冒頭・メイン写真）を120点に磨く。そして誤字・画像の粗さ・ズレは「たった1箇所」が全体を沈めると心得て、目立つ場所ほど念入りにチェック。'},
+      {layer:'数字', name:'数字はハンパなほど本当っぽい', tip:'「約250人」より「247人」', e:'b',
+        w:'キリのいい数字は「盛ってそう」、細かい数字は「ちゃんと数えたんだな」と感じられます。同じ内容でも、数字の細かさだけで信じてもらえる度合いが変わります。',
+        h:'実績やアンケート結果は丸めずそのまま出す（「導入実績247社」）。逆に、価格や所要時間など「わかりやすさが命」の数字はキリよく。基準は「信じてほしい数字は細かく、覚えてほしい数字は丸く」。'},
+      {layer:'コピー', name:'同じ事実でも言い方で変わる', tip:'「脂肪分10%」より「90%脂肪カット」', e:'a',
+        w:'中身がまったく同じでも、どちら側から言うかで印象は大きく変わります。「手術の成功率90%」と「10人に1人は失敗」は同じ事実ですが、受ける印象は正反対です。',
+        h:'伝えたい事実を「良い側」から言い換えられないか、必ず一度試す。「3割が退会」→「7割の方が継続」。ただし不都合な事実を隠す方向に使うと、バレたとき信頼ごと失います。'},
+    ]},
+  {id:4, name:'覚えさせる', sub:'記憶に残す', a:'--g4a', b:'--g4b', jmod:0, wmod:0,
+    note:'記憶に残るのは「ひとつだけ違うもの」と「自分で気づいたこと」だけ。',
+    mechs:[
+      {layer:'構成', name:'山場と終わりがすべて', tip:'最終ページ／ラスト3秒に一番いいものを', e:'a',
+        w:'体験の記憶は「一番の山場」と「終わり方」でほぼ決まり、長さは覚えていられません。旅行の記憶が「あの絶景と、最後の夜」だけになるのと同じです。',
+        h:'冊子なら最終見開きと裏表紙、動画ならラスト3秒、Webなら一番下に、最強の素材とメッセージを置く。「最後は連絡先だけ」は、一番おいしい場所を捨てる設計です。'},
+      {layer:'構成', name:'ひとつだけ壊す', tip:'そろえた特長リストの中で、1個だけ形を変える', e:'a',
+        w:'同じ形で並んだものの中の「ひとつだけ違うもの」だけが記憶に残ります。全部を目立たせると「違うもの」が存在しなくなり、何も残りません。',
+        h:'特長リスト・料金表・商品一覧で、一番覚えてほしい1項目だけ色や形を変える。残りはあえてきれいにそろえておくのがコツ。'},
+      {layer:'コピー', name:'自分で気づかせる', tip:'穴埋め・クイズ・途中で切れるコピー', e:'a',
+        w:'教えられたことより、自分で思い出したこと・自分で気づいたことのほうが、はるかに強く記憶に残ります。「わかった！」の瞬間に記憶が焼き付くのです。',
+        h:'穴埋めコピー（「◯◯だけ、じゃない。」）、めくると答えがある仕掛け、クイズ形式。ただし難しすぎると「わかった！」が起きず、ただの不親切に。読者の9割が2秒で解ける難しさに調整。'},
+      {layer:'ロゴ', name:'欠けを埋めたくなる', tip:'あえて欠けさせて、脳に完成させてもらう', e:'b',
+        w:'一部が欠けた図形を見ると、脳は勝手に欠けを埋めて「完全な形」として見ます。埋めた瞬間の「見つけた！」という小さな気持ちよさと一緒に、その形が記憶されます（FedExのロゴに隠れた矢印が有名な例）。',
+        h:'ロゴやキービジュアルの輪郭を少し欠けさせる、余白の形に別の意味を仕込む、など。欠けさせすぎるとただ読めないだけになるので、9割の人が気づける範囲で。'},
+      {layer:'反復', name:'会うほど好きになる', tip:'色・マーク・言い回しを全部の媒体でそろえる', e:'a',
+        w:'人は、繰り返し目にしたものを、それだけで好きになっていきます。理由はいりません。「見慣れた」は「好き」に化けるのです。',
+        h:'ブランドの色・マーク・語り口を、チラシもWebも動画も全部そろえて、接触回数を稼ぐ。媒体ごとにデザインを変えるのは、せっかく貯めた「見慣れ」をリセットする行為です。'},
+      {layer:'写真', name:'絵は文字より残る', tip:'言葉で10回より、絵で1回', e:'a',
+        w:'数日たって思い出せるのは、読んだ言葉より見た絵や写真のほうが圧倒的に多い——何度も実験で確かめられている、記憶の基本性質です。',
+        h:'一番覚えてほしいメッセージは、文章で説明する前に「絵にできないか」を考える。「地域密着」と書くより、商店街で笑う社員の写真1枚。図解やアイコン化も同じ理屈で効きます。'},
+      {layer:'構成', name:'覚えられるのは最初と最後', tip:'リストの真ん中は忘れられる', e:'a',
+        w:'並んだ情報のうち記憶に残るのは、最初のいくつかと最後のいくつか。真ん中はごっそり抜け落ちます。人の記憶の、とても安定した性質です。',
+        h:'商品リスト・特長・プログラムは、一番大事なものを先頭に、二番目に大事なものを最後に。真ん中は「読まれなくても致命傷にならないもの」の置き場所です。'},
+    ]},
+  {id:5, name:'動かす', sub:'行動させる', a:'--g5a', b:'--g5b', jmod:1, wmod:0,
+    note:'人を動かすのは説得ではなく、締切と「最初の一歩の軽さ」。',
+    caution:'ウソの「限定」「締切」は、バレた瞬間にすべての信頼を壊す。入口を作る技術であって、逃げ道をふさぐ技術ではない。',
+    mechs:[
+      {layer:'コピー', name:'「損」は「得」の2倍痛い', tip:'「¥1,000お得」より「逃すと¥1,000損」', e:'a',
+        w:'同じ金額でも、失う痛みは得るうれしさの約2倍強く感じられます。人は得をしに動くより、損を避けるために動く生き物です。',
+        h:'「今月中の申込みなら今の価格。来月から¥1,000上がります」のように、事実を損の側から見せる。ただし脅かしすぎると反発されるので、あくまで淡々と。'},
+      {layer:'コピー', name:'締切を見せる', tip:'「いつでもどうぞ」は「今じゃなくていい」と同じ', e:'b',
+        w:'期限や数量に限りがあると、「あとでいいや」が止まります。また、手に入りにくいものほど価値が高く感じられる、という心の働きもあります。締切のないお誘いは、今動く理由を渡していません。',
+        h:'本当にある締切・本当にある数量だけを使うこと。作り物の「限定」は、一度バレるとその後のすべての訴えが疑われます。'},
+      {layer:'フォーム', name:'最初から選んでおく', tip:'申込書の初期設定は、説得より強い', e:'a',
+        w:'人は、最初から設定されているものを変えません。臓器提供の同意率が国によって4%と98%に分かれた一番の理由は、国民性ではなく「申請書が最初からチェック済みか、空欄か」の違いだけでした。',
+        h:'申込書のおすすめプランを最初から選択状態にする、標準セットを用意する、など。とても強力なぶん、あとで気づいたお客さんが嫌な気持ちになる初期設定は使わないこと。'},
+      {layer:'選択肢', name:'選択肢を減らす', tip:'24種より6種のほうが売れる', e:'b',
+        w:'ジャムの試食を24種類並べた売り場は、6種類の売り場より買われる率が約10分の1でした。選択肢が多すぎると、比べるのが面倒になって「選ばない」を選んでしまうのです。',
+        h:'プランやコースは3つが定番（真ん中が選ばれます）。品ぞろえの多さを見せたいお店は、減らす代わりにジャンルで畳んで「一度に比べる数」を小さくします。'},
+      {layer:'導線', name:'最初の一歩を軽くする', tip:'QRは1つ・記入は1項目', e:'a',
+        w:'人が動くかどうかは、やる気の量より「手間の少なさ」で決まります。ほんのわずかな面倒（電話番号を探す、入力項目が多い）が、行動をあきらめさせます。',
+        h:'連絡手段は主役を1つに絞る。電話・QR・URL・SNSを全部並べると、どれも選ばれません。QRの飛び先は、入力が一番少ないページへ直結させます。'},
+      {layer:'構成', name:'先に小さな贈り物', tip:'もらうと、返したくなる', e:'a',
+        w:'人は何かをもらうと「お返しをしなきゃ」という気持ちが自動的に生まれます。試食がその場の購入につながるのは、味だけの力ではありません。',
+        h:'先に役立つ情報・クーポン・サンプルを渡してから、お願い（申込・来店）を伝える順番に。チラシなら「保存したくなるお役立ち面」を作ると、捨てられずに恩も積める一石二鳥です。'},
+      {layer:'導線', name:'最初から2個押してあるスタンプ', tip:'ゴールが見えると、人は走り出す', e:'a',
+        w:'スタンプカードを「10個で特典」で渡すより、「12個で特典、最初から2個押し済み」で渡したほうが完走率が上がります。残りは同じ10個なのに、です。人は「もう進んでいる」実感があると、がぜん動き出します。',
+        h:'スタンプカード・会員ステップ・応募手順に「もう始まってる感」を仕込む。手順案内も「STEP3まであります」より「STEP1はこのチラシを見た時点で完了！」の見せ方が効きます。'},
+      {layer:'コピー', name:'「無料」は特別な言葉', tip:'1円と0円のあいだには、崖がある', e:'a',
+        w:'「100円→50円」の値下げより「10円→0円」のほうが、人の反応はけた違いに跳ね上がります。無料は「損する可能性がゼロ」という特別なサインで、ただの値引きの延長ではありません。',
+        h:'「初回無料」「見積り無料」「送料無料」は、金額としては小さくても最前面に出す価値があります。ただし「無料のワナでは？」と警戒もされるので、無料にできる理由（初回だから・見積りだけだから）をひとこと添えると安心されます。'},
+      {layer:'フォーム', name:'押せそうな形にする', tip:'ボタンに見えるものは、押される', e:'b',
+        w:'取っ手があれば引きたくなり、ボタンの形なら押したくなる——モノの形は「どう扱えばいいか」を無言で語っています。紙の上のQRコードや申込欄も同じです。',
+        h:'行動してほしい場所は「押せそう・触れそうな見た目」に：影付きのボタン風、指のアイコン、「タップ」「かざすだけ」といった動作の言葉。ただの文字列のURLは、行動の呼びかけとして最弱です。'},
+      {layer:'選択肢', name:'当て馬を置く', tip:'明らかに損な選択肢が、本命を輝かせる', e:'a',
+        w:'「S 300円／L 500円」で迷う人も、「M 450円」が加わると急にLを選び始めます。Mは選ばれるためではなく、Lをお得に見せるための当て馬です。',
+        h:'売りたいプランのそばに「少しの差額なのに明らかに見劣りする選択肢」を置く。3プラン設計（真ん中が選ばれる）と組み合わせると強力。ただし当て馬とバレるほど露骨な設定は逆効果です。'},
+    ]},
+  {id:6, name:'好きにさせる', sub:'好意を育てる', a:'--g6a', b:'--g6b', jmod:0, wmod:3,
+    note:'好意を作るのは、会う回数と「人の手のぬくもり」。',
+    mechs:[
+      {layer:'反復', name:'会うほど好きになる', tip:'同じ見た目で、何度も会う', e:'a',
+        w:'繰り返し目にするだけで好意が育つ——心理学で最も確実とされる現象のひとつです。「なんとなく好き」の正体は、たいてい会った回数です。',
+        h:'1回の豪華な広告より、同じ見た目での複数回の接触。露出の計画＝好意の計画です。'},
+      {layer:'質感', name:'人の手の痕跡', tip:'手書き文字・にじみ・紙の質感', e:'b',
+        w:'手作業の跡は「人がここに時間をかけた」というメッセージとして伝わり、温かみや誠実さを感じさせます。AIやテンプレで作ったものが増えるほど、手の痕跡の価値は上がっていきます。',
+        h:'手書き文字、ゆらいだ線、紙の風合い。ただし全面に使うと素人っぽくなります。きちんと整った紙面の中の1〜2箇所だから効くのです。'},
+      {layer:'イラスト', name:'リアルすぎる手前で止める', tip:'ほどよくデフォルメした絵が一番好かれる', e:'c',
+        w:'人間そっくりに近づきすぎた人形やCGは、あるところで急に不気味になります（「不気味の谷」と呼ばれます）。その谷に落ちる手前——ほどよく簡略化された絵——が一番安心して好かれます。',
+        h:'人物イラストは、目・手・肌の描き込みの量で「リアルさの度合い」を調整。写真そっくりのCG人物より、少しマンガっぽい表現のほうが安全圏です。'},
+      {layer:'物性', name:'開ける楽しさ', tip:'めくる・剥がす・開く、が小さなごほうびになる', e:'c', print:true,
+        w:'開ける・めくる・剥がすという動作には、「隠れていたものが現れる」小さなワクワクがあります。DMが開けられるかどうかは、中身より先に、この動作の設計で決まります。',
+        h:'観音開きの折り、窓あき、シール。プロの経験則ですが、「開封されたら勝ち」のDMでは、お金をかける価値の高いポイントです。',},
+      {layer:'タイポ', name:'文字の形は味がする', tip:'カクカクした字＝ザクザク、丸い字＝とろける', e:'a',
+        w:'「ブーバ」と聞くと丸い形、「キキ」と聞くとトゲトゲした形を思い浮かべる——この感覚は、国や言語がちがってもほぼ共通です。文字の形は、商品の食感や手ざわりの「試食」の代わりになります。',
+        h:'ザクザク系のお菓子はカクカクした太い書体、とろける系は丸くやわらかい書体。食品・化粧品など、質感が売りの商品パッケージやメニューに。'},
+      {layer:'構成', name:'自分で仕上げた感', tip:'ひと手間かけたものは、かわいい', e:'b',
+        w:'自分で組み立てた家具は、既製品より愛着がわきます。人は「自分の手が入ったもの」を、実際の出来ばえ以上に高く評価するのです。',
+        h:'塗り絵・切り取り・書き込み欄・「あなたの街の◯◯を書いてみよう」など、読者が完成に参加できる余地を残す。すみずみまで完璧に仕上げた紙面には、実は入り込むすき間がありません。'},
+      {layer:'構成', name:'ちいさな運だめし', tip:'スクラッチは、結果より「けずる前」が楽しい', e:'b',
+        w:'結果が読めないごほうびは、確実なごほうびより強く心を引きます。くじやスクラッチのワクワクの正体は、当たりそのものより「どっちかな」の瞬間にあります。',
+        h:'スクラッチ、めくると当たりが出るDM、ランダムなおまけ。ただしこの仕組みはギャンブルと同じ心の回路を使う強い技術です。子ども向けや高額商品では控えめに——「入口を作る技術であって、抜け出せなくする技術ではない」の代表例と心得て。'},
+    ]},
+];
+
+/* ============ 職人の暗黙知（選択不要のライブラリ） ============ */
+const CRAFT=[
+ {group:'文字の呼吸', items:[
+  {name:'カッコと句読点のアキを詰める', tip:'「」（）の前後の全角アキが「素人感」の正体', e:'c',
+   w:'日本語フォントのカッコ・句読点は、文字の箱の中に大きな空白を持っています。そのまま組むと、カッコの前後だけ間延びして見える——プロの組版とチラシアプリの出力の差は、まずここに出ます。',
+   h:'見出し・キャッチでは約物（カッコ・句読点）の前後を詰める（ソフトの「約物半角」設定や手詰め）。本文は自動のままでOK。見出しだけで印象は変わります。'},
+  {name:'詰めるのはキャッチだけ、本文は触らない', tip:'文字詰めの全力は見出しに。本文の字間はいじらない', e:'c',
+   w:'大きな文字ほど字間のばらつきが目立ち、小さな文字は詰めると読みにくくなります。つまり手間をかける価値があるのは大きい文字だけ。本文まで詰めるのは、労力の無駄どころか可読性を下げる行為です。',
+   h:'キャッチは1文字ずつ目で見て詰める（特に「ト」「イ」など空白の多い字の前後）。本文はフォント任せ。時間配分は見出し9：本文1。'},
+  {name:'長体・平体は禁じ手', tip:'文字をつぶすくらいなら、文章を削る', e:'c',
+   w:'文字を細長く・平たく変形させると、入りきらない問題は解決しますが、「無理やり押し込んだ」空気が紙面全体に漂います。読者は理由を言えなくても、その窮屈さを感じ取ります。',
+   h:'スペースに入らないときの正解は変形ではなく、文章を削るか、文字サイズの設計に戻ること。どうしても必要な表組みなどでも95%まで。'},
+  {name:'数字と英字は少し下げる', tip:'和文に混ざった数字は、大きく見える', e:'c',
+   w:'同じサイズでも、数字や英字は漢字・かなより大きく・浮いて見えることがあります。フォントの設計上、数字の箱の使い方が違うからです。',
+   h:'和文中の数字・英字は同級か少し小さめ（95〜97%）にするか、和文と相性のいい欧文フォントに置き換えると、行が静かになります。価格など目立たせたい数字は逆に大きく——意図して差をつける分にはOK。'},
+  {name:'書体は2つまで、変化はウェイトで', tip:'和文1＋欧文1。太さの違いで表情を作る', e:'c',
+   w:'書体が3つを超えると、紙面の「声」が多重人格になります。実は1書体でも、太さ（ウェイト）のバリエーションだけで十分な変化が作れます。',
+   h:'和文1ファミリー＋欧文1ファミリーを基本セットに。見出し＝太く、本文＝標準、注記＝細く。書体を足したくなったら、まずウェイトと大きさで解決できないか試す。'},
+ ]},
+ {group:'写真の扱い', items:[
+  {name:'関節で切らない', tip:'人物のトリミングは首・肘・膝を避ける', e:'c',
+   w:'人物写真を関節のライン（首・肘・手首・膝・足首）で切ると、見る人は無意識に「切断」を連想して、かすかな痛々しさを感じます。',
+   h:'切るなら関節と関節のあいだ（二の腕の途中、太ももの途中）。バストアップは胸の下、膝上は太もも中間で。迷ったら少し引いて切る。'},
+  {name:'進行方向に余白を', tip:'人や乗り物の「向かう先」を空ける', e:'b',
+   w:'人物の目線や体の向き、車の進行方向の先に余白がないと、「壁に向かっている」ような詰まった印象になります。逆に向かう先が空いていると、写真の中に時間と物語が生まれます。見る人の視線も、被写体の向く先へ自然に流れます。',
+   h:'右を向いた人物は左端に寄せて右を空ける。その空いた先に、読ませたいコピーを置けば視線誘導も兼ねられて一石二鳥。'},
+  {name:'水平は絶対、傾けるなら堂々と', tip:'1〜2度の傾きは「事故」に見える', e:'c',
+   w:'地平線や建物がわずかに傾いた写真は、見る人に理由の分からない不安を与えます。一方、明らかに大きく傾けた写真は「演出」として受け取られます。中途半端だけが罪です。',
+   h:'風景・建物は水平垂直をガイドで厳密に出す。動きを出したいときは5度以上、思い切って傾ける。'},
+  {name:'ダメな写真は小さく使う', tip:'素材の弱さは、拡大するほど拡声される', e:'c',
+   w:'ピントの甘い写真、暗い写真、構図の悪い写真を大きく使うと、弱点まで拡大されます。逆に小さく使えば、雰囲気だけを借りて弱点を隠せます。',
+   h:'いい写真1枚を主役に大きく、微妙な写真は小さく並べて「点数の証拠」として使う。全部同じサイズで並べるのは、一番弱い写真に紙面を合わせる行為です。'},
+  {name:'画面の明るさを信じない', tip:'印刷は画面より一段沈む', e:'c',
+   w:'モニターは光っていて、紙は光りません。画面でちょうどいい明るさの写真は、印刷するとワントーン暗く・濁って出ます。特に人肌と料理は沈むとまずそう・不健康に見えます。',
+   h:'印刷用の写真は画面で「少し明るすぎるかな」くらいに調整しておく。人肌と料理は特に明るめ・血色よく。可能なら本機校正か、せめて社内のプリンタで一度出して確認。'},
+ ]},
+ {group:'色の実務', items:[
+  {name:'まっ黄色・まっ赤を疑う', tip:'純色は強すぎる。少し濁すと大人になる', e:'c',
+   w:'Y100%の黄色やビビッドな純色は、画面上では元気に見えても、紙面全体で使うと安売り感と視覚疲労を生みます。市販の良質なデザインの「黄色」をスポイトで拾うと、たいてい少し濁っています。',
+   h:'ベタ面に使う色は、純色から少しだけ濁す（別の版を数%混ぜる／彩度を落とす）。強調の一点だけは純色でOK——全面の色と一点の色は役割が違います。'},
+  {name:'黒文字はK100ノセ', tip:'小さな黒文字は4色で作らない', e:'b',
+   w:'黒い文字をCMYK4色の掛け合わせで作ると、印刷時のわずかな版ズレで文字のフチに色がにじみ、細い文字は読めなくなります。K（スミ）1色だけで作った文字はズレの影響を受けません。',
+   h:'本文・小さな文字の黒は必ずK100%単色（スミノセ）。大きなベタの黒だけ、深みが欲しければリッチブラックを検討。データ入稿前のチェック項目に入れておく。'},
+  {name:'「白じゃない白」を敷く', tip:'ごく薄い色の下地で、紙面が落ち着く', e:'c',
+   w:'まっ白な背景は清潔ですが、ときに硬く、まぶしく感じられます。肉眼では白としか認識されないほど薄いクリームやグレーを敷くと、紙面全体がすっと落ち着きます。',
+   h:'温かみが欲しければ薄いクリーム、上質さなら薄いグレー（2〜4%程度）。白い要素（白抜き文字・白枠）が乗ると差が生きます。やりすぎると「汚れ」に見えるので、印刷での出方を確認。'},
+  {name:'鮮やかな補色を隣接させない', tip:'彩度の高い赤と緑が接すると、境界がチカチカする', e:'b',
+   w:'彩度の高い補色同士（赤と緑、青とオレンジ）が直接触れ合うと、境界線が振動して見える現象（ハレーション）が起きます。目が痛く、文字なら読めません。',
+   h:'補色を使うなら、間に白・黒・無彩色の緩衝を挟むか、どちらかの彩度を落とす。補色の組み合わせ自体は強力な武器——接触させないことだけ守る。'},
+ ]},
+ {group:'レイアウトの手癖', items:[
+  {name:'揃いは1mmで壊れる', tip:'「なんとなく揃ってる」は揃っていない', e:'c',
+   w:'人の目は、揃っているはずのものの1mm弱のズレを「理由の分からない気持ち悪さ」として検知します。作り手が「大体合ってる」と思った時点で、見る人には崩れて見えています。',
+   h:'目測を信じず、ガイド・整列機能で物理的に揃える。特に「端」と「中心」。逆に、ズラすときは誰が見てもわかる量ズラす——中途半端が一番悪い、は傾きと同じ原理です。'},
+  {name:'「なんか変」はサイズの種類を数える', tip:'違和感の正体は、たいてい大きさが4種類以上あること', e:'c',
+   w:'紙面がゴチャつく原因を色や配置に探しがちですが、実際は「文字や写真のサイズの種類が多すぎる」ことが最多です。サイズの種類＝紙面の声の種類。多いほど雑踏になります。',
+   h:'違和感を覚えたら、使っているサイズを数える。文字も写真も3〜4種類に統合する。「この2つ、サイズを分ける理由ある？」と問うて、なければ同じにする。'},
+  {name:'視覚の中心は、真ん中より上', tip:'ど真ん中に置くと、下がって見える', e:'b',
+   w:'人の目は、幾何学的な中心より少し上を「真ん中」と感じます。定規で正確に中央へ置いた要素は、なぜか下にずり落ちて見えるのです。',
+   h:'主役・ロゴ・表紙タイトルは、数学的中心より2〜5%上に置く。額装や表紙で「なんか沈んで見える」ときは、まずこれを疑う。'},
+  {name:'角版・切り抜き・裁ち落としを混ぜすぎない', tip:'写真の「形式」も3種類までのルールに含める', e:'c',
+   w:'四角い写真（角版）、輪郭で切った写真（切り抜き）、紙のフチまで広げた写真（裁ち落とし）は、それぞれ別の「声」を持っています。1紙面に3形式全部あると、写真同士がケンカします。',
+   h:'基本は1紙面に2形式まで。角版でそろえた中に切り抜きを1つ——これも「そろえて1つ崩す」の応用です。'},
+  {name:'主役を強くするな、脇役を沈めろ', tip:'目立たせたいときは、まわりを引き算する', e:'c',
+   w:'「もっと目立たせて」に対して主役を大きく・派手にしていくと、軍拡競争になって紙面全体が叫び出します。目立ちは相対値なので、まわりを静かにするほうが簡単で、上品に仕上がります。',
+   h:'主役に触る前に、脇役の彩度を落とす・サイズを下げる・余白を増やす。「目立たせて」の依頼の8割は、実は「まわりを沈めて」で解決します。'},
+  {name:'敵は隣にいる', tip:'デザインは単体でなく、置かれる環境との相対で決まる', e:'c',
+   w:'チラシはポストの中の他のチラシと、看板は隣の看板と、バナーは周囲の記事と戦います。机の上で単体で見て良いデザインが、現場で埋もれることはよくあります。媒体の宿命の実践編です。',
+   h:'作る前に「隣に何が並ぶか」の実物・スクショを集めて、その横に自分のラフを置いて判断する。周りが全部赤いなら、勝ち色は赤ではありません。'},
+ ]},
+ {group:'仕上げと確認', items:[
+  {name:'3歩下がって見る', tip:'サムネサイズで構造が見えなければ、実寸でも迷子になる', e:'c',
+   w:'画面に張り付いて作っていると、細部は見えても全体の構造が見えなくなります。縮小して見たとき「どこが主役で、何の話か」が判別できない紙面は、実寸でも読者を迷わせます。',
+   h:'定期的に画面を縮小する・モニターから3歩下がる・スマホに送って見る。ポスターや看板は特に、実際の視距離での見え方が本番です。'},
+  {name:'一晩寝かせて、翌朝10秒', tip:'完成直後の目は、一番当てにならない', e:'c',
+   w:'何時間も見続けた紙面は、脳が慣れてしまって欠点が見えません（看板が風景になるのと同じ現象が、作り手にも起きます）。翌朝の新鮮な目の最初の10秒が、読者の目に一番近い。',
+   h:'納期が許すなら一晩置いて、翌朝まっさらな気持ちで10秒だけ見る。最初に目が行った場所は意図どおりか？ 違和感は？ その10秒のメモが最良の校正です。'},
+  {name:'誤字は目でなく口で見つける', tip:'校正は音読。目は「読めてしまう」', e:'b',
+   w:'人の脳は文章を予測しながら読むため、「ありがとうごさいます」程度の誤字は自動補正して見逃します。音読すると、この自動補正が働かず、引っかかりとして検出できます。',
+   h:'重要な文言（社名・価格・日付・電話番号）は必ず音読。数字は一桁ずつ読み上げる。他人に読んでもらえばさらに確実——予測補正は書いた本人が一番強くかかるので。'},
+  {name:'塗り足しと安全マージン', tip:'フチまで色を使うなら外へ3mm、文字は内へ3mm', e:'b',
+   w:'印刷物は大きな紙に刷ってから断裁するため、必ず±1mm前後の断裁ズレが起きます。フチまでの絵柄が3mm外まで延びていないと白い線が出て、文字がフチに近すぎると切れます。',
+   h:'裁ち落としの絵柄・写真は仕上がり線の外へ3mm延長（塗り足し）。文字・ロゴは仕上がり線から最低3mm（できれば5mm）内側へ。入稿前チェックの定番項目。'},
+ ]},
+];
+/* ============ 用語辞典 ============ */
+const GLOSSARY=[
+ {cat:'文字・組版', terms:[
+  ['級数（Q）','文字サイズの単位。1Q＝0.25mm。印刷業界でptと並んで使われる。「16Q」＝4mmの文字'],
+  ['ポイント（pt）','文字サイズの単位。1pt≒0.35mm。このツールの数値もpt。Qとの換算は 1pt≒1.4Q'],
+  ['ウェイト','同じ書体の太さのバリエーション（Light／Regular／Bold など）。書体を増やさず表情を作る道具'],
+  ['カーニング・字詰め','文字と文字のすき間を調整すること。全力を注ぐのはキャッチだけ、本文は触らない'],
+  ['字送り・行送り','文字の中心から次の文字の中心まで／行から次の行までの距離。「行間」は行と行のすき間のこと'],
+  ['明朝体','とめ・はね・払いのある伝統的な書体。信頼・公式・上品の記号として働く'],
+  ['ゴシック体','線の太さが均一な書体。親しみ・現代的・遠くからの見やすさに強い'],
+  ['セリフ／サンセリフ','欧文書体の分類。セリフ＝飾りあり（明朝の親戚）、サンセリフ＝飾りなし（ゴシックの親戚）'],
+  ['約物（やくもの）','カッコ・句読点・中黒などの記号類の総称。この前後のアキが素人感の分かれ目'],
+  ['禁則処理','行頭に「。」や「」」が来ないように自動調整するルール。オフになっていると事故る'],
+  ['長体・平体','文字を縦長・横長に変形させること。原則禁じ手。使っても95%まで'],
+  ['ジャンプ率','見出しと本文の文字サイズの比率。大きいほど元気、小さいほど上品'],
+ ]},
+ {cat:'印刷・入稿', terms:[
+  ['トンボ','断裁する位置を示す十字のマーク。データの四隅と辺の中央に付く'],
+  ['塗り足し','仕上がり線の外へ3mm延ばしておく絵柄。断裁ズレで白フチが出るのを防ぐ'],
+  ['断裁（だんさい）','刷った大きな紙を仕上がりサイズに切ること。±1mm前後は必ずズレる前提で作る'],
+  ['CMYK','印刷の4色インキ（シアン・マゼンタ・イエロー・スミ）。画面のRGBより表現できる色が狭い'],
+  ['RGB','画面の光の3色。RGBのままのデータを印刷すると、くすんで沈む'],
+  ['K100・スミベタ','黒をK（スミ）1色だけで作ること。小さな黒文字はこれが鉄則（版ズレでにじまない）'],
+  ['リッチブラック','CMYを混ぜて作る深い黒。大きなベタ面用。細い文字に使うとにじむ'],
+  ['ノセ（オーバープリント）','下の色を消さずに上からインキを重ねて刷る設定。黒文字は基本ノセ'],
+  ['抜き（ノックアウト）','下の色を白く抜いてから上の色を刷る設定。ズレると白い隙間が出る'],
+  ['特色（とくしょく）','CMYKの掛け合わせでは作れない色を、専用インキで刷ること。金・銀・蛍光・コーポレートカラーなど'],
+  ['網点（あみてん）','印刷の濃淡を小さな点の大小で表現する仕組み。虫めがねで印刷物を見ると見える'],
+  ['解像度（dpi）','画像の細かさ。印刷は原寸350dpiが目安、Webは72dpiで足りる。足りないとガタガタに'],
+  ['斤量（きんりょう）','紙の厚さを重さで表す単位。数字が大きいほど厚くて重い＝しっかりした手ざわり'],
+  ['束見本（つかみほん）','実際に使う紙で作った無地のサンプル冊子。厚み・重さ・手ざわりを事前確認するためのもの'],
+  ['色校正（色校）','印刷前に色味を確認するための試し刷り。画面と紙の色は必ず違うので、大事な案件では必須'],
+ ]},
+ {cat:'レイアウト', terms:[
+  ['版面（はんめん）','紙面のうち、文字や絵柄を置く領域のこと。フチの余白の内側'],
+  ['マージン','フチの余白。このツールでは短辺の4〜9%を目安に計算している'],
+  ['ノド・小口（こぐち）','冊子の綴じ側がノド、開く側が小口。ノドは開きにくいので余白+3mm'],
+  ['天・地','紙面の上が天、下が地。「天地中央」＝上下方向の真ん中'],
+  ['グリッド','要素の位置をそろえるための見えないマス目。12分割が万能'],
+  ['角版（かくはん）','四角いまま使う写真。いちばん基本の形式'],
+  ['切り抜き','被写体の輪郭に沿って背景を消した写真。軽快・楽しい印象'],
+  ['裁ち落とし（断ち切り）','紙のフチまで広げた写真・絵柄。塗り足し3mmとセット'],
+  ['ホワイトスペース','余白のこと。「何もない場所」ではなくグループを分ける仕切り'],
+  ['アイキャッチ','紙面で最初に目を引く役割の要素。1紙面に1つ'],
+ ]},
+ {cat:'制作の流れ', terms:[
+  ['ラフ','手描きなどのざっくりした構成案。ここで方向を合意してから作り込む'],
+  ['カンプ','完成イメージに近い見本。クライアント確認用'],
+  ['アタリ','仮に置いてある画像や文字。「アタリです」＝あとで本物に差し替わる'],
+  ['初校・再校','1回目・2回目の確認用出力。直しの回数を数える単位'],
+  ['校了（こうりょう）','「直しなし、このまま印刷へ進めてOK」の状態。ここから先の変更は原則できない'],
+  ['責了（せきりょう）','残った小さな直しを印刷所に任せて完了とすること'],
+  ['入稿（にゅうこう）','完成データを印刷所へ渡すこと。塗り足し・K100・解像度のチェックはこの前に'],
+ ]},
+ {cat:'コピー・Web', terms:[
+  ['キャッチコピー','目を止めさせる短い言葉。読ませる係ではなく、止める係'],
+  ['ボディコピー','本文のこと。説得を担当する'],
+  ['リード文','見出しと本文の橋渡しをする短い導入文'],
+  ['CTA','行動の呼びかけ（電話・QR・購入ボタンなど）。1紙面に主役1つ'],
+  ['ファーストビュー','Webページを開いてスクロールする前に見える最初の画面。生死を分ける'],
+  ['サムネ','一覧に表示される小さな見本画像。実質「表紙」であり最重要の1枚'],
+ ]},
+];
+const state = {media:null, target:null, tone:null, axis:null, sub:null, format:null, info:'mid'};
+const $ = id => document.getElementById(id);
+const r1 = n => Math.round(n*2)/2;
+const EV = {a:'◎ 何度も実験で確認ずみ', b:'○ 公式の基準・複数の研究あり', c:'△ プロの経験則'};
+
+function chipRow(box, items, onPick){
+  items.forEach(it=>{
+    const b=document.createElement('button');
+    b.className='chip';
+    b.innerHTML=`${it.name}<small>${it.hint||''}</small>`;
+    b.onclick=()=>{[...box.children].forEach(c=>c.classList.toggle('on',c===b)); onPick(it);};
+    box.appendChild(b);
+  });
+}
+chipRow($('mediaChips'), MEDIA, m=>{state.media=m; state.format=m.formats?m.formats[0]:null; renderFormats(); renderFate(); unlock('s2'); update();});
+
+function renderFormats(){
+  const box=$('formatChips'); box.innerHTML='';
+  const m=state.media;
+  if(!m||!m.formats) return;
+  m.formats.forEach((f,i)=>{
+    const b=document.createElement('button');
+    b.className='chip'+(i===0?' on':'');
+    b.innerHTML=`${f.name}<small>${f.w}×${f.h}mm</small>`;
+    b.onclick=()=>{state.format=f;[...box.children].forEach(c=>c.classList.toggle('on',c===b)); update();};
+    box.appendChild(b);
+  });
+}
+const INFO=[{id:'lo',name:'少なめ',hint:'イメージ重視'},{id:'mid',name:'ふつう',hint:'標準'},{id:'hi',name:'多め',hint:'説明・一覧が多い'}];
+INFO.forEach(it=>{
+  const b=document.createElement('button');
+  b.className='chip'+(it.id==='mid'?' on':'');
+  b.innerHTML=`${it.name}<small>${it.hint}</small>`;
+  b.onclick=()=>{state.info=it.id;[...$('infoChips').children].forEach(c=>c.classList.toggle('on',c===b)); update();};
+  $('infoChips').appendChild(b);
+});
+
+function renderFate(){
+  const m=state.media, sec=$('fateSec');
+  if(!m){sec.hidden=true;return;}
+  sec.hidden=false;
+  $('fateName').textContent=m.name;
+  $('essenceBox').innerHTML=`<div class="essence">
+    <div class="erow"><div class="ek">役割</div><div class="ev2">${m.essence.role}</div></div>
+    <div class="erow"><div class="ek">伝えるべき</div><div class="ev2">${m.essence.convey}</div></div>
+    <div class="erow"><div class="ek">あるべき姿</div><div class="ev2">${m.essence.ideal}</div></div>
+  </div>`;
+  $('fateText').textContent='◤ 宿命：'+m.fate;
+  const box=$('fateMechs'); box.innerHTML='';
+  m.fmech.forEach((f,i)=>{
+    const dd=document.createElement('div');
+    dd.className='mech'; dd.tabIndex=0; dd.setAttribute('role','button');
+    dd.style.setProperty('--d',(i*.09)+'s');
+    dd.innerHTML=`<span class="layer">宿命</span><div><div class="mech-name">${f.name}<span class="ev ${f.e}" style="margin-left:6px;font-size:8.5px">${EV[f.e].slice(0,1)}</span></div><div class="mech-tip">${f.tip}</div></div><div class="chev"></div>${detailHTML(f)}`;
+    dd.onclick=()=>toggleOpen(dd);
+    dd.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();toggleOpen(dd);}};
+    box.appendChild(dd);
+  });
+  if(m.tests){
+    const tv=document.createElement('div');
+    tv.className='rev'; tv.style.marginTop='10px';
+    tv.innerHTML=' <b>仕上がりの試験</b>（イメージは自由。合否だけを確認する）<br>'+m.tests.map(x=>'・'+x).join('<br>');
+    box.appendChild(tv);
+  }
+}
+chipRow($('targetChips'), TARGETS, t=>{state.target=t; unlock('s3'); update();});
+chipRow($('toneChips'), TONES, t=>{state.tone=t; unlock('s4'); update();});
+AXES.forEach(ax=>{
+  const b=document.createElement('button');
+  b.className='axis';
+  b.style.setProperty('--xa',`var(${ax.a})`); b.style.setProperty('--xb',`var(${ax.b})`);
+  b.innerHTML=`<div class="ax-name">${ax.name}</div><div class="ax-sub">${ax.sub}</div>`;
+  b.onclick=()=>{
+    state.axis=ax; state.sub=null;
+    [...$('axisCards').children].forEach(c=>c.classList.toggle('on',c===b));
+    document.documentElement.style.setProperty('--ca',`var(${ax.a})`);
+    document.documentElement.style.setProperty('--cb',`var(${ax.b})`);
+    unlock('s5'); renderSubs(); update();
+  };
+  $('axisCards').appendChild(b);
+});
+function renderSubs(){
+  const box=$('subChips'); box.innerHTML='';
+  const mk=(label,val,on)=>{
+    const b=document.createElement('button');
+    b.className='chip'+(on?' on':''); b.textContent=label;
+    b.onclick=()=>{state.sub=val;[...box.children].forEach(c=>c.classList.toggle('on',c===b)); update();};
+    box.appendChild(b);
+  };
+  mk('なし（主目的に集中）',null,true);
+  AXES.filter(a=>a.id!==state.axis.id).forEach(ax=>mk(ax.name,ax,false));
+}
+function unlock(id){$(id).classList.remove('locked');}
+
+/* ================= spec engine ================= */
+function computeSpecs(){
+  const m=state.media, t=state.target, tn=state.tone, ax=state.axis;
+  const isPct=m.body.u==='%H';
+  const body=r1(m.body.v*t.coef);
+  const jump=Math.min(8,Math.max(2,tn.jump+(ax?ax.jmod:0)));
+  const head=isPct?r1(body*jump):Math.round(body*jump);
+  const infoMod=state.info==='hi'?-8:state.info==='lo'?5:0;
+  const white=Math.max(20,Math.min(65,tn.white+(ax?ax.wmod:0)+(t.id==='senior'?3:0)+infoMod));
+  const marginIdx=tn.id==='loud'?0:tn.id==='std'?1:2;
+  let margin=m.margin[marginIdx], marginWhy='絵を額に入れると上等に見えるのと同じ働き', marginShort=null;
+  if(m.formats&&state.format){
+    const pct=[0.04,0.06,0.09][marginIdx]+(state.info==='hi'?-0.015:state.info==='lo'?0.008:0);
+    marginShort=Math.min(state.format.w,state.format.h);
+    margin=Math.max(6,Math.round(marginShort*pct));
+    marginWhy=`比率ルール：短辺${marginShort}mm×約${(pct*100).toFixed(1)}%。固定mmでなく判型比で決めると、どのサイズでも同じ品位になる`;
+  }
+  const lh=tn.id==='quiet'?'180〜190%':tn.id==='loud'?'155〜165%':'165〜175%';
+  const capMin=isPct?m.cap+'%H':r1(m.cap*Math.max(1,t.coef*0.95))+m.body.u;
+  const posterCatch=m.dist>=2?Math.round(m.dist*4*t.coef):null;
+  const unit=isPct?'%H':m.body.u;
+  const mu=state.media.print?'mm':'px';
+
+  return [
+    {sec:'文字まわり', rows:[
+      {label:'本文の文字サイズ', val:`${body}<span class="u"> ${unit}</span>`, raw:{value:body,unit},
+       why:`この媒体の基準値 ${m.body.v}${unit} × ターゲットに合わせた倍率 ${t.coef}`, e:'b',
+       w:`本文＝続けて読んでもらう文章の文字の大きさです。${isPct?'%H＝画面の高さに対する割合。スマホは機種によって画面サイズがバラバラなので、割合で決めます。':'pt（ポイント）＝印刷の文字の単位で、1ptは約0.35mm。'}ここで出す数値は「その媒体を、その読者が、無理なく読み続けられる大きさ」の目安です。${t.tnote}。`,
+       h:'まず本文サイズを決めて、見出しなど他のサイズは「本文の何倍」で決めていくと、紙面全体がそろいます。スペースが足りないときは、文字を小さくするのではなく文章を削るのが原則です。'},
+      {label:'見出しの文字サイズ', val:`${head}<span class="u"> ${unit}（本文の約${jump}倍）</span>`, raw:{value:head,unit,jumpRatio:jump},
+       why:tn.jwhy+(ax&&ax.jmod?`。目的「${ax.name}」に合わせて少し調整`:''), e:'c',
+       w:'「見出しは本文の何倍の大きさか」＝メリハリの強さです。声にたとえると、差が大きいほど大声で元気（スーパーのチラシ）、差が小さいほど静かで上品（美術館のポスター）に感じられます。',
+       h:'文字サイズの種類は3〜4段階まで（本文・小見出し・大見出し＋注記）。中間サイズを増やすほど「どれが大事か」がぼやけて、視線が迷います。写真の大小にも同じ倍率感覚を使うと、紙面全体の「声の大きさ」がそろいます。'},
+      ...(posterCatch?[{label:'キャッチの文字の高さ', val:`${posterCatch}<span class="u"> mm以上</span>`, raw:{value:posterCatch,unit:'mm'},
+       why:`「離れた場所から読める文字の高さ ≒ 距離(m)×4mm」という道路標識などの目安から計算`, e:'b',
+       w:'貼り出すポスターは「読む」前に、まず「見える」必要があります。道路や駅の案内表示づくりで使われる目安が「見る距離(m)×4mm」。3m離れて見るなら、文字の高さは12mm以上ないと読めません。',
+       h:'これは「ギリギリ読める」ラインなので、キャッチコピーは普通この2〜3倍の大きさにします。駅貼りなど5m以上離れる場所なら、さらに大きく。貼られる場所を先に確認してから決めるのが確実です。'}]:[]),
+      {label:'一番小さい文字', val:`${capMin}`, raw:{value:capMin},
+       why:'注釈・写真のキャプションなどの下限', e:'b',
+       w:'注釈や写真の説明など「読みたい人だけ読む」文字の、これ以上小さくしないラインです。この下限より小さい文字は、読めないだけでなく「読ませる気がないんだな」という態度として伝わり、信頼を削ります。',
+       h:'下限を割りそうになったら、文字をもっと小さくするのではなく、情報を削るかWebに逃がす。注釈だらけの紙面は、そもそも本文の整理がうまくいっていないサインでもあります。'},
+      {label:'1行の文字数', val:m.lineLen+`<span class="u"> 字/行</span>`, raw:{value:m.lineLen,unit:'字/行'},
+       why:'目が迷子にならず読める長さ', e:'a',
+       w:'1行が長すぎると、行の終わりから次の行の頭に戻るときに「あれ、どの行だっけ」と迷子になります。短すぎると折り返しばかりで疲れます。目の動きを計測した研究で、ちょうどいい範囲がわかっています。',
+       h:'段組（文章を2列・3列に分けること）は、1行を読みやすい長さに整えるための道具です。A4で1行が40字を超えたら2段組を検討。ポスターや動画のキャッチが「1行13字以内」なのは、目を動かさずに一目で読み切れる長さだからです。'},
+      {label:'行間', val:lh, raw:{value:lh},
+       why:'日本語がゆったり読める範囲で、トーンに合わせて調整', e:'b',
+       w:'行と行のあいだの広さです。「170%」＝文字の大きさの1.7倍の間隔で行を送る、という意味。日本語はひらがな・カタカナ・漢字が混ざって画数が多いので、英語より広めの行間が必要です。詰まった行間はせわしなく、開いた行間はゆったりした印象になります。',
+       h:'1行が長いほど、行間も広く取ります（次の行を見失わないため）。見出しは短いので130%くらいまで詰めてOK。先に行間を決めてから文章を流し込むと、あとの調整が楽です。'},
+    ]},
+    {sec:'余白・整列', rows:[
+      {label:'余白の割合', val:`${white}<span class="u"> %目安</span>`, raw:{value:white,unit:'%'},
+       why:(tn.id==='quiet'?'高級感は余白から生まれる。':'')+'余白は「何もない場所」ではなく、グループを分ける仕切り'+(ax&&ax.wmod?`。目的「${ax.name}」に合わせて少し増量`:''), e:'a',
+       w:'紙面全体のうち、何も置いていない場所の割合です。近くにあるものは仲間に、離れているものは別物に見える——この目の性質があるので、余白は「これとこれは別の話ですよ」と伝える仕切りとして働きます。空き地ではなく、情報です。',
+       h:'余白には大小の順番をつけます：紙のフチ（一番広い）→ブロックの間→段落の間→行の間（一番狭い）。この順番が崩れると、どこからどこまでがひとまとまりか読めなくなります。「ここ空いてるから何か入れて」への答え：そこは仕切りなので、埋めると迷子が増えます。'},
+      {label:'フチの余白', val:`${margin}<span class="u"> ${mu}目安${state.media.id==='booklet'?'（綴じ側は+3mm）':''}</span>`, raw:{value:margin,unit:mu,rule:marginShort?'短辺比率':'固定値'},
+       why:marginWhy, e:'c',
+       w:'紙のフチにぐるっと確保する余白です。同じ絵でも額に入れると上等に見えるように、フチがきちんとそろっていると「管理が行き届いている」印象の土台になります。フチがガタガタの紙面は、内容を読む前に雑な印象を与えます。',
+       h:'上下左右を同じ幅にするのが基本。写真を紙のフチまで断ち切りで使うときも、文字は必ずこの余白の内側に収めます。冊子は綴じ側が開きにくいので+3mm。印刷物は断裁が少しズレるので、文字はフチからさらに内側へ。'},
+      {label:'整列のルール', val:m.grid, raw:{value:m.grid},
+       why:'そろえるから、崩した1箇所が生きる', e:'b',
+       w:'紙面を等分するマス目を想定して、要素の位置をそろえる方法です。12分割は2列・3列・4列・6列のどれにも割れる便利な数。そろった紙面は「読みやすい」以前に「安心して読める」——次に目をやる場所が予想どおりだからです。',
+       h:'そろえること自体が目的ではなく、「1箇所だけ崩す」ための土台づくりです。全体がそろっているからこそ、崩した1箇所に注目が集まります。最初からバラバラの紙面には、崩す楽しさも存在しません。'},
+    ]},
+    {sec:'色', rows:[
+      {label:'色数', val:tn.colors, raw:{value:tn.colors},
+       why:tn.cwhy, e:'c',
+       w:'紙面で使う色の数です（白・黒・グレーは数えません）。「70／25／5」はメインの色を70%、サブを25%、目立たせ役を5%の面積で使う、という定番の配分。色が少ないほど落ち着いて高級に、多いほどにぎやかで大衆的に見えます。',
+       h:'色を増やしたくなったら、まず同じ色の濃い・薄いのバリエーションで足りないか試す。それでもダメなときだけ新しい色を足す。目立たせ役の色は面積5%以内を死守——5%を超えた瞬間、目立たなくなります。'},
+      {label:'文字と背景の濃さの差', val:t.contrast, raw:{value:t.contrast},
+       why:t.cwhy, e:'a',
+       w:'文字の色と背景の色の「明るさの差」を数字で表したものです。4.5:1は世界共通の読みやすさ基準（WCAG）の合格ライン——白い背景なら、だいたい中間より濃いグレー以上ならOK。7:1はさらに厳しい基準です。無料のWebツール（コントラストチェッカー）に色を入れると、合格かどうか判定してくれます。'+(t.id==='senior'?'シニアは目のレンズが黄色く濁るため、特に青系と薄い色の見分けがつきにくくなります。厳しい方の基準（7:1）をおすすめします。':''),
+       h:'印刷物でも考え方は同じです。一番事故が起きやすいのは、写真の上に文字を置くとき——写真は場所によって明るさが変わるからです。文字の下に半透明の敷きや帯を入れて、濃さの差を確保します。データを一度白黒にして見ると、読めるかどうかすぐ確認できます。'},
+      {label:'目立たせ役の色', val:'紙面で1箇所だけ', raw:{value:'1箇所だけ'},
+       why:'目立つのは「色」ではなく「ひとつだけ違うこと」', e:'a',
+       w:'一番見せたい場所にだけ使う色です。目立ちは色の性質ではなく「まわりとの違い」から生まれるので、目立たせ役の色をあちこちに散らすと、違いが消えて全部が同時に埋もれます。',
+       h:'目立たせ役の色は、価格・締切・行動ボタンなど「行動に直結する1点」のために取っておく。2箇所目に使いたくなったら、それは優先順位を決めきれていないサイン。デザインではなく、情報の整理に戻って決めましょう。'},
+    ]},
+    {sec:'情報の量', rows:[
+      {label:'グループの数', val:'3〜5', raw:{value:'3〜5'},
+       why:'人が一度に頭に置ける「かたまり」は4つ前後、という研究から', e:'a',
+       w:'情報の大分類の数です。人が一度に頭の中に置いておける「かたまり」は4つ前後、というのが今の研究の定説です（昔よく言われた「7±2」は、今では多すぎるとされています）。',
+       h:'項目が多いときは、削るのではなくグループ分けします。「6ジャンル×5品」は「30品」と同じ量なのに、少なく感じられて選びやすい。目次・メニュー・料金表の作り方の基本です。'},
+      {label:'選ばせる数', val:'6以下', raw:{value:'6以下'},
+       why:'選択肢が多すぎると「選ばない」を選んでしまう', e:'b',
+       w:'お客さんに「どれにしますか」と差し出す数です。ジャムの試食実験では、24種類並べた売り場は6種類の売り場より、買われる率が約10分の1でした。多すぎると比べるのが面倒になり、選ぶこと自体をやめてしまうのです。',
+       h:'プランやコースは3つが定番（真ん中が選ばれやすい）。品ぞろえの多さが売りのお店は、数を減らす代わりにジャンルで畳んで「一度に見比べる数」を小さくします。'},
+      {label:'行動の呼びかけ', val:'1つ', raw:{value:1},
+       why:'出口が多い紙面は、出口がない紙面と同じ', e:'c',
+       w:'「電話してね」「QRを読んでね」「お店に来てね」——読んだ人にとってほしい行動の指示のことです。電話・QR・URL・SNSを全部並べると、選択肢が多すぎる状態になり、結局どれも実行されません。',
+       h:'主役の連絡手段を1つ決めて大きく置き、予備は1つまで・控えめに。「とりあえず全部載せて」と言われたときの答えがこれです。QRを主役にすると、何人が読み取ったか数字で効果もわかります。'},
+      {label:'アピールする強みの数', val:'3つ', raw:{value:3},
+       why:'3つまでは説得力が増え、4つ目から「盛りすぎ？」と疑われ始める', e:'c',
+       w:'「選ばれる理由」として並べる項目の数です。アピールは3つまでなら信じてもらいやすく、4つ目あたりから「ちょっと盛ってない？」という疑いが生まれ始める、という研究報告があります。また「3つ」は人が「根拠が十分」と感じる最小の数です。',
+       h:'強みが10個あるなら、3つに絞って残りは本文や裏面へ。10個の強みを同じ大きさで並べた紙面は、「強みがない」紙面と同じに見えます。何を捨てるかを決めることが、コンセプトを決めることです。'},
+    ]},
+  ];
+}
+
+/* ================= render ================= */
+function update(){renderSheet(); renderBlueprint(); updateRail();}
+function updateRail(){
+  const done={media:!!state.media,target:!!state.target,tone:!!state.tone,axis:!!state.axis,
+    bp:!!(state.media&&state.target&&state.tone&&state.axis)};
+  document.querySelectorAll('#rail .dot').forEach(d=>d.classList.toggle('done',!!done[d.dataset.k]));
+}
+/* sheet tilt (hover devices only) */
+if(window.matchMedia&&matchMedia('(hover:hover)').matches){
+  const cv=document.querySelector('.canvas');
+  cv.addEventListener('pointermove',e=>{
+    const s=$('sheet'); if(s.classList.contains('empty'))return;
+    const r=cv.getBoundingClientRect();
+    const rx=((e.clientY-r.top)/r.height-.5)*-10;
+    const ry=((e.clientX-r.left)/r.width-.5)*12;
+    s.style.setProperty('--rx',rx.toFixed(2)+'deg');
+    s.style.setProperty('--ry',ry.toFixed(2)+'deg');
+  });
+  cv.addEventListener('pointerleave',()=>{
+    const s=$('sheet'); s.style.setProperty('--rx','0deg'); s.style.setProperty('--ry','0deg');
+  });
+}
+function el(styles, delay){
+  const d=document.createElement('div');
+  d.className='el'; d.style.cssText=styles; d.style.setProperty('--d',delay+'s');
+  return d;
+}
+function grad(deg){return `background:linear-gradient(${deg||135}deg,var(--ca),var(--cb));`}
+function renderSheet(){
+  const s=$('sheet');
+  s.classList.remove('empty'); s.innerHTML='';
+  if(!state.media){s.classList.add('empty');s.innerHTML='<span>媒体を選ぶと出現します</span>';return;}
+  s.style.setProperty('--w',state.media.w+'px');
+  s.style.setProperty('--h',state.media.h+'px');
+  const note=$('stageNote');
+  if(!state.axis){
+    s.classList.remove('lit');
+    note.textContent=state.media.note+' 残りのステップでレイアウトが組み上がります。';
+    return;
+  }
+  const sc=state.tone?state.tone.scale:1;
+  const th=state.target?Math.min(1.5,state.target.coef):1;
+  const wash=document.createElement('div'); wash.className='wash'; s.appendChild(wash);
+  const bar=(x,y,w,h,delay,solid)=>el(`left:${x}%;top:${y}%;width:${w*sc}%;height:${h*th}px;border-radius:3px;`+(solid?grad(90):`background:#D9DCE6;`),delay);
+  const B={
+    1(){s.appendChild(el(`left:58%;top:16%;width:${34*sc}%;aspect-ratio:1;border-radius:50%;${grad()}`,.15));
+       s.appendChild(bar(10,26,34,8,.3));
+       s.appendChild(el(`left:10%;top:56%;width:${62*sc}%;height:${10*th}px;border-radius:3px;transform-origin:left;${grad(90)}transform:rotate(-4deg);`,.45));
+       s.appendChild(bar(10,72,50,6,.6)); s.appendChild(bar(10,82,40,6,.7));},
+    2(){s.appendChild(bar(10,12,55,9,.15,true)); s.appendChild(bar(70,12,20,9,.25));
+       s.appendChild(el(`left:10%;top:32%;width:80%;height:1.5px;background:linear-gradient(90deg,var(--ca),transparent);`,.4));
+       s.appendChild(bar(10,42,80,5,.5)); s.appendChild(bar(10,50,80,5,.58)); s.appendChild(bar(10,58,60,5,.66));
+       s.appendChild(el(`left:60%;top:76%;width:${30*sc}%;height:10px;border-radius:3px;${grad(90)}`,.85));},
+    3(){s.appendChild(bar(25,14,50,9,.15,true)); s.appendChild(bar(30,28,40,5,.3));
+       s.appendChild(el(`left:35%;top:42%;width:${30*sc}%;height:28%;border:1.5px solid #C9CFE2;border-radius:4px;background:#F3F5FA;`,.45));
+       s.appendChild(bar(25,78,50,5,.6));
+       s.appendChild(el(`right:8%;bottom:6%;width:13%;aspect-ratio:1;border-radius:50%;${grad()}`,.8));},
+    4(){[0,1,2,3].forEach(i=>s.appendChild(el(`left:${12+i*20}%;top:22%;width:13%;aspect-ratio:1;border-radius:4px;background:#D9DCE6;`,.15+i*.12)));
+       s.appendChild(el(`left:${12+4*20-1}%;top:19%;width:${15*sc}%;aspect-ratio:1;border-radius:50%;${grad()}transform:rotate(8deg);`,.7));
+       s.appendChild(bar(12,58,76,6,.85)); s.appendChild(bar(12,68,60,6,.95)); s.appendChild(bar(12,84,30,8,1.05,true));},
+    5(){s.appendChild(bar(10,14,64,8,.15)); s.appendChild(bar(10,26,50,6,.25));
+       s.appendChild(el(`right:8%;top:10%;padding:2px 6px;font-size:8px;font-weight:700;color:#fff;border-radius:999px;${grad(90)}`,.4)).textContent='〆';
+       s.appendChild(el(`left:10%;top:48%;width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid var(--ca);`,.55));
+       s.appendChild(bar(22,50,40,5,.62));
+       s.appendChild(el(`left:22%;top:70%;width:${56*sc}%;height:16%;border-radius:999px;${grad(90)}box-shadow:0 5px 12px rgba(0,0,0,.18);`,.85));},
+    6(){s.appendChild(el(`left:14%;top:14%;width:${44*sc}%;height:26%;border-radius:52% 48% 55% 45%/55% 45% 52% 48%;${grad()}opacity:.9;`,.15));
+       s.appendChild(el(`right:12%;top:30%;width:22%;aspect-ratio:1;border-radius:47% 53% 50% 50%/52% 48% 55% 45%;background:#D9DCE6;`,.35));
+       s.appendChild(bar(14,58,52,6,.55));
+       s.appendChild(el(`left:14%;top:70%;width:40%;height:${6*th}px;border-radius:3px;background:#D9DCE6;transform:rotate(-2deg);`,.65));
+       s.appendChild(el(`left:14%;top:84%;width:26%;height:8px;border-radius:4px 8px 5px 7px;${grad(90)}transform:rotate(-1.5deg);`,.8));}
+  };
+  B[state.axis.id]();
+  if(state.sub){
+    s.appendChild(el(`right:6%;bottom:5%;padding:1px 7px;font-size:7.5px;font-weight:700;color:var(--ca);border:1px solid var(--ca);border-radius:999px;background:#fff;`,1.15)).textContent='+'+state.sub.name;
+  }
+  requestAnimationFrame(()=>requestAnimationFrame(()=>s.classList.add('lit')));
+  note.textContent=state.axis.note+(state.tone?` トーン「${state.tone.name}」に合わせて要素の量と余白を調整。`:'');
+}
+
+function detailHTML(d){
+  return `<div class="detail"><div class="detail-in">
+    <div class="d-block"><b>どういうこと？</b>${d.w}</div>
+    <div class="d-block"><b>どう使う？</b>${d.h}</div>
+    <div class="d-block"><b>どのくらい確か？</b><span class="ev ${d.e}">${EV[d.e]}</span></div>
+  </div></div>`;
+}
+function toggleOpen(elm){elm.classList.toggle('open');}
+
+function renderBlueprint(){
+  const bp=$('bp');
+  if(!(state.media&&state.target&&state.tone&&state.axis)){bp.hidden=true;return;}
+  bp.hidden=false; bp.classList.remove('show');
+  $('bpMeta').textContent=`${state.media.name}${state.format?'（'+state.format.name+'）':''} ／ ${state.target.name} ／ ${state.tone.name} ／ 情報量：${state.info==='hi'?'多め':state.info==='lo'?'少なめ':'ふつう'} ／ 主目的：${state.axis.name}${state.sub?'＋'+state.sub.name:''}　見る距離の想定 ${state.media.dist}m`;
+  const S=computeSpecs();
+  const area=$('specArea'); area.innerHTML='';
+  let d=0;
+  S.forEach(sec=>{
+    const e=document.createElement('div');
+    e.className='sec'; e.style.setProperty('--d',(d++*.09)+'s');
+    e.innerHTML=`<div class="sec-title">${sec.sec}</div>`;
+    sec.rows.forEach(r=>{
+      const row=document.createElement('div');
+      row.className='row'; row.tabIndex=0; row.setAttribute('role','button');
+      row.innerHTML=`<div class="row-label">${r.label} <span class="ev ${r.e}" style="font-size:8.5px">${EV[r.e].slice(0,1)}</span></div><div class="row-val">${r.val}</div><div class="chev"></div><div class="row-why">${r.why}</div>${detailHTML(r)}`;
+      row.onclick=()=>toggleOpen(row);
+      row.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();toggleOpen(row);}};
+      e.appendChild(row);
+    });
+    area.appendChild(e);
+  });
+  const box=$('mechList'); box.innerHTML='';
+  const ax=state.axis;
+  const add=(m,isSub)=>{
+    if(m.print&&!state.media.print)return;
+    const dd=document.createElement('div');
+    dd.className='mech'+(isSub?' sub':''); dd.tabIndex=0; dd.setAttribute('role','button');
+    dd.style.setProperty('--d',(d++*.06)+'s');
+    dd.innerHTML=`<span class="layer">${m.layer}</span><div><div class="mech-name">${m.name}<span class="ev ${m.e}" style="margin-left:6px;font-size:8.5px">${EV[m.e].slice(0,1)}</span>${isSub?`<span class="sublabel">副・${state.sub.name}</span>`:''}</div><div class="mech-tip">${m.tip}</div></div><div class="chev"></div>${detailHTML(m)}`;
+    dd.onclick=()=>toggleOpen(dd);
+    dd.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();toggleOpen(dd);}};
+    box.appendChild(dd);
+  };
+  ax.mechs.forEach(m=>add(m,false));
+  if(ax.caution){
+    const c=document.createElement('div');
+    c.className='caution'; c.style.setProperty('--d',(d++*.06)+'s');
+    c.textContent=' '+ax.caution; box.appendChild(c);
+  }
+  if(state.sub) state.sub.mechs.slice(0,2).forEach(m=>add(m,true));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>bp.classList.add('show')));
+}
+
+/* ============ 職人の暗黙知ライブラリ ============ */
+let craftBuilt=false;
+$('craftToggle').onclick=()=>{
+  const body=$('craftBody');
+  body.hidden=!body.hidden;
+  $('craftHint').textContent=body.hidden?'タップで開く（選択不要・全24項目）':'タップで閉じる';
+  if(!body.hidden&&!craftBuilt){
+    craftBuilt=true;
+    let i=0;
+    CRAFT.forEach(g=>{
+      const h=document.createElement('div');
+      h.className='craft-group'; h.textContent=g.group;
+      body.appendChild(h);
+      g.items.forEach(it=>{
+        const dd=document.createElement('div');
+        dd.className='mech'; dd.tabIndex=0; dd.setAttribute('role','button');
+        dd.style.setProperty('--d',((i++%8)*.05)+'s');
+        dd.innerHTML=`<span class="layer">${g.group.slice(0,2)}</span><div><div class="mech-name">${it.name}<span class="ev ${it.e}" style="margin-left:6px;font-size:8.5px">${EV[it.e].slice(0,1)}</span></div><div class="mech-tip">${it.tip}</div></div><div class="chev"></div>${detailHTML(it)}`;
+        dd.onclick=()=>toggleOpen(dd);
+        dd.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();toggleOpen(dd);}};
+        body.appendChild(dd);
+      });
+    });
+  }
+};
+
+/* ============ 用語辞典 ============ */
+let glossBuilt=false;
+function buildGloss(filter){
+  const list=$('glossList'); list.innerHTML='';
+  const f=(filter||'').trim().toLowerCase();
+  GLOSSARY.forEach(g=>{
+    const hits=g.terms.filter(([n,d])=>!f||n.toLowerCase().includes(f)||d.toLowerCase().includes(f));
+    if(!hits.length)return;
+    const h=document.createElement('div'); h.className='gcat'; h.textContent=g.cat;
+    list.appendChild(h);
+    hits.forEach(([n,d])=>{
+      const t=document.createElement('div'); t.className='term';
+      t.innerHTML=`<b>${n}</b><span>${d}</span>`;
+      list.appendChild(t);
+    });
+  });
+  if(!list.children.length){const e=document.createElement('div');e.className='term';e.innerHTML='<span>見つかりませんでした</span>';list.appendChild(e);}
+}
+$('glossToggle').onclick=()=>{
+  const body=$('glossBody');
+  body.hidden=!body.hidden;
+  $('glossHint').textContent=body.hidden?'タップで開く（全50語・検索可）':'タップで閉じる';
+  if(!body.hidden&&!glossBuilt){glossBuilt=true;buildGloss('');}
+};
+$('glossSearch').oninput=e=>buildGloss(e.target.value);
+$('glossSearch').onclick=e=>e.stopPropagation();
+
+/* ================= copy ================= */
+function toast(msg){const to=$('toast');to.textContent=msg;to.classList.add('show');setTimeout(()=>to.classList.remove('show'),1800);}
+function doCopy(text,msg){
+  const done=()=>toast(msg);
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(()=>fb());}else fb();
+  function fb(){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();done();}
+}
+const strip=h=>String(h).replace(/<[^>]*>/g,'');
+
+$('copyBtn').onclick=()=>{
+  if(!(state.media&&state.target&&state.tone&&state.axis))return;
+  const S=computeSpecs();
+  let t=`【知覚導線 設計図】\n媒体：${state.media.name}（見る距離${state.media.dist}m想定）\nターゲット：${state.target.name}\nトーン：${state.tone.name}\n主目的：${state.axis.name}${state.sub?'／副目的：'+state.sub.name:''}\n凡例：◎何度も実験で確認ずみ ○公式の基準・複数の研究 △プロの経験則\n`;
+  t+=`\n■ この媒体の本質\n役割：${state.media.essence.role}\n伝えるべき：${state.media.essence.convey}\nあるべき姿：${state.media.essence.ideal}\n`;
+  t+=`\n■ この媒体の宿命\n${state.media.fate}\n`;
+  state.media.fmech.forEach(f=>t+=`・${f.name}（${EV[f.e].slice(0,1)}） — ${f.tip}\n`);
+  if(state.format)t+=`判型：${state.format.name}（${state.format.w}×${state.format.h}mm）\n`;
+  if(state.media.tests){t+=' 仕上がりの試験\n';state.media.tests.forEach(x=>t+=`・${x}\n`);}
+  S.forEach(sec=>{t+=`\n■ ${sec.sec}\n`;sec.rows.forEach(r=>t+=`・${r.label}：${strip(r.val)}（${EV[r.e].slice(0,1)}）\n　└ ${r.why}\n`);});
+  t+='\n■ レイアウトの型とテクニック\n';
+  state.axis.mechs.forEach(m=>{if(!(m.print&&!state.media.print))t+=`・[${m.layer}] ${m.name}（${EV[m.e].slice(0,1)}） — ${m.tip}\n`;});
+  if(state.sub){t+='（副）\n';state.sub.mechs.slice(0,2).forEach(m=>{if(!(m.print&&!state.media.print))t+=`・[${m.layer}] ${m.name}（${EV[m.e].slice(0,1)}） — ${m.tip}\n`;});}
+  if(state.axis.caution)t+='\n '+state.axis.caution+'\n';
+  t+='\n✦ 仕上げ前チェック：すべての要素に「これは何のため？」。答えられない要素は消す候補。\n※ここの数値はスタート地点。ブランドのルールや実測を優先。';
+  doCopy(t,'テキストをコピーしました');
+};
+
+$('jsonBtn').onclick=()=>{
+  if(!(state.media&&state.target&&state.tone&&state.axis))return;
+  const S=computeSpecs();
+  const specs={};
+  S.forEach(sec=>{
+    specs[sec.sec]=sec.rows.map(r=>({
+      item:r.label, value:r.raw?r.raw.value:strip(r.val), unit:r.raw&&r.raw.unit?r.raw.unit:undefined,
+      jumpRatio:r.raw&&r.raw.jumpRatio?r.raw.jumpRatio:undefined,
+      rationale:r.why, evidence:EV[r.e], detail:{explanation:r.w, usage:r.h}
+    }));
+  });
+  const mechs=[];
+  const push=(m,role)=>{if(!(m.print&&!state.media.print))mechs.push({role,layer:m.layer,name:m.name,tip:m.tip,evidence:EV[m.e],detail:{explanation:m.w,usage:m.h}});};
+  state.axis.mechs.forEach(m=>push(m,'primary'));
+  if(state.sub)state.sub.mechs.slice(0,2).forEach(m=>push(m,'secondary'));
+  const obj={
+    tool:'知覚導線ナビ', version:"6.0", generatedAt:new Date().toISOString(),
+    inputs:{
+      media:{id:state.media.id,name:state.media.name,viewingDistanceM:state.media.dist,isPrint:state.media.print,
+        essence:state.media.essence,
+        fate:state.media.fate,
+        mediaTechniques:state.media.fmech.map(f=>({name:f.name,summary:f.tip,evidence:EV[f.e],explanation:f.w,usage:f.h})),
+        format:state.format?{name:state.format.name,widthMm:state.format.w,heightMm:state.format.h}:null,
+        finishTests:state.media.tests||null},
+      infoDensity:state.info,
+      target:{id:state.target.id,name:state.target.name,sizeCoefficient:state.target.coef,requiredContrast:state.target.contrast},
+      tone:{id:state.tone.id,name:state.tone.name,baseJumpRatio:state.tone.jump,baseWhitespacePct:state.tone.white},
+      primaryPurpose:{id:state.axis.id,name:state.axis.name},
+      secondaryPurpose:state.sub?{id:state.sub.id,name:state.sub.name}:null
+    },
+    specs, mechanisms:mechs,
+    caution:state.axis.caution||null,
+    reverseCheck:'すべての要素に「これは何のため？」と問う。答えられない要素は消す候補',
+    disclaimer:'ここの数値はスタート地点。ブランドのルールや実測を優先。'
+  };
+  doCopy(JSON.stringify(obj,null,2),'JSONをコピーしました');
+};
+
+/* ============ image generation prompt (GPT image / gpt-image-1) ============ */
+const IMG_MAP = {
+  media:{
+    flyer:  {size:'1024x1536', ar:'2:3 portrait', medium:'A4 printed flyer (leaflet) design'},
+    booklet:{size:'1536x1024', ar:'3:2 landscape', medium:'brochure spread (two-page) design'},
+    poster: {size:'1024x1536', ar:'2:3 portrait', medium:'large-format B2 poster design, viewed from 3 meters away, must communicate in one glance'},
+    sign:   {size:'1536x1024', ar:'3:1 ultra-wide horizontal signboard (compose as a wide strip within the canvas)', medium:'roadside shop signboard viewed by moving people from about 10 meters for 1-2 seconds; ONE message only, huge bold lettering, instantly recognizable color and silhouette'},
+    lp:     {size:'1536x1024', ar:'3:2 landscape', medium:'web landing-page hero section / banner design'},
+    video:  {size:'1024x1536', ar:'9:16 vertical (compose within 2:3 canvas, keep top 12% and bottom 12% free of important elements as UI-safe area)', medium:'vertical short-video key visual / thumbnail'},
+  },
+  tone:{
+    quiet:{style:['minimal','serene','premium','quiet luxury','restrained','gallery-like'],
+      space:'generous negative space dominating the canvas', energy:'calm and dignified'},
+    std:{style:['clean','balanced','professional','trustworthy','contemporary Japanese graphic design'],
+      space:'comfortable breathing room between element groups', energy:'confident and approachable'},
+    loud:{style:['energetic','bold','vibrant','promotional','lively retail'],
+      space:'dense but organized, clear grouping by proximity', energy:'high-energy and inviting'},
+  },
+  axis:{
+    1:{comp:'ONE dominant isolated focal element commanding attention; a single high-saturation accent color used in exactly one spot while everything else stays muted; one element deliberately tilted 3-5 degrees breaking an otherwise strict grid',
+       avoid:['multiple competing focal points','accent color scattered in several places']},
+    2:{comp:'clear Z-pattern reading flow: strong headline top-left, supporting visual center, conclusion element bottom-right; strict grid alignment; elements grouped by whitespace proximity, no boxes or dividing lines',
+       avoid:['scattered layout with no reading path','decorative dividers and boxed sections']},
+    3:{comp:'symmetrical, centered, formally balanced composition; restrained palette with deep low-lightness base color; serif-style dignified typography treatment; one small seal-like circular accent',
+       avoid:['playful asymmetry','more than one accent color','casual handwritten elements']},
+    4:{comp:'a row or grid of repeated identical modular motifs where EXACTLY ONE unit deviates in color and shape; strong memorable closing element at the bottom of the canvas',
+       avoid:['all elements equally decorated','no repetition structure']},
+    5:{comp:'prominent button-shaped call-to-action area in the lower third, largest interactive-looking element; a small deadline badge top-right; directional cue (arrow or gaze) pointing toward the CTA; single action path only',
+       avoid:['multiple competing buttons or contact methods','CTA smaller than decorative elements']},
+    6:{comp:'organic hand-drawn irregular shapes with warm handcrafted texture; slight intentional imperfections (wobbly lines, uneven edges) within an otherwise tidy layout; human touch visible in 1-2 spots only',
+       avoid:['sterile perfect geometry everywhere','over-textured messy look']},
+  }
+};
+
+function buildImagePrompt(){
+  const m=IMG_MAP.media[state.media.id], tn=IMG_MAP.tone[state.tone.id], ax=IMG_MAP.axis[state.axis.id];
+  const jump=Math.min(8,Math.max(2,state.tone.jump+state.axis.jmod));
+  const white=Math.min(65,state.tone.white+state.axis.wmod+(state.target.id==='senior'?3:0));
+  const subject=($('subjectInput').value||'').trim();
+  const catchCopy=($('catchInput').value||'').trim();
+  const colorPlan=state.tone.id==='quiet'
+    ? 'ONE base color plus neutrals (white/black/gray) only — total 2 colors'
+    : state.tone.id==='std'
+    ? 'THREE colors with area ratio 70% base / 25% secondary / 5% accent'
+    : 'up to FOUR colors: 1 base + 1 accent + 2 supporting; accent stays isolated';
+  const targetNote={
+    young:'standard visual acuity assumed',
+    all:'universal design: err on the larger, higher-contrast side',
+    senior:'senior-friendly: extra-large type feel, very high contrast (avoid blue-on-dark and pale gray combinations)',
+    kids:'child-friendly: large friendly type feel, simple concrete imagery',
+  }[state.target.id];
+
+  const promptText=[
+    `${m.medium}, ${m.ar}.`,
+    subject?`Subject: ${subject}.`:'Subject: [REPLACE WITH YOUR SUBJECT].',
+    `Art direction: ${tn.style.join(', ')}. Overall energy: ${tn.energy}.`,
+    `Composition: ${ax.comp}.`,
+    `Whitespace: approximately ${white}% of the canvas is intentional negative space; ${tn.space}. Whitespace hierarchy: outer margins largest, then between groups, then within groups.`,
+    `Visual hierarchy: headline is about ${jump}x the visual scale of body text (jump ratio ${jump}:1). Maximum 3-4 size tiers. ${jump>=5?'Loud, high-contrast size differences.':jump<=3?'Subtle, refined size differences.':'Balanced size contrast.'}`,
+    `Color: ${colorPlan}. Text-background contrast must be strong (WCAG ${state.target.contrast}). Accessibility: ${targetNote}.`,
+    catchCopy?`Render this exact Japanese headline text prominently: 「${catchCopy}」. Keep other text as abstract greeked placeholder lines.`:`All text as abstract greeked placeholder bars/lines (no readable words) — real typography will be added in production.`,
+    `Information density: at most 3 feature points, single call-to-action, maximum 4-5 content groups.`,
+    `Flat vector-style graphic design mockup, professional Japanese commercial print quality, no photorealistic 3D render, no watermark.`,
+  ].join(' ');
+
+  return {
+    tool:'知覚導線ナビ', version:"6.0", type:'image_generation_prompt',
+    generatedAt:new Date().toISOString(),
+    model_hint:'gpt-image-1 / DALL-E compatible',
+    size_hint:m.size,
+    prompt:promptText,
+    negative_hints:[...ax.avoid,'cluttered layout','more than one visual exit point','random decorative elements with no purpose','illegible low-contrast text'],
+    editable_fields:{subject:subject||'[未入力：題材を差し替えてください]', headline:catchCopy||null},
+    derived_from:{
+      media:state.media.name, target:state.target.name, tone:state.tone.name,
+      primaryPurpose:state.axis.name, secondaryPurpose:state.sub?state.sub.name:null,
+      jumpRatio:jump+':1', whitespacePct:white, contrast:state.target.contrast,
+    },
+    production_notes:[
+      '生成画像はラフ・方向性確認用。実制作の文字サイズ・余白・色は設計図JSONの数値に従う',
+      '日本語の文字はうまく描けないことが多いため、キャッチ以外はダミーの線（グリーキング）で描く指示にしている',
+      '生成結果が構図の指示に従わないときは、Compositionの文を先頭に移すと従いやすい',
+    ],
+  };
+}
+$('imgPromptBtn').onclick=()=>{
+  if(!(state.media&&state.target&&state.tone&&state.axis)){toast('先にSTEP1〜4を選択してください');return;}
+  doCopy(JSON.stringify(buildImagePrompt(),null,2),'画像生成プロンプトをコピーしました');
+};
+
+/* ============ 包括ガイドJSON（選択不要・知識ベース全体） ============ */
+function buildFullGuide(){
+  return {
+    meta:{
+      name:'知覚導線 グラフィックデザイン包括ガイド',
+      version:'1.0', basedOnTool:"知覚導線ナビ v13", generatedAt:new Date().toISOString(),
+      purpose:'紙・Web・動画のグラフィックデザインを、知覚心理・行動科学の知見に基づいて設計するための包括的な知識ベース。人が読むガイドとしても、AIに渡す設計仕様としても使える。',
+      how_to_use_with_ai:'このJSON全体をAIに渡し、「このガイドに従って、媒体=◯◯／ターゲット=◯◯／トーン=◯◯／主目的=◯◯の設計方針（数値と使用テクニック）を出して」と指示する。数値はcalculation.formulasから算出できる。',
+    },
+    philosophy:{
+      core:'デザインは「意思」を説得する技術ではなく、「意思より前の知覚」に働きかける技術である。',
+      unified_model:'すべてのテクニックは「予測とのズレ」の操作に分類できる：ズレを作る＝注目させる／ズレを減らす＝理解・信頼させる／ズレを埋めさせる＝記憶させる。',
+      golden_rules:[
+        '注意は有限資源。目立たせる要素は紙面に1つだけ。全部目立たせる＝何も目立たない',
+        'そろえるから、崩した1箇所が効く。整列は崩しのための土台',
+        '余白は「空き地」ではなく、グループを分ける仕切り。埋めると意味が壊れる',
+        '出口（行動の呼びかけ）は1つ。出口が多い紙面は出口がない紙面と同じ',
+        '文字サイズ・コントラストの下限は「一番読みにくい読者」に合わせる（ユニバーサル設計）',
+        '何を捨てるかを決めることが、コンセプトを決めること',
+        '数値からの逸脱は自由。ただし「なぜ逸脱したか」を言える状態で',
+      ],
+      ethics:[
+        'これらは相手の行動に「入口を作る」技術であって、「出られなくする」技術ではない',
+        'ウソの限定・架空の締切・露骨な当て馬は、バレた瞬間にすべての信頼を壊す',
+        '変動報酬（くじ・スクラッチ）はギャンブルと同じ心の回路を使う。子ども向け・高額商品では抑制的に',
+        'デフォルト（初期設定）は説得より強い。あとで気づいた客が嫌がる初期値は使わない',
+      ],
+    },
+    workflow:{
+      steps:[
+        'STEP1 媒体を決める（見られる距離が決まる）',
+        'STEP2 主ターゲットを決める（必要な文字サイズ・コントラストが決まる）',
+        'STEP3 トーンを決める（メリハリの強さ・余白の量が決まる）',
+        'STEP4 主目的を1つ選ぶ（レイアウトの型と使用テクニックが決まる）',
+        'STEP5 副目的は任意で1つ、そのテクニックは1〜2個まで',
+        '設計 → 制作 → 仕上げ前チェック',
+      ],
+      final_check:'すべての要素に「これは何のために置いた？」と問う。答えられない要素は削除候補。推奨値からズラした箇所は理由をメモに残す。',
+    },
+    evidence_legend:{ a:EV.a, b:EV.b, c:EV.c,
+      note:'△の項目は特に、案件ごとの検証を前提とする。ブランドのルール・実測結果は常にこのガイドの数値に優先する。'},
+    parameters:{
+      media:MEDIA.map(m=>({id:m.id,name:m.name,viewingDistanceM:m.dist,isPrint:m.print,
+        essence:m.essence,
+        fate:m.fate,
+        mediaTechniques:m.fmech.map(f=>({name:f.name,summary:f.tip,evidence:EV[f.e],explanation:f.w,usage:f.h})),
+        formats:m.formats||null,
+        finishTests:m.tests||null,
+        baseBodySize:{value:m.body.v,unit:m.body.u==='%H'?'%H（画面高さに対する割合）':m.body.u},
+        minCaptionSize:m.cap,lineLength:m.lineLen,gridRule:m.grid,
+        marginByTone:{loud:m.margin[0],std:m.margin[1],quiet:m.margin[2],unit:m.print?'mm':'px'},
+        character:m.note})),
+      targets:TARGETS.map(t=>({id:t.id,name:t.name,ageHint:t.hint,sizeCoefficient:t.coef,
+        requiredContrast:t.contrast,designNote:t.tnote,contrastNote:t.cwhy})),
+      tones:TONES.map(t=>({id:t.id,name:t.name,concept:t.hint,baseJumpRatio:t.jump,
+        baseWhitespacePct:t.white,colorRule:t.colors,colorRationale:t.cwhy,jumpRationale:t.jwhy})),
+    },
+    calculation:{
+      formulas:{
+        bodySize:'media.baseBodySize × target.sizeCoefficient',
+        jumpRatio:'clamp(tone.baseJumpRatio + purpose.jumpModifier, 2, 8)',
+        headlineSize:'bodySize × jumpRatio',
+        whitespacePct:'min(65, tone.baseWhitespacePct + purpose.whitespaceModifier + (target=senior ? 3 : 0))',
+        margin:'判型あり媒体：短辺 ×（躍動4%／標準6%／静謐9%）± 情報量補正（多め−1.5%／少なめ+0.8%）、最小6mm。冊子は綴じ側+3mm。判型なし媒体：media.marginByTone[tone]',
+        posterCatchHeightMm:'viewingDistanceM × 4 × target.sizeCoefficient（貼り出し媒体のみ。判読の最低ライン。キャッチは通常この2〜3倍）',
+        lineHeight:'トーン別：静謐180〜190% ／ 標準165〜175% ／ 躍動155〜165%（見出しは130%前後まで詰め可）',
+      },
+      fixed_rules:{
+        sizeTiers:'文字サイズの段階は3〜4段まで（本文・小見出し・大見出し＋注記）',
+        groups:'情報の大分類は3〜5個（人が一度に頭に置けるかたまりは4つ前後）',
+        choices:'選ばせる数は6以下、プランは3つが定番（真ん中が選ばれる）',
+        cta:'行動の呼びかけは主役1つ＋控えめな予備1つまで',
+        features:'アピールする強みは3つ（4つ目から「盛りすぎ？」と疑われ始める）',
+        accentColor:'目立たせ役の色は面積5%以内・紙面で1箇所だけ',
+        whitespaceHierarchy:'余白の大小：紙のフチ＞ブロック間＞段落間＞行間。この順番を崩さない',
+      },
+    },
+    purposes:AXES.map(ax=>({
+      id:ax.id, name:ax.name, goal:ax.sub, principle:ax.note,
+      jumpModifier:ax.jmod, whitespaceModifier:ax.wmod,
+      caution:ax.caution||null,
+      techniques:ax.mechs.map(m=>({
+        layer:m.layer, name:m.name, summary:m.tip,
+        printOnly:!!m.print, evidence:EV[m.e],
+        explanation:m.w, usage:m.h,
+      })),
+    })),
+    glossary:GLOSSARY.map(g=>({category:g.cat,terms:g.terms.map(([n,d])=>({term:n,definition:d}))})),
+    craft_knowledge:CRAFT.map(g=>({group:g.group,items:g.items.map(it=>({name:it.name,summary:it.tip,evidence:EV[it.e],explanation:it.w,usage:it.h}))})),
+    troubleshooting:{
+      space_shortage_order:['①文章を削る','②写真の点数を減らす','③フチの余白を詰める（短辺の6%が下限）','④段数を増やす'],
+      never_touch:['本文の文字サイズ','文字と背景の濃さの差','行間の下限'],
+      principle:'フチを譲ることはあっても、ブロック間の余白（グループの仕切り）は死守する。読めなくなった瞬間、全部が無意味になる。',
+    },
+    disclaimer:'本ガイドの数値・テクニックは「まず間違いのないスタート地点」。ブランドガイドライン、法的表示義務、実測データが常に優先する。',
+  };
+}
+$('guideBtn').onclick=()=>{
+  doCopy(JSON.stringify(buildFullGuide(),null,2),'包括ガイドJSONをコピーしました');
+};
+$('guideDlBtn').onclick=()=>{
+  try{
+    const blob=new Blob([JSON.stringify(buildFullGuide(),null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='知覚導線ガイド.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    toast('.jsonファイルを保存しました');
+  }catch(e){
+    doCopy(JSON.stringify(buildFullGuide(),null,2),'保存できない環境のためコピーしました');
+  }
+};
+
+$('resetBtn').onclick=()=>{
+  Object.keys(state).forEach(k=>state[k]=null); state.info='mid';
+  $('formatChips').innerHTML='';
+  [...$('infoChips').children].forEach((c,i)=>c.classList.toggle('on',i===1));
+  ['mediaChips','targetChips','toneChips','axisCards','subChips'].forEach(id=>[...$(id).children].forEach(c=>c.classList.remove('on')));
+  ['s2','s3','s4','s5'].forEach(id=>$(id).classList.add('locked'));
+  $('fateSec').hidden=true; updateRail();
+  $('bp').hidden=true; renderSheet();
+};
+renderSheet();
+</script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI自動化 時短トラッカー</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #ffffff;
+  --bg2: #f5f5f4;
+  --bg3: #e8e8e5;
+  --text: #1a1a18;
+  --text2: #6b6b67;
+  --text3: #9e9e99;
+  --border: rgba(0,0,0,0.12);
+  --border2: rgba(0,0,0,0.22);
+  --teal: #1D9E75;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --mono: 'JetBrains Mono', 'Fira Mono', 'Courier New', monospace;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1c1a;
+    --bg2: #252523;
+    --bg3: #2e2e2c;
+    --text: #f0f0ec;
+    --text2: #9e9e99;
+    --text3: #6b6b67;
+    --border: rgba(255,255,255,0.10);
+    --border2: rgba(255,255,255,0.20);
+  }
+}
+
+body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem; }
+.container { max-width: 720px; margin: 0 auto; }
+
+.hero {
+  text-align: center;
+  padding: 2.5rem 1rem 2rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg2);
+  margin-bottom: 1rem;
+}
+.hero-label { font-size: 12px; color: var(--text2); letter-spacing: .08em; margin-bottom: .5rem; }
+.hero-num { font-size: 80px; font-weight: 500; line-height: 1; font-family: var(--mono); color: var(--text); }
+.hero-unit { font-size: 24px; color: var(--text2); font-family: var(--mono); }
+.hero-sub { font-size: 13px; color: var(--text2); margin-top: .5rem; }
+
+.stats-row {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg2);
+}
+.stat-item { flex: 1; text-align: center; padding: 1rem .5rem; border-right: 1px solid var(--border); }
+.stat-item:last-child { border-right: none; }
+.stat-val { font-size: 26px; font-weight: 500; font-family: var(--mono); color: var(--text); }
+.stat-lbl { font-size: 11px; color: var(--text2); margin-top: 3px; }
+
+.toggle-row { display: flex; justify-content: center; gap: 6px; margin-bottom: 1.5rem; }
+.t-btn {
+  padding: 7px 22px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border2);
+  font-size: 13px; cursor: pointer;
+  background: var(--bg); color: var(--text2);
+  font-family: var(--sans); transition: all .15s;
+}
+.t-btn.on { border-color: var(--text); color: var(--text); font-weight: 500; }
+
+.tools-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.tools-ttl { font-size: 13px; font-weight: 500; color: var(--text); }
+.tools-hint { font-size: 12px; color: var(--text2); font-weight: 400; }
+
+.btn-add {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: var(--radius);
+  border: 1px solid var(--border2); background: var(--bg);
+  color: var(--text); font-size: 12px; cursor: pointer;
+  font-family: var(--sans); transition: background .15s;
+}
+.btn-add:hover { background: var(--bg2); }
+
+/* ツール行 */
+.tool-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: border-color .15s;
+}
+.tool-card:hover { border-color: var(--border2); }
+
+.tool-card-head {
+  display: flex; align-items: center;
+  padding: 10px 12px 8px;
+  gap: 10px;
+}
+.tool-name-wrap { flex: 1; min-width: 0; }
+.tool-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tool-cat { font-size: 11px; color: var(--text2); margin-top: 1px; }
+
+.result-chip { font-size: 14px; font-weight: 500; font-family: var(--mono); white-space: nowrap; flex-shrink: 0; }
+.result-sub { font-size: 11px; color: var(--text2); font-family: var(--mono); white-space: nowrap; }
+
+.del-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--text2); padding: 2px 4px; border-radius: 4px;
+  font-size: 15px; line-height: 1; flex-shrink: 0; transition: color .15s, background .15s;
+}
+.del-btn:hover { color: #E24B4A; background: #FCEBEB; }
+
+.tool-card-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+}
+.inp-cell {
+  padding: 10px 12px;
+  border-right: 1px solid var(--border);
+}
+.inp-cell:last-child { border-right: none; }
+.inp-lbl { font-size: 11px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+.inp-wrap { display: flex; align-items: center; gap: 6px; }
+.n-inp {
+  flex: 1; min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  font-size: 15px; text-align: center;
+  background: var(--bg); color: var(--text);
+  font-family: var(--mono); transition: border-color .15s;
+}
+.n-inp:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 2px rgba(29,158,117,.15); }
+.inp-unit { font-size: 12px; font-weight: 500; color: var(--text2); flex-shrink: 0; }
+
+/* バー */
+.bar-section { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border); }
+.bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.bar-name { font-size: 12px; color: var(--text2); width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 0; }
+.bar-track { flex: 1; height: 12px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
+.bar-val { font-size: 12px; font-family: var(--mono); color: var(--text2); min-width: 44px; text-align: right; flex-shrink: 0; }
+
+.empty {
+  text-align: center; padding: 2.5rem;
+  color: var(--text2); font-size: 13px;
+  border: 1px dashed var(--border2); border-radius: var(--radius);
+}
+
+/* モーダル */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.35); z-index: 100;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem; width: 360px;
+  max-width: calc(100vw - 2rem);
+}
+.modal h3 { font-size: 14px; font-weight: 500; margin-bottom: 1rem; color: var(--text); }
+.frow { margin-bottom: 10px; }
+.frow label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 3px; }
+.frow input, .frow select {
+  width: 100%; padding: 7px 10px;
+  border: 1px solid var(--border2); border-radius: var(--radius);
+  font-size: 13px; background: var(--bg); color: var(--text);
+  font-family: var(--sans); transition: border-color .15s;
+}
+.frow input:focus, .frow select:focus { outline: none; border-color: var(--teal); }
+.frow-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.mbtns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
+.btn-cancel {
+  padding: 7px 16px; border: 1px solid var(--border2); border-radius: var(--radius);
+  background: none; color: var(--text2); cursor: pointer; font-size: 13px; font-family: var(--sans);
+}
+.btn-save {
+  padding: 7px 16px; border: 1px solid var(--teal); border-radius: var(--radius);
+  background: var(--teal); color: #fff; cursor: pointer; font-size: 13px; font-family: var(--sans);
+}
+.btn-save:hover { opacity: .88; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-label" id="hero-label">月間 削減時間</div>
+    <div>
+      <span class="hero-num" id="hero-num">0</span>
+      <span class="hero-unit">h</span>
+    </div>
+    <div class="hero-sub" id="hero-sub">ツールを追加してください</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-val" id="days-val">0</div>
+      <div class="stat-lbl" id="days-lbl">月換算稼働日（8h）</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="min-val">0</div>
+      <div class="stat-lbl" id="min-lbl">合計削減 分</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="tools-val">0</div>
+      <div class="stat-lbl">稼働ツール数</div>
+    </div>
+  </div>
+
+  <div class="toggle-row">
+    <button class="t-btn on" id="btn-m" onclick="setView('month')">月次</button>
+    <button class="t-btn" id="btn-y" onclick="setView('year')">年次</button>
+  </div>
+
+  <div class="tools-header">
+    <span class="tools-ttl">ツール一覧 <span class="tools-hint">— 導入前・後の作業時間(分) と 月稼働数 を入力</span></span>
+    <button class="btn-add" onclick="openModal()">
+      <i class="ti ti-plus" aria-hidden="true"></i> 追加
+    </button>
+  </div>
+
+  <div id="tool-list"></div>
+
+  <div class="bar-section" id="bar-section" style="display:none">
+    <div id="bars"></div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>ツールを追加</h3>
+    <div class="frow"><label>ツール名</label><input id="f-name" type="text" placeholder="例: MATE（名刺OCR）"></div>
+    <div class="frow"><label>カテゴリ</label>
+      <select id="f-cat">
+        <option>OCR</option><option>GAS</option><option>Python</option>
+        <option>HTML</option><option>ExtendScript</option><option>その他</option>
+      </select>
+    </div>
+    <div class="frow">
+      <label>作業時間・稼働数</label>
+      <div class="frow-row">
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:3px">導入前（分/回）</div>
+          <input id="f-before" type="number" min="0" step="1" placeholder="例: 30">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:3px">導入後（分/回）</div>
+          <input id="f-after" type="number" min="0" step="1" placeholder="例: 5">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:3px">月間稼働数（回）</div>
+          <input id="f-freq" type="number" min="0" step="1" placeholder="例: 40">
+        </div>
+      </div>
+    </div>
+    <div class="mbtns">
+      <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
+      <button class="btn-save" onclick="saveModal()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CAT_COLORS = {
+  OCR: '#1D9E75', GAS: '#185FA5', Python: '#BA7517',
+  HTML: '#534AB7', ExtendScript: '#D85A30', 'その他': '#888780'
+};
+
+const DEFAULTS = [
+  {id:1, name:'MATE（名刺OCR）',   cat:'OCR',    before:20, after:2, freq:60},
+  {id:2, name:'BASE（BGM自動化）', cat:'GAS',    before:45, after:5, freq:30},
+  {id:3, name:'Time is Money',     cat:'OCR',    before:90, after:8, freq:8},
+  {id:4, name:'BannerSpec',        cat:'HTML',   before:30, after:5, freq:40},
+  {id:5, name:'Excel→AI自動組版', cat:'Python', before:60, after:5, freq:20},
+];
+const LS_KEY = 'jitan_tracker_v1';
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem(LS_KEY));
+    if (s && Array.isArray(s.tools)) return s;
+  } catch(e) {}
+  return null;
+}
+
+function persist() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ tools, nid, view }));
+  } catch(e) {}
+}
+
+const saved = loadState();
+let tools = saved ? saved.tools : DEFAULTS;
+let nid   = saved ? saved.nid  : 6;
+let view  = saved ? saved.view : 'month';
+
+function mult() { return view === 'year' ? 12 : 1; }
+function saveMins(t) { return Math.max(0, (t.before - t.after)) * t.freq; }
+function toH(mins) { return Math.round(mins / 60 * 10) / 10; }
+function eff(t) { return t.before > 0 ? Math.round((t.before - t.after) / t.before * 100) : 0; }
+
+function animateTo(el, target, decimals) {
+  const start = parseFloat(el.textContent.replace(/,/g, '')) || 0;
+  const steps = 24; let i = 0;
+  const step = () => {
+    i++;
+    const v = start + (target - start) * (i / steps);
+    el.textContent = decimals === 0 ? Math.round(v).toLocaleString() : v.toFixed(decimals);
+    if (i < steps) requestAnimationFrame(step);
+    else el.textContent = decimals === 0 ? Math.round(target).toLocaleString() : target.toFixed(decimals);
+  };
+  requestAnimationFrame(step);
+}
+
+function render() {
+  const m = mult();
+  const totalMins = tools.reduce((s, t) => s + saveMins(t), 0) * m;
+  const totalH = toH(totalMins);
+  const days = Math.round(totalH / 8 * 100) / 100;
+
+  animateTo(document.getElementById('hero-num'), totalH, 1);
+  document.getElementById('hero-label').textContent = (view === 'year' ? '年間' : '月間') + ' 削減時間';
+  document.getElementById('hero-sub').textContent = tools.length
+    ? `${tools.length}本のツールで ${Math.round(totalMins).toLocaleString()} 分を削減`
+    : 'ツールを追加してください';
+
+  animateTo(document.getElementById('days-val'), days, 2);
+  document.getElementById('days-lbl').textContent = view === 'year' ? '年換算稼働日（8h）' : '月換算稼働日（8h）';
+  animateTo(document.getElementById('min-val'), Math.round(totalMins), 0);
+  document.getElementById('min-lbl').textContent = view === 'year' ? '年間削減 分' : '月間削減 分';
+  document.getElementById('tools-val').textContent = tools.length;
+
+  document.getElementById('btn-m').classList.toggle('on', view === 'month');
+  document.getElementById('btn-y').classList.toggle('on', view === 'year');
+
+  const list = document.getElementById('tool-list');
+  if (!tools.length) {
+    list.innerHTML = '<div class="empty"><i class="ti ti-robot" style="font-size:24px;display:block;margin-bottom:8px" aria-hidden="true"></i>ツールを追加してください</div>';
+    document.getElementById('bar-section').style.display = 'none';
+    return;
+  }
+
+  list.innerHTML = tools.map(t => {
+    const sm = saveMins(t);
+    const dispH = toH(sm * m);
+    const dispMins = Math.round(sm * m);
+    const e = eff(t);
+    const color = CAT_COLORS[t.cat] || '#888780';
+    const chipColor = dispH > 0 ? color : 'var(--text3)';
+    return `<div class="tool-card">
+      <div class="tool-card-head">
+        <div class="tool-name-wrap">
+          <div class="tool-name">${t.name}</div>
+          <div class="tool-cat">${t.cat}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="result-chip" style="color:${chipColor}">${dispH > 0 ? '+' + dispH + 'h' : '–'}</div>
+          <div class="result-sub">${dispMins > 0 ? dispMins.toLocaleString() + '分' : ''} ${e > 0 ? '削減率 ' + e + '%' : ''}</div>
+        </div>
+        <button class="del-btn" onclick="del(${t.id})" aria-label="削除"><i class="ti ti-trash" style="font-size:14px" aria-hidden="true"></i></button>
+      </div>
+      <div class="tool-card-inputs">
+        <div class="inp-cell">
+          <div class="inp-lbl">導入前（分/回）</div>
+          <div class="inp-wrap">
+            <input class="n-inp" type="number" min="0" step="1" value="${t.before}" onchange="updField(${t.id},'before',this.value)">
+            <span class="inp-unit">分</span>
+          </div>
+        </div>
+        <div class="inp-cell">
+          <div class="inp-lbl">導入後（分/回）</div>
+          <div class="inp-wrap">
+            <input class="n-inp" type="number" min="0" step="1" value="${t.after}" onchange="updField(${t.id},'after',this.value)">
+            <span class="inp-unit">分</span>
+          </div>
+        </div>
+        <div class="inp-cell">
+          <div class="inp-lbl">月間稼働数</div>
+          <div class="inp-wrap">
+            <input class="n-inp" type="number" min="0" step="1" value="${t.freq}" onchange="updField(${t.id},'freq',this.value)">
+            <span class="inp-unit">回</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const barSec = document.getElementById('bar-section');
+  barSec.style.display = 'block';
+  const sorted = [...tools].sort((a, b) => saveMins(b) - saveMins(a));
+  const maxV = saveMins(sorted[0]) * m || 1;
+  document.getElementById('bars').innerHTML = sorted.map(t => {
+    const v = toH(saveMins(t) * m);
+    const pct = Math.round(saveMins(t) * m / maxV * 100);
+    const color = CAT_COLORS[t.cat] || '#888780';
+    return `<div class="bar-row">
+      <span class="bar-name">${t.name}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <span class="bar-val">${v}h</span>
+    </div>`;
+  }).join('');
+}
+
+function setView(v) { view = v; persist(); render(); }
+function updField(id, field, val) {
+  const t = tools.find(t => t.id === id);
+  if (t) { t[field] = Math.max(0, parseInt(val) || 0); persist(); render(); }
+}
+function del(id) { tools = tools.filter(t => t.id !== id); persist(); render(); }
+
+function openModal() { document.getElementById('modal').classList.add('open'); }
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  ['f-name','f-before','f-after','f-freq'].forEach(id => document.getElementById(id).value = '');
+}
+function saveModal() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) return;
+  tools.push({
+    id: nid++,
+    name,
+    cat: document.getElementById('f-cat').value,
+    before: Math.max(0, parseInt(document.getElementById('f-before').value) || 0),
+    after:  Math.max(0, parseInt(document.getElementById('f-after').value)  || 0),
+    freq:   Math.max(0, parseInt(document.getElementById('f-freq').value)   || 0),
+  });
+  persist();
+  closeModal();
+  render();
+}
+
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal')) closeModal();
+});
+
+render();
+</script>
+</body>
+</html>

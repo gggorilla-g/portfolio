@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ヤマサキのIllustratorショートカット - Macキーボード</title>
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+        }
+body {
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+background: rgba(255, 124, 0, 0.6);
+min-height: 100vh;
+padding: 20px;
+display: flex;
+flex-direction: column;
+align-items: center;
+-webkit-tap-highlight-color: transparent;
+touch-action: manipulation;
+        }
+.container {
+max-width: 1400px;
+width: 100%;
+        }
+.header-section {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 10px;
+flex-wrap: wrap;
+gap: 12px;
+        }
+h1 {
+color: white;
+font-size: 2.25rem;
+flex-shrink: 0;
+text-align: left;
+        }
+.header-right {
+display: flex;
+align-items: center;
+gap: 14px;
+flex: 1;
+justify-content: flex-end;
+min-width: 0;
+        }
+.shortcut-counter {
+background: rgba(255,255,255,0.95);
+color: #FF7C00;
+padding: 10px 20px;
+border-radius: 20px;
+font-size: 1.1rem;
+font-weight: bold;
+box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+flex-shrink: 0;
+        }
+.subtitle {
+color: #666;
+text-align: center;
+margin-bottom: 30px;
+font-size: 1.1rem;
+width: 100%;
+        }
+.filter-section {
+background: rgba(255,255,255,0.95);
+border-radius: 16px;
+padding: 20px;
+margin-bottom: 20px;
+box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+.filter-buttons {
+display: flex;
+gap: 12px;
+flex-wrap: wrap;
+justify-content: center;
+margin-bottom: 0;
+        }
+/* Header search bar */
+.header-search {
+display: none;
+align-items: center;
+background: rgba(255,255,255,0.18);
+border: 1.5px solid rgba(255,255,255,0.55);
+border-radius: 30px;
+padding: 0 6px 0 16px;
+gap: 6px;
+transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+backdrop-filter: blur(8px);
+min-width: 0;
+flex: 1;
+max-width: 380px;
+        }
+.header-search.visible {
+display: flex;
+animation: fadeInHeader 0.3s ease;
+        }
+@keyframes fadeInHeader {
+from { opacity: 0; transform: translateX(12px); }
+to { opacity: 1; transform: translateX(0); }
+        }
+.header-search:focus-within {
+background: rgba(255,255,255,0.28);
+border-color: rgba(255,255,255,0.9);
+box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+.header-search-icon {
+flex-shrink: 0;
+opacity: 0.75;
+        }
+.header-search-input {
+flex: 1;
+background: transparent;
+border: none;
+outline: none;
+font-size: 0.95rem;
+font-family: inherit;
+color: #fff;
+padding: 10px 0;
+min-width: 0;
+letter-spacing: 0.01em;
+        }
+.header-search-input::placeholder {
+color: rgba(255,255,255,0.6);
+font-size: 0.9rem;
+        }
+.header-search-clear {
+flex-shrink: 0;
+background: rgba(255,255,255,0.2);
+border: none;
+border-radius: 50%;
+width: 28px;
+height: 28px;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+opacity: 0;
+pointer-events: none;
+transition: all 0.2s ease;
+        }
+.header-search-clear.show {
+opacity: 1;
+pointer-events: auto;
+        }
+.header-search-clear:hover {
+background: rgba(255,255,255,0.35);
+        }
+.header-search-clear svg {
+display: block;
+        }
+/* hide old search area in filter section */
+.search-area { display: none !important; }
+.filter-btn {
+background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+border: 3px solid #FF7C00;
+color: #FF7C00;
+padding: 12px 24px;
+border-radius: 25px;
+cursor: pointer;
+transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+font-weight: 600;
+font-size: 1rem;
+position: relative;
+overflow: hidden;
+min-width: 90px;
+text-align: center;
+        }
+.filter-btn::before {
+content: '';
+position: absolute;
+top: 50%;
+left: 50%;
+width: 0;
+height: 0;
+border-radius: 50%;
+background: rgba(255, 124, 0, 0.2);
+transform: translate(-50%, -50%);
+transition: width 0.6s, height 0.6s;
+        }
+.filter-btn:hover {
+transform: translateY(-4px) scale(1.05);
+border-color: #FF6A00;
+        }
+.filter-btn:hover::before {
+width: 300px;
+height: 300px;
+        }
+.filter-btn:active {
+transform: translateY(-2px) scale(1.02);
+        }
+.filter-btn.active {
+background: linear-gradient(135deg, #FF7C00 0%, #FF9E40 100%);
+color: white;
+border-color: #FF7C00;
+transform: translateY(-2px);
+        }
+.filter-btn.active::after {
+content: '✓';
+margin-left: 8px;
+font-size: 1.1em;
+animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+@keyframes checkPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+.keyboard {
+background: linear-gradient(145deg, #e8e8e8 0%, #f0f0f0 100%);
+border-radius: 16px;
+padding: 20px;
+box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+width: 100%;
+overflow-x: auto;
+overflow-y: hidden;
+-webkit-overflow-scrolling: touch;
+margin-bottom: 30px;
+position: relative;
+        }
+.keyboard-row {
+display: flex;
+gap: 6px;
+margin-bottom: 6px;
+justify-content: center;
+        }
+.key {
+background: linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%);
+border: 1px solid #ccc;
+border-radius: 8px;
+padding: 12px;
+min-width: 50px;
+height: 50px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 14px;
+font-weight: 500;
+cursor: pointer;
+transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+position: relative;
+color: #333;
+user-select: none;
+-webkit-user-select: none;
+-webkit-tap-highlight-color: transparent;
+        }
+.key::after {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+border-radius: 8px;
+background: linear-gradient(135deg, rgba(255,124,0,0) 0%, rgba(255,124,0,0.1) 100%);
+opacity: 0;
+transition: opacity 0.3s;
+        }
+.key:hover {
+background: linear-gradient(145deg, #FF8C1A 0%, #FF7C00 100%);
+color: white;
+transform: translateY(-4px) scale(1.08);
+border-color: #FF6A00;
+        }
+.key:hover::after {
+opacity: 1;
+        }
+.key:active {
+transform: translateY(-1px) scale(1.03);
+        }
+.key.active-shortcut {
+background: linear-gradient(145deg, #FF7C00 0%, #FF6A00 100%) !important;
+color: white !important;
+border-color: #E66A00;
+animation: keyPulse 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+@keyframes keyPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+@keyframes modifierBlink {
+            0% { 
+background: linear-gradient(145deg, #FF7C00 0%, #FF6A00 100%);
+opacity: 1;
+            }
+            50% { 
+background: linear-gradient(145deg, #FF9E40 0%, #FF8C1A 100%);
+opacity: 0.7;
+            }
+            100% { 
+background: linear-gradient(145deg, #FF7C00 0%, #FF6A00 100%);
+opacity: 1;
+            }
+        }
+.key.modifier.blinking {
+animation: modifierBlink 4s ease-in-out infinite;
+color: white !important;
+border-color: #E66A00;
+        }
+.key.modifier {
+background: linear-gradient(145deg, #f7fafc 0%, #edf2f7 100%);
+font-size: 12px;
+        }
+.key.modifier:hover {
+background: linear-gradient(145deg, #FF8C1A 0%, #FF7C00 100%);
+color: white;
+        }
+.key.space {
+min-width: 300px;
+        }
+.key.wide {
+min-width: 80px;
+        }
+.key.extra-wide {
+min-width: 100px;
+        }
+.key-indicator {
+position: absolute;
+top: 4px;
+right: 4px;
+width: 8px;
+height: 8px;
+background: #FF7C00;
+border-radius: 50%;
+display: none;
+animation: indicatorPulse 2s infinite;
+        }
+@keyframes indicatorPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+.key.has-shortcut .key-indicator {
+display: block;
+        }
+/* Tooltip styles */
+.key-tooltip {
+position: absolute;
+background: rgba(255, 255, 255, 0.95);
+border: 3px solid #FF7C00;
+border-radius: 12px;
+padding: 15px 20px;
+box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+z-index: 1000;
+pointer-events: none;
+opacity: 0;
+transform: translateY(10px);
+transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+max-width: 300px;
+        }
+.key-tooltip.show {
+opacity: 1;
+transform: translateY(0);
+        }
+.key-tooltip::before {
+content: '';
+position: absolute;
+bottom: 100%;
+left: 50%;
+transform: translateX(-50%);
+border: 10px solid transparent;
+border-bottom-color: #FF7C00;
+        }
+.key-tooltip::after {
+content: '';
+position: absolute;
+bottom: 100%;
+left: 50%;
+transform: translateX(-50%);
+border: 7px solid transparent;
+border-bottom-color: white;
+margin-bottom: -3px;
+        }
+.tooltip-shortcut {
+font-size: 1.1rem;
+font-weight: bold;
+color: #FF7C00;
+margin-bottom: 8px;
+        }
+.tooltip-description {
+font-size: 0.95rem;
+color: #333;
+line-height: 1.4;
+        }
+.shortcut-list {
+background: rgba(255,255,255,0.97);
+border-radius: 16px;
+padding: 25px;
+box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+max-height: 600px;
+overflow-y: auto;
+margin-bottom: 20px;
+animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+@keyframes slideIn {
+            from {
+opacity: 0;
+transform: translateY(-20px);
+            }
+            to {
+opacity: 1;
+transform: translateY(0);
+            }
+        }
+.shortcut-list::-webkit-scrollbar {
+width: 10px;
+        }
+.shortcut-list::-webkit-scrollbar-track {
+background: #f1f1f1;
+border-radius: 10px;
+        }
+.shortcut-list::-webkit-scrollbar-thumb {
+background: linear-gradient(135deg, #FF7C00 0%, #FF9E40 100%);
+border-radius: 10px;
+        }
+.shortcut-list::-webkit-scrollbar-thumb:hover {
+background: linear-gradient(135deg, #FF6A00 0%, #FF8C1A 100%);
+        }
+.list-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 25px;
+padding-bottom: 20px;
+border-bottom: 3px solid #FF7C00;
+        }
+.list-title {
+font-size: 1.8rem;
+font-weight: bold;
+color: #FF7C00;
+        }
+.list-count {
+font-size: 1.1rem;
+color: #666;
+font-weight: 600;
+        }
+.shortcut-items {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+gap: 12px;
+        }
+.shortcut-item {
+display: flex;
+align-items: center;
+padding: 14px 18px;
+background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+border-radius: 12px;
+transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+cursor: pointer;
+border: 2px solid transparent;
+        }
+.shortcut-item:hover {
+background: linear-gradient(135deg, #FFE8D6 0%, #FFD4B3 100%);
+transform: translateX(8px) scale(1.02);
+border-color: #FF7C00;
+        }
+.shortcut-item.highlighted {
+background: linear-gradient(135deg, #FFD4B3 0%, #FFC299 100%);
+border-color: #FF7C00;
+transform: translateX(8px) scale(1.02);
+        }
+.shortcut-key {
+font-weight: bold;
+color: #FF7C00;
+min-width: 100px;
+font-size: 1.05rem;
+        }
+.shortcut-desc {
+color: #333;
+font-size: 0.95rem;
+        }
+/* ハイライトマーク */
+mark {
+background: rgba(255, 200, 50, 0.5);
+color: inherit;
+border-radius: 3px;
+padding: 0 2px;
+        }
+.no-results {
+text-align: center;
+padding: 40px 20px;
+color: #999;
+font-size: 1.1rem;
+        }
+.no-results-icon {
+font-size: 3rem;
+margin-bottom: 12px;
+        }
+@media (max-width: 1200px) {
+.key {
+min-width: 45px;
+height: 45px;
+font-size: 12px;
+padding: 8px;
+            }
+.key.space {
+min-width: 250px;
+            }
+.shortcut-list {
+max-height: 500px;
+            }
+        }
+@media (max-width: 768px) {
+body {
+padding: 10px;
+            }
+.header-section {
+flex-direction: column;
+align-items: flex-start;
+gap: 8px;
+            }
+.header-right {
+width: 100%;
+justify-content: space-between;
+            }
+.header-search {
+max-width: none;
+flex: 1;
+            }
+h1 {
+font-size: 1.35rem;
+margin-bottom: 0;
+text-align: left;
+            }
+.shortcut-counter {
+font-size: 1rem;
+padding: 8px 16px;
+            }
+.subtitle {
+font-size: 0.9rem;
+margin-bottom: 15px;
+            }
+.filter-section {
+padding: 15px;
+margin-bottom: 15px;
+            }
+.filter-buttons {
+gap: 8px;
+            }
+.filter-btn {
+padding: 10px 18px;
+font-size: 0.9rem;
+min-height: 44px;
+min-width: 75px;
+            }
+.keyboard {
+padding: 10px;
+overflow-x: scroll;
+-webkit-overflow-scrolling: touch;
+scrollbar-width: thin;
+            }
+.keyboard::-webkit-scrollbar {
+height: 6px;
+            }
+.keyboard::-webkit-scrollbar-thumb {
+background: #FF7C00;
+border-radius: 3px;
+            }
+.keyboard-row {
+gap: 3px;
+margin-bottom: 3px;
+            }
+.key {
+min-width: 38px;
+height: 38px;
+font-size: 10px;
+padding: 4px;
+flex-shrink: 0;
+            }
+.key.wide {
+min-width: 60px;
+            }
+.key.extra-wide {
+min-width: 70px;
+            }
+.key.space {
+min-width: 160px;
+            }
+.shortcut-list {
+padding: 20px;
+max-height: 400px;
+            }
+.list-title {
+font-size: 1.3rem;
+            }
+.list-count {
+font-size: 1rem;
+            }
+.shortcut-items {
+grid-template-columns: 1fr;
+            }
+.shortcut-item {
+flex-direction: column;
+align-items: flex-start;
+            }
+.shortcut-key {
+min-width: auto;
+font-size: 0.95rem;
+margin-bottom: 5px;
+            }
+.shortcut-desc {
+font-size: 0.85rem;
+            }
+.key-tooltip {
+max-width: 250px;
+padding: 12px 16px;
+            }
+.tooltip-shortcut {
+font-size: 1rem;
+            }
+.tooltip-description {
+font-size: 0.85rem;
+            }
+@media (max-width: 480px) {
+h1 {
+font-size: 1.17rem;
+            }
+.shortcut-counter {
+font-size: 0.9rem;
+padding: 6px 12px;
+            }
+.subtitle {
+font-size: 0.85rem;
+            }
+.filter-btn {
+padding: 8px 14px;
+font-size: 0.8rem;
+min-width: 65px;
+            }
+.key {
+min-width: 32px;
+height: 32px;
+font-size: 8px;
+padding: 2px;
+            }
+.key.wide {
+min-width: 50px;
+            }
+.key.extra-wide {
+min-width: 60px;
+            }
+.key.space {
+min-width: 130px;
+            }
+.shortcut-list {
+max-height: 350px;
+padding: 15px;
+            }
+.list-title {
+font-size: 1.1rem;
+            }
+        }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header-section">
+<h1>ヤマサキのIllustratorショートカット</h1>
+<div class="header-right">
+<!-- ヘッダー検索バー（ALLモード時のみ表示） -->
+<div class="header-search" id="headerSearch">
+<svg class="header-search-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="11" cy="11" r="7"/>
+<line x1="16.5" y1="16.5" x2="22" y2="22"/>
+</svg>
+<input
+type="text"
+class="header-search-input"
+id="searchInput"
+placeholder="ショートカットを検索…"
+autocomplete="off"
+autocorrect="off"
+autocapitalize="off"
+spellcheck="false"
+>
+<button class="header-search-clear" id="searchClear" title="クリア">
+<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round">
+<line x1="1" y1="1" x2="11" y2="11"/>
+<line x1="11" y1="1" x2="1" y2="11"/>
+</svg>
+</button>
+</div>
+<div class="shortcut-counter" id="shortcutCounter">総数: 0個</div>
+</div>
+</div>
+<div class="filter-section">
+<div class="filter-buttons">
+<button class="filter-btn" data-filter="ALL">ALL</button>
+<button class="filter-btn" data-filter="⌘">⌘</button>
+<button class="filter-btn" data-filter="⌘⇧">⌘⇧</button>
+<button class="filter-btn" data-filter="⌘⌥">⌘⌥</button>
+<button class="filter-btn" data-filter="⌘⇧⌥">⌘⇧⌥</button>
+<button class="filter-btn" data-filter="⇧">⇧</button>
+<button class="filter-btn" data-filter="⌃">⌃</button>
+<button class="filter-btn" data-filter="単体">単</button>
+</div>
+<!-- 検索エリア（ALLモード時のみ表示） -->
+<div class="search-area" id="searchArea">
+<div class="search-input-wrapper">
+<span class="search-icon"></span>
+<input
+type="text"
+class="search-input"
+id="searchInput"
+placeholder="キーワードで検索（例：グループ、コピー、ツール…）"
+autocomplete="off"
+autocorrect="off"
+autocapitalize="off"
+spellcheck="false"
+>
+</div>
+<button class="search-clear" id="searchClear" title="クリア">✕</button>
+</div>
+</div>
+<div class="keyboard" id="mainKeyboard">
+<!-- Row 1 -->
+<div class="keyboard-row">
+<div class="key" data-key="esc">esc</div>
+<div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+<div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div><div class="key"></div>
+<div class="key"></div><div class="key"></div>
+</div>
+<!-- Row 2 -->
+<div class="keyboard-row">
+<div class="key" data-key="`">` ~</div>
+<div class="key" data-key="1">1</div>
+<div class="key" data-key="2">2</div>
+<div class="key" data-key="3">3</div>
+<div class="key" data-key="4">4</div>
+<div class="key" data-key="5">5</div>
+<div class="key" data-key="6">6</div>
+<div class="key" data-key="7">7</div>
+<div class="key" data-key="8">8</div>
+<div class="key" data-key="9">9</div>
+<div class="key" data-key="0">0</div>
+<div class="key" data-key="-">- _</div>
+<div class="key" data-key="=">=  +</div>
+<div class="key wide" data-key="delete">delete</div>
+</div>
+<!-- Row 3 -->
+<div class="keyboard-row">
+<div class="key wide" data-key="tab">tab</div>
+<div class="key" data-key="Q">Q</div>
+<div class="key" data-key="W">W</div>
+<div class="key" data-key="E">E</div>
+<div class="key" data-key="R">R</div>
+<div class="key" data-key="T">T</div>
+<div class="key" data-key="Y">Y</div>
+<div class="key" data-key="U">U</div>
+<div class="key" data-key="I">I</div>
+<div class="key" data-key="O">O</div>
+<div class="key" data-key="P">P</div>
+<div class="key" data-key="[">[  {</div>
+<div class="key" data-key="]">]  }</div>
+<div class="key wide" data-key="\\">\\ |</div>
+</div>
+<!-- Row 4 -->
+<div class="keyboard-row">
+<div class="key extra-wide modifier" data-key="control">control</div>
+<div class="key" data-key="A">A</div>
+<div class="key" data-key="S">S</div>
+<div class="key" data-key="D">D</div>
+<div class="key" data-key="F">F</div>
+<div class="key" data-key="G">G</div>
+<div class="key" data-key="H">H</div>
+<div class="key" data-key="J">J</div>
+<div class="key" data-key="K">K</div>
+<div class="key" data-key="L">L</div>
+<div class="key" data-key=";">; :</div>
+<div class="key" data-key="'">' "</div>
+<div class="key extra-wide" data-key="return">return</div>
+</div>
+<!-- Row 5 -->
+<div class="keyboard-row">
+<div class="key extra-wide modifier" data-key="shift">shift</div>
+<div class="key" data-key="Z">Z</div>
+<div class="key" data-key="X">X</div>
+<div class="key" data-key="C">C</div>
+<div class="key" data-key="V">V</div>
+<div class="key" data-key="B">B</div>
+<div class="key" data-key="N">N</div>
+<div class="key" data-key="M">M</div>
+<div class="key" data-key=",">, &lt;</div>
+<div class="key" data-key=".">. &gt;</div>
+<div class="key" data-key="/">/ ?</div>
+<div class="key extra-wide modifier" data-key="shift-r">shift</div>
+</div>
+<!-- Row 6 -->
+<div class="keyboard-row">
+<div class="key modifier" data-key="fn">fn</div>
+<div class="key modifier" data-key="option">option</div>
+<div class="key modifier" data-key="command">⌘</div>
+<div class="key space" data-key="space">space</div>
+<div class="key modifier" data-key="command-r">⌘</div>
+<div class="key modifier" data-key="option-r">option</div>
+<div class="key modifier" data-key="←">←</div>
+<div class="key modifier" data-key="↑↓">↑ ↓</div>
+<div class="key modifier" data-key="→">→</div>
+</div>
+</div>
+<div id="shortcutListContainer"></div>
+</div>
+<!-- Tooltip element -->
+<div class="key-tooltip" id="keyTooltip">
+<div class="tooltip-shortcut" id="tooltipShortcut"></div>
+<div class="tooltip-description" id="tooltipDescription"></div>
+</div>
+<script>
+const shortcuts = {
+// ⌘ Command
+'⌘0': '全体表示',
+'⌘1': '実寸表示',
+'⌘2': 'ロック',
+'⌘3': '非表示',
+'⌘4': '垂直にリフレクト（スクリプト）',
+'⌘5': 'ガイド化',
+'⌘6': 'テキストの改行を解除（スクリプト）',
+'⌘7': 'クリッピングマスク',
+'⌘8': '全角→半角（スクリプト）',
+'⌘9': '半角→全角（スクリプト）',
+'⌘A': '全選択',
+'⌘B': '背面にペースト',
+'⌘C': 'コピー',
+'⌘D': '繰り返し',
+'⌘E': '段落そのまま揃え（スクリプト）',
+'⌘F': '前面にペースト',
+'⌘G': 'グループ化',
+'⌘H': '空行解除（スクリプト）',
+'⌘I': '選択したオブジェクトを入れ替える（スクリプト）',
+'⌘J': 'パス連結',
+'⌘K': '環境設定',
+'⌘L': 'オブジェクトのリンクを再設定（スクリプト）',
+'⌘M': 'テキスト連結（スクリプト）',
+'⌘N': '新規プロジェクト',
+'⌘O': '開く',
+'⌘P': 'プリント',
+'⌘Q': 'Illustratorを終了',
+'⌘R': 'アートボードに合わせた長方形（スクリプト）',
+'⌘S': '保存',
+'⌘T': 'テキストウィンドウ',
+'⌘U': 'テキストを列ごとに分解（スクリプト）',
+'⌘V': 'ペースト',
+'⌘W': 'プロジェクトを閉じる',
+'⌘X': 'カット',
+'⌘Y': 'アウトライン表示',
+'⌘Z': '戻る',
+'⌘]': '前面へ',
+'⌘[': '背面へ',
+'⌘⇧[': '最背面',
+'⌘⇧]': '最前面',
+'⌘⇧O': 'アウトライン化',
+'⌘⇧S': '別名保存',
+'⌘⇧T': 'トリミング表示',
+'⌘⇧W': '特定文字の色変更（スクリプト）',
+// ⌘⌥ Command + Option
+'⌘⌥0': '全てのアートボードを選択（スクリプト）',
+'⌘⌥2': '全ロック解除',
+'⌘⌥3': '全表示',
+'⌘⌥4': '垂直揃えGX（スクリプト）',
+'⌘⌥5': '水平揃えGX（スクリプト）',
+'⌘⌥7': 'マスク解除',
+'⌘⌥9': 'テキストスレッドを補正適用（スクリプト）',
+'⌘⌥A': 'アートボード内のオブジェクトのみ全選択',
+'⌘⌥B': 'ブレンドツール',
+'⌘⌥C': '最前面のオブジェクトで作成（エンベロープ）',
+'⌘⌥E': 'トリムマークを作成',
+'⌘⌥E': 'トリムマークを作成',
+'⌘⌥G': 'リンク画像を全て埋め込む（スクリプト）',
+'⌘⌥H': '余分な改行を削除（スクリプト）',
+'⌘⌥F': '複合パスを作成',
+'⌘⌥P': 'ドキュメント設定',
+'⌘⌥O': 'プレス品質PDFを保存（スクリプト）',
+'⌘⌥Q': 'URLをQRコードア化（スクリプト）',
+'⌘⌥R': 'パスにラフを適用',
+'⌘⌥S': 'パスにスムーズを適用',
+'⌘⌥T': '同じフォントサイズのテキストを全選択（スクリプト）',
+'⌘⌥V': 'コピー先の書式でペースト',
+'⌘⌥W': 'パスにギザギザを適用',
+'⌘⌥X': 'テキストボックスのサイズを合わせる（スクリプト）',
+'⌘⌥Y': '同じフォントを全選択（スクリプト）',
+'⌘⌥Z': '共通の線と塗りを持つオブジェクトを全選択',
+'⌘⌥;': 'ガイドをロック／解除（トグル）',
+// ⌘⇧ Command + Shift
+'⌘⇧9': 'テキストスレッドを解除',
+'⌘⇧G': 'グループ解除',
+'⌘⇧A': 'テキストを横書き→縦書き（スクリプト）',
+'⌘⇧B': 'テキストをスレッドに分割（スクリプト）',
+'⌘⇧C': '新規スウォッチ',
+'⌘⇧D': 'テキストを縦書き→横書き（スクリプト）',
+'⌘⇧F': '回転ツール',
+'⌘⇧H': '色の校正（作業用CMYK）',
+'⌘⇧J': 'テキストの回り込みを作成',
+'⌘⇧P': '配置',
+'⌘⇧R': 'マーカー（スクリプト）',
+'⌘⇧M': 'テキストにメリハリ（スクリプト）',
+'⌘⇧N': 'テキスト直下に図形（スクリプト）',
+'⌘⇧U': 'テキストを改行位置でバラす（スクリプト）',
+'⌘⇧>': 'テキストを2pt拡大',
+'⌘⇧<': 'テキストを2pt縮小',
+// ⌘⇧⌥ Command + Shift + Option
+'⌘⇧⌥A': '書き出し形式',
+'⌘⇧⌥C': 'エンベロープの解除',
+'⌘⇧⌥D': '個別に変形',
+'⌘⇧⌥G': 'グリッドに分割',
+'⌘⇧⌥I': 'アートボード名を一括変更（スクリプト）',
+'⌘⇧⌥J': '画像トレースして白地削除（スクリプト）',
+'⌘⇧⌥K': 'キーボードショートカットツール呼び出し',
+'⌘⇧⌥P': 'パッケージを作成',
+'⌘⇧⌥S': '最小ファイルサイズで書き出し（スクリプト）',
+'⌘⇧⌥F': '複合パスを解除',
+'⌘⇧⌥T': '彩度調整',
+'⌘⇧⌥N': '選択オブジェクトから新規レイヤー（スクリプト）',
+'⌘⇧⌥V': '全てのアートボードに貼り付け',
+'⌘⇧⌥W': 'ワープで作成…',
+'⌘⇧⌥X': 'その他のスクリプト呼び出し',
+'⌘⇧⌥Z': '不要なパスの削除',
+// ⇧ Shift
+'⇧1': '垂直に揃える',
+'⇧2': '水平に揃える',
+'⇧3': '上端揃え',
+'⇧4': '垂直に均等揃え',
+'⇧5': '水平に均等揃え',
+'⇧6': 'アセットの書き出しウィンドウ',
+'⇧7': '文字組み更新ウィンドウ',
+'⇧8': '分版プレビューウィンドウ',
+'⇧A': '共通の線を全選択',
+'⇧B': '分割・統合',
+'⇧C': 'アピアランスウィンドウ',
+'⇧D': 'スウォッチウィンドウ',
+'⇧E': '右端揃え',
+'⇧F': '透明ウィンドウ',
+'⇧G': 'リンクウィンドウ',
+'⇧H': '色を反転',
+'⇧I': 'エリア内文字オプション',
+'⇧J': 'パスファインダーウィンドウ',
+'⇧K': '検索・置換',
+'⇧L': 'ラスタライズ',
+'⇧M': 'シェイプ形成ツール',
+'⇧N': 'シェイパーツール',
+'⇧O': 'アートボードツール',
+'⇧P': 'アウトラインのオフセット',
+'⇧Q': '左端揃え',
+'⇧R': 'レイヤーウィンドウ',
+'⇧S': '下端揃え',
+'⇧T': 'カラーウィンドウ',
+'⇧U': 'グラデーションウィンドウ',
+'⇧V': 'アートボードウィンドウ',
+'⇧W': '線幅変更ツール',
+'⇧X': '線と塗りのカラーを反転',
+'⇧Y': 'シアーツール',
+'⇧Z': '共通の塗りを全選択',
+// ⌃ Control
+'⌃4': '垂直揃えEX（スクリプト）',
+'⌃5': '水平揃えEX（スクリプト）',
+'⌃6': '横文字連結（スクリプト）',
+'⌃7': '数字のみ半角全角切り替え（スクリプト）',
+'⌃8': '括弧のみ半角全角切り替え（スクリプト）',
+'⌃9': '％のみ大文字小文字を切り替え（スクリプト）',
+'⌃A': 'テキスト改行バラし（スクリプト）',
+'⌃B': '大きなオブジェクトにサイズを合わせる（スクリプト）',
+'⌃D': 'スウォッチ（黒）を適用（スクリプト）',
+'⌃C': '入稿チェック（スクリプト）',
+'⌃G': '全てのレイヤーをロックを解除（スクリプト）',
+'⌃H': 'アクティブレイヤーをロック（スクリプト）',
+'⌃J': '塗りと線を無しに（スクリプト）',
+'⌃R': 'レイヤーアップ（スクリプト）',
+'⌃F': 'レイヤーダウン（スクリプト）',
+'⌃N': 'オブジェクトをアートボードサイズを合わせる（スクリプト）',
+'⌃M': 'カレンダー（スクリプト）',
+'⌃S': 'spai 呼び出し／閉じる',
+'⌃T': 'テキストの縦中横（スクリプト）',
+'⌃E': '線を0.25pt上げる（スクリプト）',
+'⌃Q': '線を0.25pt下げる（スクリプト）',
+'⌃U': 'フォントの太さを切り替える（スクリプト）',
+'⌃V': '小さなオブジェクトにサイズを合わせる（スクリプト）',
+'⌃W': 'スウォッチ（白）を適用（スクリプト）',
+'⌃X': '対象レイヤーのみ表示→全表示（スクリプト）',
+'⌃Y': 'アクティブレイヤー以外をロック（スクリプト）',
+'⌃Z': 'テキストのトラッキングの値を0にする（スクリプト）',
+// 単体キー
+'V': '選択ツール',
+'A': 'ダイレクト選択ツール',
+'P': 'ペンツール',
+'M': '四角形ツール',
+'L': '楕円ツール',
+'\\': '線分ツール',
+'R': '回転ツール',
+'T': '文字ツール',
+'I': 'スポイト',
+'X': '塗り／線切替',
+'/': '塗りなし',
+'space': '手のひら',
+'esc': '操作キャンセル／入力解除'
+        };
+const keyMapping = {
+'0': '0', '1': '1', '2': '2', '3': '3', '4': '4',
+'5': '5', '6': '6', '7': '7', '8': '8', '9': '9',
+'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
+'F': 'F', 'G': 'G', 'H': 'H', 'I': 'I', 'J': 'J',
+'K': 'K', 'L': 'L', 'M': 'M', 'N': 'N', 'O': 'O',
+'P': 'P', 'Q': 'Q', 'R': 'R', 'S': 'S', 'T': 'T',
+'U': 'U', 'V': 'V', 'W': 'W', 'X': 'X', 'Y': 'Y',
+'Z': 'Z', '[': '[', ']': ']', '\\': '\\', ';': ';',
+'/': '/', 'space': 'space', 'esc': 'esc', '<': ',', '>': '.',
+        };
+const keys = document.querySelectorAll('.key');
+const filterButtons = document.querySelectorAll('.filter-btn');
+const listContainer = document.getElementById('shortcutListContainer');
+const tooltip = document.getElementById('keyTooltip');
+const tooltipShortcut = document.getElementById('tooltipShortcut');
+const tooltipDescription = document.getElementById('tooltipDescription');
+const shortcutCounter = document.getElementById('shortcutCounter');
+const keyboard = document.getElementById('mainKeyboard');
+const searchArea = document.getElementById('headerSearch');
+const searchInput = document.getElementById('searchInput');
+const searchClear = document.getElementById('searchClear');
+let currentActiveButton = null;
+let isHighlightActive = false;
+let currentFilter = null;
+let isInListArea = false;
+let tooltipTimeout = null;
+let isALLMode = false;
+let currentSearchQuery = '';
+// Update counter with total shortcuts
+shortcutCounter.textContent = `総数: ${Object.keys(shortcuts).length}個`;
+
+// -------- 検索機能 --------
+function escapeHtml(str) {
+return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        }
+function highlightText(text, query) {
+if (!query) return escapeHtml(text);
+const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const regex = new RegExp(`(${escaped})`, 'gi');
+return escapeHtml(text).replace(regex, '<mark>$1</mark>');
+        }
+function searchShortcuts(query) {
+const q = query.trim().toLowerCase();
+if (!q) return [];
+const result = [];
+for (let [shortcut, description] of Object.entries(shortcuts)) {
+const shortcutLower = shortcut.toLowerCase();
+const descLower = description.toLowerCase();
+if (shortcutLower.includes(q) || descLower.includes(q)) {
+result.push({ shortcut, description });
+                }
+            }
+return result;
+        }
+function displaySearchResults(query) {
+const results = searchShortcuts(query);
+if (results.length === 0) {
+listContainer.innerHTML = `
+                    <div class="shortcut-list">
+                        <div class="list-header">
+                            <div class="list-title">「${escapeHtml(query)}」の検索結果</div>
+                            <div class="list-count">0件</div>
+                        </div>
+                        <div class="no-results">
+                            <div>該当するショートカットが見つかりませんでした</div>
+                        </div>
+                    </div>
+                `;
+clearHighlights();
+return;
+            }
+// ヒットしたキーをハイライト
+const hitKeys = new Set();
+results.forEach(item => {
+getKeysForShortcut(item.shortcut).forEach(k => hitKeys.add(k));
+            });
+highlightKeys(Array.from(hitKeys));
+const html = `
+                <div class="shortcut-list">
+                    <div class="list-header">
+                        <div class="list-title">「${escapeHtml(query)}」の検索結果</div>
+                        <div class="list-count">${results.length}件</div>
+                    </div>
+                    <div class="shortcut-items" id="searchResultItems">
+${results.map(item => `
+                            <div class="shortcut-item" data-shortcut="${item.shortcut}">
+                                <span class="shortcut-key">${highlightText(item.shortcut, query)}</span>
+                                <span class="shortcut-desc">${highlightText(item.description, query)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+listContainer.innerHTML = html;
+// リストアイテムホバー — mouseover/mouseout on container to avoid gap flicker
+const shortcutItemsEl = document.getElementById('searchResultItems');
+if (shortcutItemsEl) {
+shortcutItemsEl.addEventListener('mouseover', (e) => {
+const item = e.target.closest('.shortcut-item');
+if (!item) return;
+document.querySelectorAll('.shortcut-item').forEach(i => i.classList.remove('highlighted'));
+item.classList.add('highlighted');
+highlightKeys(getKeysForShortcut(item.getAttribute('data-shortcut')));
+                });
+shortcutItemsEl.addEventListener('mouseout', (e) => {
+// only fire when leaving to outside the container
+if (shortcutItemsEl.contains(e.relatedTarget)) return;
+document.querySelectorAll('.shortcut-item').forEach(i => i.classList.remove('highlighted'));
+highlightKeys(Array.from(hitKeys));
+                });
+            }
+const shortcutList = document.querySelector('.shortcut-list');
+if (shortcutList) {
+shortcutList.addEventListener('mouseenter', () => { isInListArea = true; });
+shortcutList.addEventListener('mouseleave', () => {
+isInListArea = false;
+if (currentSearchQuery) highlightKeys(Array.from(hitKeys));
+                });
+            }
+        }
+// 検索入力イベント
+searchInput.addEventListener('input', () => {
+currentSearchQuery = searchInput.value;
+// クリアボタンの表示切替
+if (currentSearchQuery.trim()) {
+searchClear.classList.add('show');
+displaySearchResults(currentSearchQuery);
+                } else {
+searchClear.classList.remove('show');
+// 空になったらALLモードのデフォルト表示へ
+clearHighlights();
+listContainer.innerHTML = '';
+                }
+        });
+// クリアボタン
+searchClear.addEventListener('click', () => {
+searchInput.value = '';
+currentSearchQuery = '';
+searchClear.classList.remove('show');
+clearHighlights();
+listContainer.innerHTML = '';
+searchInput.focus();
+        });
+
+// -------- 既存関数 --------
+function setModifierKeyBlinking(filter) {
+const keysToBlink = [];
+if (filter === '⌘') { keysToBlink.push('command'); }
+else if (filter === '⌘⇧') { keysToBlink.push('command', 'shift'); }
+else if (filter === '⌘⌥') { keysToBlink.push('command', 'option'); }
+else if (filter === '⌘⇧⌥') { keysToBlink.push('command', 'shift', 'option'); }
+else if (filter === '⇧') { keysToBlink.push('shift'); }
+else if (filter === '⌃') { keysToBlink.push('control'); }
+keys.forEach(key => {
+const keyCode = key.getAttribute('data-key');
+const shouldBlink = keysToBlink.includes(keyCode);
+if (key.classList.contains('modifier')) {
+if (shouldBlink) {
+if (key.classList.contains('blinking')) {
+key.style.animation = 'none';
+void key.offsetHeight;
+key.style.animation = '';
+                        } else { key.classList.add('blinking'); }
+                    } else { key.classList.remove('blinking'); }
+                }
+            });
+        }
+function markKeysWithShortcuts() {
+keys.forEach(key => {
+const keyCode = key.getAttribute('data-key');
+if (!keyCode) return;
+const hasShortcut = Object.keys(shortcuts).some(shortcut => {
+const shortcutKey = shortcut.split(/[⌘⇧⌥⌃]/).pop();
+return keyMapping[shortcutKey] === keyCode;
+                });
+if (hasShortcut) key.classList.add('has-shortcut');
+            });
+        }
+function getKeysForShortcut(shortcut) {
+const keysToHighlight = [];
+if (shortcut.includes('⌘')) keysToHighlight.push('command');
+if (shortcut.includes('⇧')) keysToHighlight.push('shift');
+if (shortcut.includes('⌥')) keysToHighlight.push('option');
+if (shortcut.includes('⌃')) keysToHighlight.push('control');
+const mainKey = shortcut.split(/[⌘⇧⌥⌃]/).pop();
+if (keyMapping[mainKey]) keysToHighlight.push(keyMapping[mainKey]);
+else if (mainKey) keysToHighlight.push(mainKey);
+return keysToHighlight;
+        }
+function getAllKeysForFilter(filter) {
+const allKeys = new Set();
+for (let [shortcut] of Object.entries(shortcuts)) {
+let matches = false;
+if (filter === '⌘') matches = shortcut.startsWith('⌘') && !shortcut.includes('⇧') && !shortcut.includes('⌥');
+else if (filter === '⌘⇧') matches = shortcut.includes('⌘⇧') && !shortcut.includes('⌥');
+else if (filter === '⌘⌥') matches = shortcut.includes('⌘⌥') && !shortcut.includes('⇧');
+else if (filter === '⌘⇧⌥') matches = shortcut.includes('⌘⇧⌥');
+else if (filter === '⇧') matches = shortcut.startsWith('⇧') && !shortcut.includes('⌘');
+else if (filter === '⌃') matches = shortcut.startsWith('⌃');
+else if (filter === '単体') matches = !shortcut.includes('⌘') && !shortcut.includes('⇧') && !shortcut.includes('⌥') && !shortcut.includes('⌃');
+if (matches) getKeysForShortcut(shortcut).forEach(k => allKeys.add(k));
+            }
+return Array.from(allKeys);
+        }
+function highlightKeys(keyCodes) {
+keys.forEach(key => key.classList.remove('active-shortcut'));
+keyCodes.forEach(keyCode => {
+keys.forEach(key => {
+if (key.getAttribute('data-key') === keyCode) key.classList.add('active-shortcut');
+                });
+            });
+        }
+function clearHighlights() {
+keys.forEach(key => key.classList.remove('active-shortcut'));
+hideTooltip();
+        }
+function restoreCategoryHighlight() {
+if (currentFilter && currentFilter !== 'ALL' && !isInListArea) {
+highlightKeys(getAllKeysForFilter(currentFilter));
+            }
+        }
+function getShortcutsForFilter(filter) {
+const result = [];
+for (let [shortcut, description] of Object.entries(shortcuts)) {
+let matches = false;
+if (filter === '⌘') matches = shortcut.startsWith('⌘') && !shortcut.includes('⇧') && !shortcut.includes('⌥');
+else if (filter === '⌘⇧') matches = shortcut.includes('⌘⇧') && !shortcut.includes('⌥');
+else if (filter === '⌘⌥') matches = shortcut.includes('⌘⌥') && !shortcut.includes('⇧');
+else if (filter === '⌘⇧⌥') matches = shortcut.includes('⌘⇧⌥');
+else if (filter === '⇧') matches = shortcut.startsWith('⇧') && !shortcut.includes('⌘');
+else if (filter === '⌃') matches = shortcut.startsWith('⌃');
+else if (filter === '単体') matches = !shortcut.includes('⌘') && !shortcut.includes('⇧') && !shortcut.includes('⌥') && !shortcut.includes('⌃');
+if (matches) result.push({ shortcut, description });
+            }
+return result;
+        }
+function getShortcutsForKey(keyCode, filter = null) {
+const result = [];
+for (let [shortcut, description] of Object.entries(shortcuts)) {
+if (filter && filter !== 'ALL') {
+let matchesFilter = false;
+if (filter === '⌘') matchesFilter = shortcut.startsWith('⌘') && !shortcut.includes('⇧') && !shortcut.includes('⌥');
+else if (filter === '⌘⇧') matchesFilter = shortcut.includes('⌘⇧') && !shortcut.includes('⌥');
+else if (filter === '⌘⌥') matchesFilter = shortcut.includes('⌘⌥') && !shortcut.includes('⇧');
+else if (filter === '⌘⇧⌥') matchesFilter = shortcut.includes('⌘⇧⌥');
+else if (filter === '⇧') matchesFilter = shortcut.startsWith('⇧') && !shortcut.includes('⌘');
+else if (filter === '⌃') matchesFilter = shortcut.startsWith('⌃');
+else if (filter === '単体') matchesFilter = !shortcut.includes('⌘') && !shortcut.includes('⇧') && !shortcut.includes('⌥') && !shortcut.includes('⌃');
+if (!matchesFilter) continue;
+                }
+const mainKey = shortcut.split(/[⌘⇧⌥⌃]/).pop();
+if (keyMapping[mainKey] === keyCode) result.push({ shortcut, description });
+            }
+return result;
+        }
+function showTooltip(keyElement, shortcutsForKey) {
+if (shortcutsForKey.length === 0) return;
+if (tooltipTimeout) clearTimeout(tooltipTimeout);
+tooltipShortcut.textContent = shortcutsForKey.map(s => s.shortcut).join(', ');
+tooltipDescription.textContent = shortcutsForKey.map(s => s.description).join(' / ');
+const keyRect = keyElement.getBoundingClientRect();
+const tooltipRect = tooltip.getBoundingClientRect();
+let left = keyRect.left + (keyRect.width / 2) - (tooltipRect.width / 2);
+let top = keyRect.bottom + 15;
+if (left < 10) left = 10;
+if (left + tooltipRect.width > window.innerWidth - 10) left = window.innerWidth - tooltipRect.width - 10;
+tooltip.style.left = left + 'px';
+tooltip.style.top = top + 'px';
+tooltip.classList.add('show');
+        }
+function hideTooltip() {
+tooltip.classList.remove('show');
+        }
+function displayShortcutList(filter, buttonText) {
+const filteredShortcuts = getShortcutsForFilter(filter);
+const html = `
+                <div class="shortcut-list">
+                    <div class="list-header">
+                        <div class="list-title">${buttonText}</div>
+                        <div class="list-count">${filteredShortcuts.length}個</div>
+                    </div>
+                    <div class="shortcut-items">
+${filteredShortcuts.map(item => `
+                            <div class="shortcut-item" data-shortcut="${item.shortcut}">
+                                <span class="shortcut-key">${item.shortcut}</span>
+                                <span class="shortcut-desc">${item.description}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+listContainer.innerHTML = html;
+const filterItemsEl = listContainer.querySelector('.shortcut-items');
+if (filterItemsEl) {
+filterItemsEl.addEventListener('mouseover', (e) => {
+const item = e.target.closest('.shortcut-item');
+if (!item) return;
+filterItemsEl.querySelectorAll('.shortcut-item').forEach(i => i.classList.remove('highlighted'));
+item.classList.add('highlighted');
+highlightKeys(getKeysForShortcut(item.getAttribute('data-shortcut')));
+                });
+filterItemsEl.addEventListener('mouseout', (e) => {
+if (filterItemsEl.contains(e.relatedTarget)) return;
+filterItemsEl.querySelectorAll('.shortcut-item').forEach(i => i.classList.remove('highlighted'));
+                });
+            }
+const shortcutList = document.querySelector('.shortcut-list');
+if (shortcutList) {
+shortcutList.addEventListener('mouseenter', () => { isInListArea = true; clearHighlights(); });
+shortcutList.addEventListener('mouseleave', () => { isInListArea = false; restoreCategoryHighlight(); });
+            }
+        }
+function displayShortcutsForSingleKey(keyCode, keyLabel) {
+const allShortcuts = getShortcutsForKey(keyCode, null);
+const html = `
+                <div class="shortcut-list">
+                    <div class="list-header">
+                        <div class="list-title">${keyLabel} キーのショートカット</div>
+                        <div class="list-count">${allShortcuts.length}個</div>
+                    </div>
+                    <div class="shortcut-items" id="singleKeyItems">
+${allShortcuts.map(item => `
+                            <div class="shortcut-item" data-shortcut="${item.shortcut}">
+                                <span class="shortcut-key">${item.shortcut}</span>
+                                <span class="shortcut-desc">${item.description}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+listContainer.innerHTML = html;
+const singleKeyItemsEl = document.getElementById('singleKeyItems');
+if (singleKeyItemsEl) {
+singleKeyItemsEl.addEventListener('mouseover', (e) => {
+const item = e.target.closest('.shortcut-item');
+if (!item) return;
+singleKeyItemsEl.querySelectorAll('.shortcut-item').forEach(i => i.classList.remove('highlighted'));
+item.classList.add('highlighted');
+highlightKeys(getKeysForShortcut(item.getAttribute('data-shortcut')));
+                });
+singleKeyItemsEl.addEventListener('mouseout', (e) => {
+if (singleKeyItemsEl.contains(e.relatedTarget)) return;
+singleKeyItemsEl.querySelectorAll('.shortcut-item').forEach(i => i.classList.remove('highlighted'));
+                });
+            }
+const shortcutList2 = document.querySelector('.shortcut-list');
+if (shortcutList2) {
+shortcutList2.addEventListener('mouseenter', () => { isInListArea = true; clearHighlights(); });
+shortcutList2.addEventListener('mouseleave', () => {
+isInListArea = false;
+if (isALLMode && !currentSearchQuery) highlightKeys([keyCode]);
+                });
+            }
+        }
+// キーボードエリア再入
+keyboard.addEventListener('mouseenter', () => {
+if (currentFilter && currentFilter !== 'ALL' && !isInListArea) restoreCategoryHighlight();
+        });
+// フィルターボタン
+filterButtons.forEach(btn => {
+btn.addEventListener('click', () => {
+const filter = btn.getAttribute('data-filter');
+if (currentActiveButton === btn) {
+btn.classList.remove('active');
+currentActiveButton = null;
+isHighlightActive = false;
+currentFilter = null;
+isALLMode = false;
+listContainer.innerHTML = '';
+clearHighlights();
+setModifierKeyBlinking(null);
+// 検索エリアを隠す
+searchArea.classList.remove('visible');
+searchInput.value = '';
+searchClear.classList.remove('show');
+currentSearchQuery = '';
+                } else {
+filterButtons.forEach(b => b.classList.remove('active'));
+btn.classList.add('active');
+currentActiveButton = btn;
+isHighlightActive = true;
+currentFilter = filter;
+if (filter === 'ALL') {
+isALLMode = true;
+clearHighlights();
+listContainer.innerHTML = '';
+setModifierKeyBlinking(null);
+// 検索エリアを表示
+searchArea.classList.add('visible');
+// 既存のクエリがあれば再検索
+if (currentSearchQuery) displaySearchResults(currentSearchQuery);
+                    } else {
+isALLMode = false;
+searchArea.classList.remove('visible');
+searchInput.value = '';
+searchClear.classList.remove('show');
+currentSearchQuery = '';
+if (!isInListArea) highlightKeys(getAllKeysForFilter(filter));
+setModifierKeyBlinking(filter);
+displayShortcutList(filter, btn.textContent.trim());
+                    }
+                }
+            });
+        });
+// キーホバー（検索中は無視）
+keys.forEach(key => {
+key.addEventListener('mouseenter', () => {
+const keyCode = key.getAttribute('data-key');
+if (!keyCode) return;
+// 検索中はキーホバーによる上書きをしない
+if (currentSearchQuery) return;
+if (isALLMode) {
+highlightKeys([keyCode]);
+displayShortcutsForSingleKey(keyCode, key.textContent.trim());
+                } else if (isHighlightActive && key.classList.contains('active-shortcut') && !key.classList.contains('modifier')) {
+const shortcutsForKey = getShortcutsForKey(keyCode, currentFilter);
+if (shortcutsForKey.length > 0) showTooltip(key, shortcutsForKey);
+                }
+            });
+key.addEventListener('mouseleave', () => {
+hideTooltip();
+if (currentSearchQuery) return; // 検索中は状態を保持
+if (isALLMode) {
+clearHighlights();
+listContainer.innerHTML = '';
+                } else if (currentFilter && currentFilter !== 'ALL' && !isInListArea) {
+restoreCategoryHighlight();
+                }
+            });
+        });
+document.addEventListener('click', (e) => {
+if (!e.target.closest('.key') && !e.target.closest('.key-tooltip')) hideTooltip();
+        });
+markKeysWithShortcuts();
+window.addEventListener('DOMContentLoaded', () => {
+const allButton = document.querySelector('.filter-btn[data-filter="ALL"]');
+if (allButton) allButton.click();
+        });
+</script>
+</body>
+</html>
