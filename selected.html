@@ -863,6 +863,12 @@ html.reduce .lineup .pouch{animation:none}
 #intro .line{height:1px; background:var(--ink); transform:scaleX(0); transform-origin:left; transition:transform 2.8s cubic-bezier(.65,0,.35,1)}
 #intro.run .line{transform:scaleX(1)}
 </style>
+<style>/* Safari：白黒反転の重ね方と常駐レイヤーが多いと、下地とページがまだらにちらつくので、Safari だけ軽くする */
+.sf .chrome{mix-blend-mode:normal; color:#000; transition:color .35s}
+.sf.on-dark .chrome{color:#fff}
+.sf .ch,.sf .f,.sf .big,.sf .pouch,.sf .wk-hd,.sf .name,.sf .label,.sf .ai-title,.sf .ai-sub{will-change:auto}
+</style>
+<script>(function(){var u=navigator.userAgent;if(/Safari\//.test(u)&&!/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\/|Android/.test(u))document.documentElement.classList.add('sf');})();</script>
 <style>/* serif: 明朝・セリフ体用の補正 */
 body{font-weight:400}
 .name,.sign,.ai-title,.dash dd b{letter-spacing:-.02em}
@@ -1079,7 +1085,7 @@ function markCurrent(){
   var label = pad2(c + 1) + ' / ' + pad2(pages.length);
   if (c === cur && countEl.textContent === label) return;
   cur = c;
-  pages.forEach(function(p, i){ p.classList.toggle('is-cur', i === c); });
+  pages.forEach(function(p, i){ p.classList.toggle('is-cur', i === c); }); document.documentElement.classList.toggle('on-dark', pages[c].classList.contains('dark') || pages[c].classList.contains('pg-ai'));
   countEl.textContent = label;
   chapEl.textContent = pages[c].getAttribute('data-chap') || '';
 }
@@ -1969,16 +1975,24 @@ var CAT = (function(){
       leaf.style.transition = 'none';
       if (dir > 0){ face(lf, st, SB); face(lb, to, SA); if (to > N) b.classList.add('proff'); else face(PB, to, SB); leaf.style.transform = 'rotateY(0deg)'; }
       else { face(lb, st, SA); face(lf, to, SB); if (to > 0) face(PA, to, SA); if (st > N){ face(PB, to, SB); b.classList.add('proff'); setTimeout(function(){ b.classList.remove('backc'); }, 60); } leaf.style.transform = 'rotateY(' + DEG + 'deg)'; }
-      leaf.classList.add('on'); void leaf.offsetWidth;
-      leaf.style.transition = 'transform ' + (hv ? '.9s' : '1.1s') + ' cubic-bezier(.45,.05,.25,1)';
-      leaf.style.transform = dir > 0 ? 'rotateY(' + DEG + 'deg)' : 'rotateY(0deg)';
-      /* 表紙が背を越えたところで本を開く（逆も同じ） */
-      if (dir > 0 && st === 0){ face(PA, 1, SA); setTimeout(function(){ b.classList.remove('closed'); }, hv ? 420 : 500); }
-      if (dir < 0 && to === 0) setTimeout(function(){ b.classList.add('closed'); }, 380);
-      if (dir > 0 && to > N) setTimeout(function(){ b.classList.add('backc'); }, hv ? 420 : 500);
-      setTimeout(function(){ show(to); leaf.classList.remove('on'); busy = false; }, hv ? 930 : 1130);
+      /* めくる紙と下の紙の画像が展開し終わってから動かす（Safari で古い面や白が一瞬見えないように） */
+      var from = st; if (dir > 0 && from === 0) face(PA, 1, SA);
+      ready([lf, lb, PA, PB]).then(function(){
+        leaf.classList.add('on'); void leaf.offsetWidth;
+        leaf.style.transition = 'transform ' + (hv ? '.9s' : '1.1s') + ' cubic-bezier(.45,.05,.25,1)';
+        leaf.style.transform = dir > 0 ? 'rotateY(' + DEG + 'deg)' : 'rotateY(0deg)';
+        /* 表紙が背を越えたところで本を開く（逆も同じ） */
+        if (dir > 0 && from === 0){ setTimeout(function(){ b.classList.remove('closed'); }, hv ? 420 : 500); }
+        if (dir < 0 && to === 0) setTimeout(function(){ b.classList.add('closed'); }, 380);
+        if (dir > 0 && to > N) setTimeout(function(){ b.classList.add('backc'); }, hv ? 420 : 500);
+        /* めくり終わったら、下の紙を差し替えて展開が済んでから、めくる紙を消す */
+        setTimeout(function(){ show(to); ready([PA, PB]).then(function(){ leaf.classList.remove('on'); busy = false; }); }, hv ? 930 : 1130);
+      });
       return true;
     }
+    function ready(E){ return Promise.all(E.map(function(e){ return e._ready || null; })); }
+    /* 冊子の全ページを先に読み込んで展開しておく */
+    it._keep = F.concat(BK ? [BK] : []).map(function(u){ var im = new Image(); im.src = inl(u) || abs(u); if (im.decode) im.decode().catch(function(){}); return im; });
     var hv = 0;
     var minS = cover ? 0 : 1; /* 表紙のデータがない冊子は、開いた状態から */
     show(minS);
