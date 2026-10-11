@@ -867,6 +867,10 @@ html.reduce .lineup .pouch{animation:none}
 .sf .ch,.sf .f,.sf .big,.sf .pouch,.sf .wk-hd,.sf .name,.sf .label,.sf .ai-title,.sf .ai-sub{will-change:auto}
 </style>
 <script>(function(){var u=navigator.userAgent;if(/Safari\//.test(u)&&!/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\/|Android/.test(u))document.documentElement.classList.add('sf');})();</script>
+<style>/* 冊子：下の紙をめくる紙より少し奥に置く。同じ面に重なると Safari で手前・奥が1コマごとに入れ替わってちらつく */
+.bkf .pg2{transform:translateZ(-1px)}
+.cal .sheet{transform:translateZ(-1px)}
+</style>
 <style>/* serif: 明朝・セリフ体用の補正 */
 body{font-weight:400}
 .name,.sign,.ai-title,.dash dd b{letter-spacing:-.02em}
