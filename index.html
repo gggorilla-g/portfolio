@@ -298,7 +298,7 @@ html.reduce .lineup .pouch{animation:none}
 .lfv .plate.c3{bottom:33.3%}
 .lfv .plate.c1{top:33.4%}
 .f2 .plate.cl{right:50%}
-.f2{transform-style:preserve-3d; transition:opacity .3s}
+.f2{transform-style:preserve-3d; transition:opacity .7s ease}
 .f2 .f2p{position:absolute; top:0; bottom:0; width:50%; transform-style:preserve-3d}
 .f2 .f2p.l{left:0}
 .f2 .f2p.r{right:0; transform-origin:0 50%; transform:translateZ(1px) rotateY(calc(var(--a,4deg) * -1)); z-index:2}
@@ -1919,7 +1919,13 @@ var CAT = (function(){
       var fixPos = function(){ if (getComputedStyle(e).position === 'static') e.style.position = 'relative'; };
       if (e.isConnected) fixPos(); else requestAnimationFrame(function(){ requestAnimationFrame(fixPos); });
     }
-    var src = inl(u) || abs(u); if (im._src !== src){ im.src = src; im._src = src; }
+    var src = inl(u) || abs(u), ready = Promise.resolve();
+    /* 表示中の画像を差し替えるときは、先に読み込みと展開を済ませてから入れ替える（途中で白く抜けてチカチカしないように） */
+    if (im._src !== src){ im._src = src;
+      if (!im.getAttribute('src')) im.src = src;
+      else { var pre = new Image(); pre.src = src; ready = (pre.decode ? pre.decode() : Promise.resolve()).catch(function(){}).then(function(){ if (im._src === src) im.src = src; return im.decode ? im.decode().catch(function(){}) : null; }); }
+    }
+    e._ready = ready;
     var st = im.style;
     if (size === 'cover' || size === 'contain'){
       st.left = st.top = '0'; st.width = st.height = '100%'; st.objectFit = size; st.objectPosition = pos;
@@ -2080,7 +2086,8 @@ var CAT = (function(){
     function cycle(){
       if (busy) return; clear(); busy = true; w.classList.add('anim');
       set(178);
-      at(2500, function(){ if (PAIRS.length < 2) return; w.style.opacity = '0'; setTimeout(function(){ pi = (pi + 1) % PAIRS.length; paint(); w.style.opacity = ''; }, 320); });
+      at(2500, function(){ if (PAIRS.length < 2) return; w.style.opacity = '.15'; setTimeout(function(){ pi = (pi + 1) % PAIRS.length; paint();
+        Promise.all([lf._ready, rf._ready, rb._ready]).then(function(){ w.style.opacity = ''; }); }, 720); });
       at(3500, function(){ set(4); });
       at(5600, function(){ busy = false; });
     }
@@ -2167,7 +2174,9 @@ var CAT = (function(){
     function next(){
       if (busy || F.length < 2) return; busy = true;
       leaf.classList.add('go');
-      setTimeout(function(){ k++; leaf.classList.remove('go'); paint(); busy = false; }, 1650);
+      setTimeout(function(){ k++; leaf.style.visibility = 'hidden'; leaf.classList.remove('go'); put(face, k);
+        /* 下の紙がもう次の月を見せているので、表の紙は展開が終わってから戻す */
+        face._ready.then(function(){ leaf.style.visibility = ''; put(under, k + 1); busy = false; }); }, 1650);
     }
     it.auto = F.length > 1 ? next : null; it.swipe = F.length > 1 ? next : null;
     it.fit = function(W, H, r){ var h = Math.min(H * 0.66, W * 0.8 / r); return [r * h, h]; };
