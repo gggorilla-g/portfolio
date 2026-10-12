@@ -1651,7 +1651,6 @@ function makeSea(boxId, canvasId, opt){
         }
       }
       else if (bub){ TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = 0; }
-      else if (Math.random() < 0.02){ TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = SP * (0.08 + Math.random() * 0.12); }
       else {
         var ox = (M.nx[c] + 0.5) * G, oy = (M.ny[c] + 0.5) * G, dx = ox - HX[i], dy = oy - HY[i], dl = Math.sqrt(dx * dx + dy * dy) || 1, push = RB[i] * 1.05 + Math.random() * SP * 1.2;
         TX[i] = ox + dx / dl * push; TY[i] = oy + dy / dl * push; RR[i] = RB[i];
