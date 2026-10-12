@@ -1588,7 +1588,7 @@ function makeSea(boxId, canvasId, opt){
   var box = document.getElementById(boxId), cv = document.getElementById(canvasId), ctx = cv.getContext('2d');
   var FONTS = opt.fonts, fi = -1, masks = {}, W = 0, H = 0, built = false, started = false;
   var off = document.createElement('canvas'), octx = off.getContext('2d'), img = null, buf = null, FLD = null, FW = 0, FH = 0, C = 1;
-  var KX = null, KY = null, SNAP = 0, CUR = null, phase = 0, RMX = 4, CH = null, CN = null, CI = null, pvx = 0, pvy = 0, plx = 0, ply = 0, N = 0, NB = 0, HX, HY, PX, PY, VX, VY, TX, TY, RR, RB, WT, PH, DL, SP = 9, hold = 0, simT = 0;
+  var KX = null, KY = null, SNAP = 0, WOB = 0, CUR = null, phase = 0, RMX = 4, CH = null, CN = null, CI = null, pvx = 0, pvy = 0, plx = 0, ply = 0, N = 0, NB = 0, HX, HY, PX, PY, VX, VY, TX, TY, RR, RB, WT, PH, DL, SP = 9, hold = 0, simT = 0;
   var ptr = { x: 0, y: 0, on: false, m: 0 };
   /* 書体は [太さ・斜体, 書体名, 文字]。'logo' は自分のロゴの g（ページ内のロゴのSVGをそのまま使う） */
   function fs(f, px){ return f[0] + ' ' + px + 'px ' + f[1]; }
@@ -1697,11 +1697,18 @@ function makeSea(boxId, canvasId, opt){
     var cx = CUR ? CUR.cx : W / 2, cy = CUR ? CUR.cy : H / 2, diag = Math.sqrt(W * W + H * H), far = 0, i, d = new Float32Array(N + NB);
     for (i = 0; i < N + NB; i++){ var ex = HX[i] - cx, ey = HY[i] - cy; d[i] = Math.sqrt(ex * ex + ey * ey); if (d[i] > far) far = d[i]; }
     /* 一気に閉じる：遅れはほとんど付けず、押しのけられていた油ほど強く元の場所へ引き戻す */
-    SNAP = 1;
+    /* どぷん：空いていた g に油がなだれ込み、中心で行き過ぎてから押し返され、揺れながら元に戻る */
+    SNAP = 1; WOB = 1;
+    var lam = Math.min(W, H) * 0.22;
     for (i = 0; i < N + NB; i++){
       TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = RB[i]; DL[i] = (far - d[i]) / diag * 5 + Math.random();
       var bx = HX[i] - PX[i], by = HY[i] - PY[i];
-      if (bx * bx + by * by > SP * SP){ VX[i] += bx * 0.07; VY[i] += by * 0.07; }
+      /* 勢いは、その油が動き出す瞬間にまとめて与える（待っている間に弱まらないように） */
+      KX[i] = 0; KY[i] = 0;
+      if (bx * bx + by * by > SP * SP){ KX[i] += bx * 0.09; KY[i] += by * 0.09; }
+      /* g のまわりの油ほど、中心へ向かって強く流れ込む */
+      var ix = cx - HX[i], iy = cy - HY[i], il = Math.sqrt(ix * ix + iy * iy) || 1, mg = 7 * Math.exp(-il / lam) * Math.min(1, il / (SP * 4));
+      KX[i] += ix / il * mg; KY[i] += iy / il * mg;
     }
   }
   function build(){
@@ -1759,9 +1766,12 @@ function makeSea(boxId, canvasId, opt){
     if (ptr.on){ pvx += ((ptr.x - plx) / dt - pvx) * 0.4; pvy += ((ptr.y - ply) / dt - pvy) * 0.4; } else { pvx *= 0.8; pvy *= 0.8; }
     plx = ptr.x; ply = ptr.y;
     var pvm = Math.sqrt(pvx * pvx + pvy * pvy), pcap = pvm > 30 ? 30 / pvm : 1;
-    var pr = Math.min(W, H) * 0.14, pr2 = pr * pr, t = simT * 0.035, dm = Math.pow(0.8, dt);
+    var pr = Math.min(W, H) * 0.14, pr2 = pr * pr, t = simT * 0.035;
     /* 開いた直後だけバネを硬くする：一気に開いて少し行き過ぎ、跳ね返って止まる */
     SNAP *= Math.pow(0.965, dt);
+    /* 閉じた直後だけ粘りを弱めて、行き過ぎと揺り戻しを残す */
+    WOB *= Math.pow(0.975, dt);
+    var dm = Math.pow(0.8 + 0.14 * WOB, dt);
     var ks = 0.03 + 0.09 * SNAP;
     for (var i = 0, T = N + NB; i < T; i++){
       if (DL[i] > 0){
