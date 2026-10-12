@@ -886,6 +886,14 @@ html.reduce .lineup .pouch{animation:none}
 .sf .bkf{transform-style:flat; perspective:1800px}
 .sf .bkf .pg2,.sf .cal .sheet{transform:none}
 .sf .cal{transform-style:flat; perspective:1800px}
+/* スマホの一覧：見出し（Works／Tools built with AI）は止めたまま、その下の一覧だけをスクロールする */
+@media (max-width:820px){
+  .pg-cat .in{display:flex !important; flex-direction:column; overflow:hidden !important; margin-inline:0 !important; padding-inline:0 !important; touch-action:auto}
+  .pg-cat .in > .wk-hd,.pg-cat .in > .ai-hd{flex:none}
+  .pg-cat .in > .cat{flex:1; min-height:0; overflow-y:auto; overflow-x:hidden; touch-action:pan-y; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    margin-inline:calc(-1 * var(--gut)); padding-inline:var(--gut)}
+  .pg-cat .in > .cat::-webkit-scrollbar{display:none}
+}
 .sf .bkf .pg2{transition:opacity .22s ease}
 .sf .bkf.swap .pg2{opacity:0}
 /* スマホ：英語の名前を少し下げる */
@@ -1184,7 +1192,7 @@ deck.addEventListener('touchstart', function(e){
   TOUCH.y0 = e.touches[0].clientY; TOUCH.x0 = e.touches[0].clientX;
   /* スマホの作品一覧：ページの中を指でスクロールし、端まで来てさらに引いたときだけページを送る */
   TOUCH.inner = null;
-  var inr = window.innerWidth <= 820 && e.target.closest && e.target.closest('.pg-cat .in, .pg-scripts .in');
+  var inr = window.innerWidth <= 820 && e.target.closest && e.target.closest('.pg-cat .in > .cat, .pg-scripts .in');
   if (inr && inr.scrollHeight > inr.clientHeight + 2){
     TOUCH.inner = inr; TOUCH.active = false; TOUCH.moved = false;
     TOUCH.atTop = inr.scrollTop <= 1; TOUCH.atBot = inr.scrollTop + inr.clientHeight >= inr.scrollHeight - 1;
@@ -1222,7 +1230,7 @@ deck.addEventListener('touchend', function(e){
 deck.addEventListener('touchcancel', function(){ if (TOUCH.active){ TOUCH.active = false; goTo(Math.round(TOUCH.top0 / VH)); } }, { passive: true });
 
 deck.addEventListener('wheel', function(e){
-  var inw = window.innerWidth <= 820 && e.target.closest && e.target.closest('.pg-cat .in, .pg-scripts .in');
+  var inw = window.innerWidth <= 820 && e.target.closest && e.target.closest('.pg-cat .in > .cat, .pg-scripts .in');
   if (inw && !MOVE.on && ((e.deltaY > 0 && inw.scrollTop + inw.clientHeight < inw.scrollHeight - 1) || (e.deltaY < 0 && inw.scrollTop > 1))){ wheel.last = performance.now(); return; }
   e.preventDefault();
   var now = performance.now(), quiet = now - wheel.last;
@@ -3883,6 +3891,7 @@ var PORTAL = (function(){
    ページに着いた直後から動き、指で動かしてもそのまま続ける。下まで来たら止まる。
    1px単位で送るとカクつくので、小数の位置を毎フレーム入れる */
 (function(){
+  return; /* 自動スクロールはやめた（見出しは止めたまま、一覧だけを指でスクロールする） */
   var hold = 0, lastT = 0, pos = -1, lastCur = -1, inn0 = null, SPEED = 26.4; /* px/秒 */
   var down = false; /* 指が触れている間と、指を離した後の慣性で動いている間だけ、書き込みを控える（止めはしない） */
   window.addEventListener('touchstart', function(){ down = true; }, { passive: true });
