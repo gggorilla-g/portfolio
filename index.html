@@ -1636,7 +1636,7 @@ function makeSea(boxId, canvasId, opt){
     if (masks[key]) return masks[key];
     var g = document.createElement('canvas'), gx = g.getContext('2d'), gw = Math.ceil(W / G), gh = Math.ceil(H / G);
     g.width = gw; g.height = gh;
-    var top = 56, availH = (H - top) * (W < 700 ? 0.7 : 0.84), availW = W * (W < 700 ? 0.64 : 0.54);
+    var top = 56, availH = (H - top) * (W < 700 ? 0.7 : 0.74), availW = W * (W < 700 ? 0.64 : 0.475);
     var cx = W * 0.5 / G, cy = (top + (H - top) * 0.5) / G;
     gx.fillStyle = '#000';
     if (f === 'logo'){
@@ -1739,7 +1739,7 @@ function makeSea(boxId, canvasId, opt){
     if (!w || !h) return;
     W = w; H = h; masks = {};
     /* スマホは引きで見せる：滴を細かく、g を小さめに */
-    SP = W < 700 ? Math.max(2.8, Math.min(W, H) / 135) : Math.max(4.5, Math.min(8, Math.min(W, H) / 88));
+    SP = W < 700 ? Math.max(2.8, Math.min(W, H) / 135) : Math.max(2.25, Math.min(4, Math.min(W, H) / 176));
     C = Math.max(1 / Math.min(window.devicePixelRatio || 1, 2), Math.sqrt(W * H / (opt.cells || (W < 700 ? 600000 : 1000000))));
     FW = Math.ceil(W / C); STAMPS = {}; FH = Math.ceil(H / C);
     off.width = FW; off.height = FH; img = octx.createImageData(FW, FH); buf = new Uint32Array(img.data.buffer); FLD = new Float32Array(FW * FH);
