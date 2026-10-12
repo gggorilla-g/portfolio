@@ -1775,7 +1775,8 @@ function makeSea(boxId, canvasId, opt){
     PX = new Float32Array(HX); PY = new Float32Array(HY); VX = new Float32Array(T); VY = new Float32Array(T);
     TX = new Float32Array(HX); TY = new Float32Array(HY); RR = new Float32Array(T); RB = new Float32Array(hr); WT = new Float32Array(T).fill(1); PH = new Float32Array(T); DL = new Float32Array(T); KX = new Float32Array(T); KY = new Float32Array(T);
     for (var i = 0; i < T; i++){ PH[i] = Math.random() * 6.283; RR[i] = RB[i]; }
-    if (started){ fi = (Math.max(fi, 0) - 1 + FONTS.length) % FONTS.length; phase = 0; hold = 0; retarget(0); for (var q = 0; q < T; q++){ PX[q] = TX[q]; PY[q] = TY[q]; DL[q] = 0; } }
+    if (started && fi < 0 && !REDUCE){ phase = 1; hold = (opt.shut || 70) - (opt.first || 130); }
+    else if (started){ fi = (Math.max(fi, 0) - 1 + FONTS.length) % FONTS.length; phase = 0; hold = 0; retarget(0); for (var q = 0; q < T; q++){ PX[q] = TX[q]; PY[q] = TY[q]; DL[q] = 0; } }
     built = true; draw();
   }
   function sim(dt){
@@ -1908,8 +1909,10 @@ function makeSea(boxId, canvasId, opt){
     build: build, step: step,
     start: function(){
       if (started || !built) { started = true; return; }
-      started = true; hold = 0; retarget(0.8);
-      if (REDUCE){ for (var q = 0; q < N + NB; q++){ PX[q] = TX[q]; PY[q] = TY[q]; DL[q] = 0; } draw(); }
+      started = true;
+      /* 最初は g のない油だけを見せ、少し間をおいてから最初の g を開く */
+      if (REDUCE){ hold = 0; retarget(0.8); for (var q = 0; q < N + NB; q++){ PX[q] = TX[q]; PY[q] = TY[q]; DL[q] = 0; } draw(); }
+      else { phase = 1; hold = (opt.shut || 70) - (opt.first || 130); }
     }
   };
 }
