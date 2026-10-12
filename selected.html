@@ -1088,6 +1088,9 @@ document.addEventListener("error", function(e){ var t = e.target; if (t && t.tag
 var REDUCE = false;
 var root = document.documentElement;
 var deck = document.getElementById('deck');
+/* スマホでは Works を1ページにまとめる（2ページ目を外し、作品はすべて1ページ目の一覧に入れる） */
+var WORKS_ONE = window.innerWidth <= 820;
+if (WORKS_ONE){ var wk2 = deck.querySelector('.pg-cat .cat[data-from="9"]'); if (wk2){ var s2 = wk2.closest('.pg'); if (s2) s2.parentNode.removeChild(s2); } }
 var pages = Array.prototype.slice.call(deck.querySelectorAll('.pg'));
 var VH = window.innerHeight, cur = 0;
 var chapEl = document.getElementById('chap'), countEl = document.getElementById('count');
@@ -2647,7 +2650,7 @@ var CAT = (function(){
     Promise.all(jobs).then(function(){
       ITEMS.forEach(function(it){
         var grp = it.d.g || 'works', gl = uls.filter(function(u){ return (u.getAttribute('data-g') || 'works') === grp; }), gi = ITEMS.filter(function(x){ return (x.d.g || 'works') === grp; }).indexOf(it);
-        var ul = gl[Math.floor(gi / (grp === 'ai' ? PER : 6))]; if (!ul) return;
+        var ul = gl[Math.floor(gi / (grp === 'ai' ? PER : WORKS_ONE ? 999 : 6))]; if (!ul) return;
         var li = el('li', 'ci', ul), area = el('div', 'ci-area', li), tilt = el('div', 'tilt', area);
         li.setAttribute('aria-label', it.d.t + ' ' + it.d.k);
         area.setAttribute('aria-label', it.d.t + ' ' + it.d.k);
