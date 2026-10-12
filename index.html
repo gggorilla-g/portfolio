@@ -868,7 +868,7 @@ html.reduce .lineup .pouch{animation:none}
 .sf.on-dark .chrome{color:#fff}
 .sf .ch,.sf .f,.sf .big,.sf .pouch,.sf .wk-hd,.sf .name,.sf .label,.sf .ai-title,.sf .ai-sub{will-change:auto}
 </style>
-<script>(function(){var u=navigator.userAgent;if(/Safari\//.test(u)&&!/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\/|Android/.test(u))document.documentElement.classList.add('sf');})();</script>
+<script>(function(){var u=navigator.userAgent;var ios=/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1);/* iPhone・iPad の Chrome などは中身が Safari と同じなので、Safari と同じ対策を当てる */if(ios||(/Safari\//.test(u)&&!/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\/|Android/.test(u)))document.documentElement.classList.add('sf');})();</script>
 <style>/* 冊子：下の紙をめくる紙より少し奥に置く。同じ面に重なると Safari で手前・奥が1コマごとに入れ替わってちらつく */
 .bkf .pg2{transform:translateZ(-1px)}
 .cal .sheet{transform:translateZ(-1px)}
@@ -1600,7 +1600,7 @@ function makeSea(boxId, canvasId, opt){
     if (masks[key]) return masks[key];
     var g = document.createElement('canvas'), gx = g.getContext('2d'), gw = Math.ceil(W / G), gh = Math.ceil(H / G);
     g.width = gw; g.height = gh;
-    var top = 56, availH = (H - top) * 0.84, availW = W * (W < 700 ? 0.8 : 0.54);
+    var top = 56, availH = (H - top) * (W < 700 ? 0.7 : 0.84), availW = W * (W < 700 ? 0.64 : 0.54);
     var cx = W * 0.5 / G, cy = (top + (H - top) * 0.5) / G;
     gx.fillStyle = '#000';
     if (f === 'logo'){
@@ -1689,7 +1689,8 @@ function makeSea(boxId, canvasId, opt){
     var w = box.clientWidth, h = box.clientHeight;
     if (!w || !h) return;
     W = w; H = h; masks = {};
-    SP = Math.max(4.5, Math.min(8, Math.min(W, H) / 88));
+    /* スマホは引きで見せる：滴を細かく、g を小さめに */
+    SP = W < 700 ? Math.max(2.8, Math.min(W, H) / 135) : Math.max(4.5, Math.min(8, Math.min(W, H) / 88));
     C = Math.max(1 / Math.min(window.devicePixelRatio || 1, 2), Math.sqrt(W * H / (opt.cells || (W < 700 ? 600000 : 1000000))));
     FW = Math.ceil(W / C); STAMPS = {}; FH = Math.ceil(H / C);
     off.width = FW; off.height = FH; img = octx.createImageData(FW, FH); buf = new Uint32Array(img.data.buffer); FLD = new Float32Array(FW * FH);
