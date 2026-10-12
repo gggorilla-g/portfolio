@@ -1771,6 +1771,8 @@ function makeSea(boxId, canvasId, opt){
       if (phase === 0 && hold > (opt.hold || 170)){ hold = 0; phase = 1; closeAll(); }
       else if (phase === 1 && hold > (opt.shut || 100)){ hold = 0; phase = 0; retarget(0.8); }
     }
+    /* 閉じている間（どぷん）は、動き全体を少しゆっくりに */
+    if (phase === 1) dt *= (opt.closeRate || 0.9);
     var wantM = ptr.on ? 1 : 0; ptr.m += (wantM - ptr.m) * Math.min(1, 0.1 * dt);
     /* 指の速さ：なぞった向きに油を掃く */
     if (ptr.on){ pvx += ((ptr.x - plx) / dt - pvx) * 0.4; pvy += ((ptr.y - ply) / dt - pvy) * 0.4; } else { pvx *= 0.8; pvy *= 0.8; }
@@ -1900,7 +1902,7 @@ function makeSea(boxId, canvasId, opt){
 }
 
 var HERO = makeSea('heroimg', 'filings', {
-  bg: function(){ return window.DG || 'rgb(236,235,231)'; }, fg: 'rgb(0,0,0)', hold: 190,
+  bg: function(){ return window.DG || 'rgb(236,235,231)'; }, fg: 'rgb(0,0,0)', hold: 220,
   /* 小文字の g と大文字の G を混ぜて回す */
   fonts: [['800', '"EB Garamond"', 'g'], ['900', '"Jost"', 'G'], ['900', '"Playfair Display"', 'g'], ['900', '"Bodoni Moda"', 'G'], ['400', '"Archivo Black"', 'g'], ['italic 800', '"EB Garamond"', 'G'], ['900', '"Unbounded"', 'g'], ['400', '"Abril Fatface"', 'G'], ['italic 400', '"DM Serif Display"', 'g'], ['400', '"Archivo Black"', 'G'], ['900', '"Jost"', 'g'], ['italic 900', '"Fraunces"', 'G']]
 });
