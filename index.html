@@ -1574,7 +1574,7 @@ function makeSea(boxId, canvasId, opt){
   var box = document.getElementById(boxId), cv = document.getElementById(canvasId), ctx = cv.getContext('2d');
   var FONTS = opt.fonts, fi = -1, masks = {}, W = 0, H = 0, built = false, started = false;
   var off = document.createElement('canvas'), octx = off.getContext('2d'), img = null, buf = null, FLD = null, FW = 0, FH = 0, C = 1;
-  var CUR = null, phase = 0, RMX = 4, CH = null, CN = null, CI = null, pvx = 0, pvy = 0, plx = 0, ply = 0, N = 0, NB = 0, HX, HY, PX, PY, VX, VY, TX, TY, RR, RB, WT, PH, DL, SP = 9, hold = 0, simT = 0;
+  var KX = null, KY = null, CUR = null, phase = 0, RMX = 4, CH = null, CN = null, CI = null, pvx = 0, pvy = 0, plx = 0, ply = 0, N = 0, NB = 0, HX, HY, PX, PY, VX, VY, TX, TY, RR, RB, WT, PH, DL, SP = 9, hold = 0, simT = 0;
   var ptr = { x: 0, y: 0, on: false, m: 0 };
   function fs(f, px){ return f[0] + ' ' + px + 'px ' + f[1]; }
   FONTS.forEach(function(f){ if (document.fonts && document.fonts.load) document.fonts.load(fs(f, 200), 'g').catch(function(){}); });
@@ -1611,7 +1611,21 @@ function makeSea(boxId, canvasId, opt){
     for (var y = 0; y < gh; y++) for (var x = 0; x < gw; x++) if (ins[y * gw + x]){ pass(x, y, -1, 0); pass(x, y, 0, -1); pass(x, y, -1, -1); pass(x, y, 1, -1); }
     for (y = gh - 1; y >= 0; y--) for (x = gw - 1; x >= 0; x--) if (ins[y * gw + x]){ pass(x, y, 1, 0); pass(x, y, 0, 1); pass(x, y, 1, 1); pass(x, y, -1, 1); }
     for (y = 0; y < gh; y++) for (x = 0; x < gw; x++) if (ins[y * gw + x]){ pass(x, y, -1, 0); pass(x, y, 0, -1); pass(x, y, -1, -1); pass(x, y, 1, -1); }
-    return (masks[key] = { w: gw, h: gh, ins: ins, nx: nx, ny: ny, cx: sc ? sx / sc * G : W / 2, cy: sc ? sy / sc * G : H / 2 });
+    /* 外側の各マスから、いちばん近い g の点も求めておく（開いたときの波が、縁から外へ伝わる） */
+    var qx = new Float32Array(L), qy = new Float32Array(L), q = new Float32Array(L);
+    for (i = 0; i < L; i++){ if (ins[i]){ qx[i] = i % gw; qy[i] = (i / gw) | 0; q[i] = 0; } else q[i] = 1e9; }
+    function pass2(x, y, ox, oy){
+      var X = x + ox, Y = y + oy;
+      if (X < 0 || Y < 0 || X >= gw || Y >= gh) return;
+      var j = Y * gw + X, i2 = y * gw + x;
+      if (q[j] >= 1e9) return;
+      var dx = qx[j] - x, dy = qy[j] - y, dd = dx * dx + dy * dy;
+      if (dd < q[i2]){ q[i2] = dd; qx[i2] = qx[j]; qy[i2] = qy[j]; }
+    }
+    for (y = 0; y < gh; y++) for (x = 0; x < gw; x++) if (!ins[y * gw + x]){ pass2(x, y, -1, 0); pass2(x, y, 0, -1); pass2(x, y, -1, -1); pass2(x, y, 1, -1); }
+    for (y = gh - 1; y >= 0; y--) for (x = gw - 1; x >= 0; x--) if (!ins[y * gw + x]){ pass2(x, y, 1, 0); pass2(x, y, 0, 1); pass2(x, y, 1, 1); pass2(x, y, -1, 1); }
+    for (y = 0; y < gh; y++) for (x = 0; x < gw; x++) if (!ins[y * gw + x]){ pass2(x, y, -1, 0); pass2(x, y, 0, -1); pass2(x, y, -1, -1); pass2(x, y, 1, -1); }
+    return (masks[key] = { w: gw, h: gh, ins: ins, nx: nx, ny: ny, qx: qx, qy: qy, q: q, cx: sc ? sx / sc * G : W / 2, cy: sc ? sy / sc * G : H / 2 });
   }
   /* 新しい g へ：内側にいた油は、近い縁の外へ押し出されて縁に溜まる。外側に戻れる油は自分の居場所へ戻る */
   function retarget(kick){
@@ -1621,7 +1635,21 @@ function makeSea(boxId, canvasId, opt){
     for (var i = 0; i < N + NB; i++){
       var gx = (HX[i] / G) | 0, gy = (HY[i] / G) | 0, c = gy * M.w + gx, bub = i >= N;
       var inside = gx >= 0 && gy >= 0 && gx < M.w && gy < M.h && M.ins[c];
-      if (!inside){ TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = RB[i]; }
+      KX[i] = 0; KY[i] = 0;
+      if (!inside){
+        TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = RB[i];
+        /* g のまわりの油は、開いた勢いで外へ押される。縁に近いほど強く、少し遅れて外へ波が伝わる */
+        if (kick && gx >= 0 && gy >= 0 && gx < M.w && gy < M.h && M.q[c] < 1e9){
+          var od = Math.sqrt(M.q[c]) * G, lam = Math.min(W, H) * (opt.wave || 0.09);
+          if (od < lam * 4){
+            var px0 = (M.qx[c] + 0.5) * G, py0 = (M.qy[c] + 0.5) * G, wx = HX[i] - px0, wy = HY[i] - py0, wl = Math.sqrt(wx * wx + wy * wy) || 1, mg = 3.4 * Math.exp(-od / lam);
+            KX[i] = wx / wl * mg; KY[i] = wy / wl * mg;
+            var sx0 = px0 - M.cx, sy0 = py0 - M.cy;
+            DL[i] = Math.sqrt(sx0 * sx0 + sy0 * sy0) / diag * 34 + od / 5 + Math.random() * 2;
+            continue;
+          }
+        }
+      }
       else if (bub){ TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = 0; }
       else if (Math.random() < 0.02){ TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = SP * (0.08 + Math.random() * 0.12); }
       else {
@@ -1676,7 +1704,7 @@ function makeSea(boxId, canvasId, opt){
     N = hx.length; NB = 0; var T = N;
     HX = new Float32Array(hx); HY = new Float32Array(hy);
     PX = new Float32Array(HX); PY = new Float32Array(HY); VX = new Float32Array(T); VY = new Float32Array(T);
-    TX = new Float32Array(HX); TY = new Float32Array(HY); RR = new Float32Array(T); RB = new Float32Array(hr); WT = new Float32Array(T).fill(1); PH = new Float32Array(T); DL = new Float32Array(T);
+    TX = new Float32Array(HX); TY = new Float32Array(HY); RR = new Float32Array(T); RB = new Float32Array(hr); WT = new Float32Array(T).fill(1); PH = new Float32Array(T); DL = new Float32Array(T); KX = new Float32Array(T); KY = new Float32Array(T);
     for (var i = 0; i < T; i++){ PH[i] = Math.random() * 6.283; RR[i] = RB[i]; }
     if (started){ fi = (Math.max(fi, 0) - 1 + FONTS.length) % FONTS.length; phase = 0; hold = 0; retarget(0); for (var q = 0; q < T; q++){ PX[q] = TX[q]; PY[q] = TY[q]; DL[q] = 0; } }
     built = true; draw();
@@ -1696,7 +1724,11 @@ function makeSea(boxId, canvasId, opt){
     var pvm = Math.sqrt(pvx * pvx + pvy * pvy), pcap = pvm > 30 ? 30 / pvm : 1;
     var pr = Math.min(W, H) * 0.14, pr2 = pr * pr, t = simT * 0.035, dm = Math.pow(0.8, dt);
     for (var i = 0, T = N + NB; i < T; i++){
-      if (DL[i] > 0){ DL[i] -= dt; VX[i] *= dm; VY[i] *= dm; PX[i] += VX[i] * dt; PY[i] += VY[i] * dt; continue; }
+      if (DL[i] > 0){
+        DL[i] -= dt;
+        if (DL[i] <= 0 && (KX[i] || KY[i])){ VX[i] += KX[i]; VY[i] += KY[i]; KX[i] = 0; KY[i] = 0; }
+        else { VX[i] *= dm; VY[i] *= dm; PX[i] += VX[i] * dt; PY[i] += VY[i] * dt; continue; }
+      }
       /* 自分の居場所のまわりで、ゆっくり煮え立つようにゆれる */
       var wob = RB[i] * 0.22, tx = TX[i] + Math.sin(t * (0.7 + (i % 7) * 0.09) + PH[i]) * wob, ty = TY[i] + Math.cos(t * (0.6 + (i % 5) * 0.11) + PH[i] * 1.3) * wob;
       var ax = (tx - PX[i]) * 0.03, ay = (ty - PY[i]) * 0.03;
@@ -1797,7 +1829,7 @@ function makeSea(boxId, canvasId, opt){
     build: build, step: step,
     start: function(){
       if (started || !built) { started = true; return; }
-      started = true; hold = 0; retarget(0);
+      started = true; hold = 0; retarget(0.8);
       if (REDUCE){ for (var q = 0; q < N + NB; q++){ PX[q] = TX[q]; PY[q] = TY[q]; DL[q] = 0; } draw(); }
     }
   };
