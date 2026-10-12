@@ -1645,19 +1645,19 @@ function makeSea(boxId, canvasId, opt){
     if (!w || !h) return;
     W = w; H = h; masks = {};
     SP = Math.max(4.5, Math.min(8, Math.min(W, H) / 88));
-    C = Math.max(1 / Math.min(window.devicePixelRatio || 1, 2), Math.sqrt(W * H / (opt.cells || 700000)));
+    C = Math.max(1 / Math.min(window.devicePixelRatio || 1, 2), Math.sqrt(W * H / (opt.cells || (W < 700 ? 600000 : 1000000))));
     FW = Math.ceil(W / C); STAMPS = {}; FH = Math.ceil(H / C);
     off.width = FW; off.height = FH; img = octx.createImageData(FW, FH); buf = new Uint32Array(img.data.buffer); FLD = new Float32Array(FW * FH);
     cv.width = FW; cv.height = FH;
     /* 油は、大小の丸い滴を、重ならないように敷きつめる（大きい滴から順に置き、すき間を小さい滴で埋める）。
        滴どうしは少しだけ離して置くので、ひとつずつ丸く独立して見え、近づいたときだけ溶け合う */
-    var top = opt.top || 60, rmax = SP * 1.5, rmin = SP * 0.28, gap = opt.gap || 1.0;
+    var top = opt.top || 60, rmax = SP * 0.62, rmin = SP * 0.3, gap = opt.gap || 1.0;
     var cs = rmax * 2 * gap, gw = Math.ceil((W + 2 * rmax) / cs) + 1, gh = Math.ceil((H - top + 2 * rmax) / cs) + 1, cells = [];
     for (var c0 = 0; c0 < gw * gh; c0++) cells.push([]);
     var hx = [], hy = [], hr = [];
-    var area = (W + 2 * rmax) * (H - top + rmax), want = Math.round(area / (SP * SP) * 1.2);
+    var area = (W + 2 * rmax) * (H - top + rmax), want = Math.round(area / (rmax * rmax * 4 * gap * gap) * 1.6);
     var rs = [];
-    for (var k0 = 0; k0 < want; k0++){ var u0 = Math.random(); rs.push(rmin + (rmax - rmin) * u0 * u0 * u0); }
+    for (var k0 = 0; k0 < want; k0++){ var u0 = Math.random(); rs.push(rmin + (rmax - rmin) * u0 * u0); }
     rs.sort(function(p, q){ return q - p; });
     for (var k = 0; k < rs.length; k++){
       var r = rs[k];
@@ -1734,7 +1734,7 @@ function makeSea(boxId, canvasId, opt){
       var a = s / 32, r = Math.round(bg[0] + (fg[0] - bg[0]) * a), g = Math.round(bg[1] + (fg[1] - bg[1]) * a), b = Math.round(bg[2] + (fg[2] - bg[2]) * a);
       lut[s] = (255 << 24) | (b << 16) | (g << 8) | r;
     }
-    var e = 0.028 * Math.max(1, 1.2 / C), lo = T0 - e, span = 2 * e, full = lut[32], none = lut[0];
+    var e = 0.05, lo = T0 - e, span = 2 * e, full = lut[32], none = lut[0];
     for (var p = 0, L = FW * FH; p < L; p++){
       var v = FLD[p];
       buf[p] = v <= lo ? none : v >= lo + span ? full : lut[((v - lo) / span * 32) | 0];
