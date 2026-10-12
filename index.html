@@ -503,6 +503,11 @@ html.reduce .lineup .pouch{animation:none}
 .dash dd b{font:100 clamp(64px,8vw,132px)/.9 var(--display); letter-spacing:-.04em; font-variant-numeric:tabular-nums}
 .dash dd b::after{content:"+"; font-size:.5em; vertical-align:.7em; margin-left:.04em}
 .dash div:last-child dd b::after{content:none}
+.dash div:last-child:nth-child(odd){grid-column:1/-1} /* 数が奇数のとき、最後の1つは横いっぱいに */
+/* 5項目で3段になるので、数字と段の間を少し詰めて1画面に収める */
+.dash:has(> div:nth-child(5)){gap:clamp(18px,2.6vh,36px) clamp(24px,3vw,48px)}
+.dash:has(> div:nth-child(5)) dd b{font-size:clamp(56px,min(6.4vw,11vh),112px)}
+@media (max-width:820px){ .dash:has(> div:nth-child(5)){gap:18px 16px} .dash:has(> div:nth-child(5)) dd b{font-size:clamp(40px,11vw,56px)} .dash:has(> div:nth-child(5)) p{margin-top:4px} .dash:has(> div:nth-child(5)) div{padding-top:10px} }
 .dash dd i{font-style:normal; font-size:13px}
 .dash p{margin:8px 0 0; font-size:11px; color:var(--steel)}
 @media (max-width:820px){ .dash{grid-column:1/-1; grid-template-columns:repeat(2,minmax(0,1fr)); gap:28px 16px} .dash dd b{font-size:clamp(48px,14vw,72px)} .dash dd{flex-wrap:wrap; gap:4px 8px} }
@@ -958,6 +963,7 @@ body{font-weight:400}
         <div class="f"><dt>担当した案件</dt><dd><b data-n="1500">1,500</b><i>件</i></dd><p>4年間</p></div>
         <div class="f"><dt>使っているショートカット</dt><dd><b data-n="200">200</b><i>個</i></dd><p>Illustrator ほか</p></div>
         <div class="f"><dt>作ったIllustratorスクリプト</dt><dd><b data-n="70">70</b><i>本</i></dd><p>ExtendScript（JavaScript）</p></div>
+        <div class="f"><dt>コンペの勝率</dt><dd><b data-n="60">60</b><i>%</i></dd><p>戦績 12/20</p></div>
         <div class="f"><dt>ツールで削減した時間</dt><dd><b data-n="800">800</b><i>時間／年</i></dd><p>部内。自作のツールとスクリプトによる、およその合計</p></div>
       </dl>
     </div>
@@ -2270,6 +2276,12 @@ var CAT = (function(){
         if (dir > 0 && from === 0){ setTimeout(function(){ b.classList.remove('closed'); }, hv ? 420 : 500); }
         if (dir < 0 && to === 0) setTimeout(function(){ b.classList.add('closed'); }, 380);
         if (dir > 0 && to > N) setTimeout(function(){ b.classList.add('backc'); }, hv ? 420 : 500);
+        /* めくる紙が背を越えたら、その下に隠れる紙を先に新しいページへ替えておく。
+           めくり終わりにめくる紙と下の紙が同じ面に重なっても、同じ絵なのでちらつきが見えない（iPhone） */
+        setTimeout(function(){
+          if (dir > 0 && to <= N) face(PA, to, SA);
+          if (dir < 0 && to <= N) face(PB, to, SB);
+        }, hv ? 520 : 620);
         /* めくり終わったら、下の紙を差し替えて展開が済んでから、めくる紙を消す */
         setTimeout(function(){ show(to); ready([PA, PB]).then(function(){ leaf.classList.remove('on'); busy = false; }); }, hv ? 930 : 1130);
       });
