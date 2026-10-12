@@ -1721,7 +1721,7 @@ function makeSea(boxId, canvasId, opt){
     for (i = 0; i < N + NB; i++){ var ex = HX[i] - cx, ey = HY[i] - cy; d[i] = Math.sqrt(ex * ex + ey * ey); if (d[i] > far) far = d[i]; }
     /* 一気に閉じる：遅れはほとんど付けず、押しのけられていた油ほど強く元の場所へ引き戻す */
     /* どぷん：空いていた g に油がなだれ込み、中心で行き過ぎてから押し返され、揺れながら元に戻る */
-    SNAP = 1; WOB = 1;
+    SNAP = 1; WOB = 0.45; /* 揺れ戻しは控えめに（強く跳ね返らない） */
     var lam = Math.min(W, H) * 0.22;
     for (i = 0; i < N + NB; i++){
       TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = RB[i]; DL[i] = (far - d[i]) / diag * 5 + Math.random();
@@ -1730,7 +1730,7 @@ function makeSea(boxId, canvasId, opt){
       KX[i] = 0; KY[i] = 0;
       if (bx * bx + by * by > SP * SP){ KX[i] += bx * 0.09; KY[i] += by * 0.09; }
       /* g のまわりの油ほど、中心へ向かって強く流れ込む */
-      var ix = cx - HX[i], iy = cy - HY[i], il = Math.sqrt(ix * ix + iy * iy) || 1, mg = Math.min(7 * Math.exp(-il / lam), il * 0.035); /* 中心を突き抜けないよう、中心に近いほど弱く（突き抜けると中心に白い穴が残る） */
+      var ix = cx - HX[i], iy = cy - HY[i], il = Math.sqrt(ix * ix + iy * iy) || 1, mg = Math.min(4.5 * Math.exp(-il / lam), il * 0.035); /* 中心を突き抜けないよう、中心に近いほど弱く（突き抜けると中心に白い穴が残る） */
       KX[i] += ix / il * mg; KY[i] += iy / il * mg;
     }
   }
