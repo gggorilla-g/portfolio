@@ -911,7 +911,7 @@ body{font-weight:400}
 <main class="deck" id="deck">
 
   <section class="pg pg-hero" id="top" data-chap="Top" aria-label="冒頭">
-    <div class="hero-img" id="heroimg"><canvas id="filings" role="img" aria-label="黒い油の海が押しのけられて浮かぶ、いろいろな書体の g と G、ロゴの g"></canvas></div>
+    <div class="hero-img" id="heroimg"><canvas id="filings" role="img" aria-label="黒い油の海が押しのけられて浮かぶ、いろいろな書体の g と G"></canvas></div>
     <div class="hero-foot grid">
       <h1 class="name f split" id="heroname">Genta Yamasaki</h1>
       <div class="hero-side">
@@ -1858,8 +1858,8 @@ function makeSea(boxId, canvasId, opt){
 
 var HERO = makeSea('heroimg', 'filings', {
   bg: function(){ return window.DG || 'rgb(236,235,231)'; }, fg: 'rgb(0,0,0)', hold: 190,
-  /* 小文字の g、大文字の G、自分のロゴの g を混ぜて回す */
-  fonts: [['800', '"EB Garamond"', 'g'], ['900', '"Jost"', 'G'], 'logo', ['900', '"Playfair Display"', 'g'], ['900', '"Bodoni Moda"', 'G'], ['400', '"Archivo Black"', 'g'], ['italic 800', '"EB Garamond"', 'G'], ['900', '"Unbounded"', 'g'], 'logo', ['400', '"Abril Fatface"', 'G'], ['italic 400', '"DM Serif Display"', 'g'], ['400', '"Archivo Black"', 'G'], ['900', '"Jost"', 'g'], ['italic 900', '"Fraunces"', 'G']]
+  /* 小文字の g と大文字の G を混ぜて回す */
+  fonts: [['800', '"EB Garamond"', 'g'], ['900', '"Jost"', 'G'], ['900', '"Playfair Display"', 'g'], ['900', '"Bodoni Moda"', 'G'], ['400', '"Archivo Black"', 'g'], ['italic 800', '"EB Garamond"', 'G'], ['900', '"Unbounded"', 'g'], ['400', '"Abril Fatface"', 'G'], ['italic 400', '"DM Serif Display"', 'g'], ['400', '"Archivo Black"', 'G'], ['900', '"Jost"', 'g'], ['italic 900', '"Fraunces"', 'G']]
 });
 
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ HERO.build(); });
