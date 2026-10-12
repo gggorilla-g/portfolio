@@ -859,17 +859,17 @@ html.reduce .lineup .pouch{animation:none}
 /* 導入：現実の時刻からこの頁の時間へ */
 #intro{
   position:fixed; inset:0; z-index:60; background:var(--paper); color:var(--ink);
-  display:flex; flex-direction:column; justify-content:flex-end; gap:14px;
-  padding:var(--gut); padding-bottom:clamp(28px,6vh,64px);
+  display:flex; flex-direction:column; justify-content:center; align-items:center; gap:10px; /* ロゴと時刻は画面の中央に小さく */
+  padding:var(--gut);
   transition:opacity 2s cubic-bezier(.45,0,.25,1); cursor:pointer;
 }
 #intro.out{opacity:0; pointer-events:none} /* せり上がらず、ゆっくり溶けるように TOP が見えてくる */
-#intro .intro-mark{height:clamp(64px,9vw,120px); width:auto; display:block; margin-bottom:auto; align-self:flex-start; color:var(--ink); opacity:0; transform:translateY(8px); transition:opacity .9s ease .15s, transform 1.2s cubic-bezier(.2,.8,.2,1) .15s}
+#intro .intro-mark{height:clamp(34px,3.6vw,48px); width:auto; display:block; margin-bottom:14px; align-self:center; color:var(--ink); opacity:0; transform:translateY(8px); transition:opacity .9s ease .15s, transform 1.2s cubic-bezier(.2,.8,.2,1) .15s}
 #intro.run .intro-mark{opacity:1; transform:none}
 
-#intro .clock{font:100 clamp(52px,13vw,200px)/.9 var(--display); letter-spacing:-.04em; font-variant-numeric:tabular-nums}
-#intro .coord{font-size:12px; font-weight:400; font-variant-numeric:tabular-nums; display:flex; justify-content:space-between}
-#intro .line{height:1px; background:var(--ink); transform:scaleX(0); transform-origin:left; transition:transform 2.8s cubic-bezier(.65,0,.35,1)}
+#intro .clock{margin:0; text-align:center; font:100 clamp(30px,4.6vw,60px)/1 var(--display); letter-spacing:-.04em; font-variant-numeric:tabular-nums}
+#intro .coord{margin:0; width:clamp(230px,26vw,360px); font-size:11px; font-weight:400; font-variant-numeric:tabular-nums; display:flex; justify-content:space-between}
+#intro .line{width:clamp(230px,26vw,360px); height:1px; background:var(--ink); transform:scaleX(0); transform-origin:left; transition:transform 2.8s cubic-bezier(.65,0,.35,1)}
 #intro.run .line{transform:scaleX(1)}
 </style>
 <style>/* Safari：白黒反転の重ね方と常駐レイヤーが多いと、下地とページがまだらにちらつくので、Safari だけ軽くする */
@@ -1696,7 +1696,7 @@ function makeSea(boxId, canvasId, opt){
         if (kick && gx >= 0 && gy >= 0 && gx < M.w && gy < M.h && M.q[c] < 1e9){
           var od = Math.sqrt(M.q[c]) * G, lam = Math.min(W, H) * (opt.wave || 0.09);
           if (od < lam * 4){
-            var px0 = (M.qx[c] + 0.5) * G, py0 = (M.qy[c] + 0.5) * G, wx = HX[i] - px0, wy = HY[i] - py0, wl = Math.sqrt(wx * wx + wy * wy) || 1, mg = 5.2 * Math.exp(-od / lam);
+            var px0 = (M.qx[c] + 0.5) * G, py0 = (M.qy[c] + 0.5) * G, wx = HX[i] - px0, wy = HY[i] - py0, wl = Math.sqrt(wx * wx + wy * wy) || 1, mg = 6.6 * Math.exp(-od / lam);
             KX[i] = wx / wl * mg; KY[i] = wy / wl * mg;
             var sx0 = px0 - M.cx, sy0 = py0 - M.cy;
             DL[i] = Math.sqrt(sx0 * sx0 + sy0 * sy0) / diag * 12 + od / 16 + Math.random();
@@ -1783,7 +1783,7 @@ function makeSea(boxId, canvasId, opt){
       hold += dt;
       /* 開いた g は、一度油が戻って完全に閉じてから、次の書体で開く */
       if (phase === 0 && hold > (opt.hold || 170)){ hold = 0; phase = 1; closeAll(); }
-      else if (phase === 1 && hold > (opt.shut || 70)){ hold = 0; phase = 0; retarget(0.8); }
+      else if (phase === 1 && hold > (opt.shut || 70)){ hold = 0; phase = 0; retarget(1.15); } /* 開くときの勢いを少し強めに */
     }
     var wantM = ptr.on ? 1 : 0; ptr.m += (wantM - ptr.m) * Math.min(1, 0.1 * dt);
     /* 指の速さ：なぞった向きに油を掃く */
