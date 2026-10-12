@@ -1602,7 +1602,7 @@ function makeSea(boxId, canvasId, opt){
   var box = document.getElementById(boxId), cv = document.getElementById(canvasId), ctx = cv.getContext('2d');
   var FONTS = opt.fonts, fi = -1, masks = {}, W = 0, H = 0, built = false, started = false;
   var off = document.createElement('canvas'), octx = off.getContext('2d'), img = null, buf = null, FLD = null, FW = 0, FH = 0, C = 1;
-  var KX = null, KY = null, SNAP = 0, WOB = 0, CUR = null, phase = 0, RMX = 4, CH = null, CN = null, CI = null, pvx = 0, pvy = 0, plx = 0, ply = 0, N = 0, NB = 0, HX, HY, PX, PY, VX, VY, TX, TY, RR, RB, WT, PH, DL, SP = 9, hold = 0, simT = 0;
+  var KX = null, KY = null, SNAP = 0, WOB = 0, CUR = null, phase = 0, RMX = 4, CH = null, CN = null, CI = null, pvx = 0, pvy = 0, plx = 0, ply = 0, N = 0, NB = 0, HX, HY, PX, PY, VX, VY, TX, TY, RR, RB, WT, PH, DL, SP = 9, hold = 0, simT = 0, JT = 0, JS = 1, FRZ = 0;
   var ptr = { x: 0, y: 0, on: false, m: 0 };
   /* 書体は [太さ・斜体, 書体名, 文字]。'logo' は自分のロゴの g（ページ内のロゴのSVGをそのまま使う） */
   function fs(f, px){ return f[0] + ' ' + px + 'px ' + f[1]; }
@@ -1783,14 +1783,17 @@ function makeSea(boxId, canvasId, opt){
       hold += dt;
       /* 開いた g は、一度油が戻って完全に閉じてから、次の書体で開く */
       if (phase === 0 && hold > (opt.hold || 170)){ hold = 0; phase = 1; closeAll(); }
-      else if (phase === 1 && hold > (opt.shut || 70)){ hold = 0; phase = 0; retarget(1.15); } /* 開くときの勢いを少し強めに */
+      else if (phase === 1 && hold > (opt.shut || 70)){ hold = 0; phase = 0; retarget(1.15); FRZ = opt.freeze || 80; } /* 開くときの勢いを少し強めに。開いた瞬間は、油のソワソワした揺れを一瞬止める */
     }
     var wantM = ptr.on ? 1 : 0; ptr.m += (wantM - ptr.m) * Math.min(1, 0.1 * dt);
     /* 指の速さ：なぞった向きに油を掃く */
     if (ptr.on){ pvx += ((ptr.x - plx) / dt - pvx) * 0.4; pvy += ((ptr.y - ply) / dt - pvy) * 0.4; } else { pvx *= 0.8; pvy *= 0.8; }
     plx = ptr.x; ply = ptr.y;
     var pvm = Math.sqrt(pvx * pvx + pvy * pvy), pcap = pvm > 30 ? 30 / pvm : 1;
-    var pr = Math.min(W, H) * 0.14, pr2 = pr * pr, t = simT * 0.035;
+    /* ソワソワした揺れの時計：g が開いた瞬間だけ止め、そのあと静かに動き出す */
+    if (FRZ > 0){ FRZ -= dt; JS = 0; } else JS = Math.min(1, JS + 0.03 * dt);
+    JT += dt * 0.035 * JS;
+    var pr = Math.min(W, H) * 0.14, pr2 = pr * pr, t = JT;
     /* 開いた直後だけバネを硬くする：一気に開いて少し行き過ぎ、跳ね返って止まる */
     SNAP *= Math.pow(0.965, dt);
     /* 閉じた直後だけ粘りを弱めて、行き過ぎと揺り戻しを残す */
