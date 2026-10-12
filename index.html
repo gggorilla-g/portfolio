@@ -1922,14 +1922,14 @@ var HERO = makeSea('heroimg', 'filings', {
   bg: function(){ return window.DG || 'rgb(236,235,231)'; }, fg: 'rgb(0,0,0)', hold: 190,
   /* 小文字の g と大文字の G を混ぜて回す */
   /* 名作書体（太い書体と標準の太さの書体を混ぜる。細いサンセリフと、くびれの細い書体（ディドーン系など）は油でつぶれるので入れない）：Apple の端末に入っている書体（'sys'。入っていない端末では飛ばす）と、Google Fonts の書体・復刻版 */
-  fonts: [['800', '"EB Garamond"', 'g'], ['500', '"Futura"', 'g', 'sys'], ['400', '"Libre Baskerville"', 'G'], ['400', '"Baskerville"', 'g', 'sys'],
+  fonts: [['800', '"EB Garamond"', 'g'], ['400', '"Libre Baskerville"', 'G'], ['400', '"Baskerville"', 'g', 'sys'],
     ['400', '"Rubik Mono One"', 'G'], ['400', '"Libre Caslon Text"', 'g'], ['400', '"Anton"', 'G'], ['400', '"Optima"', 'G', 'sys'],
     ['400', '"Palatino"', 'G', 'sys'], ['400', '"Times New Roman"', 'g', 'sys'], ['400', '"Archivo Black"', 'g'], ['800', '"Rockwell"', 'G', 'sys'],
     ['italic 400', '"Hoefler Text"', 'g', 'sys'], ['400', '"Ultra"', 'g'], ['400', '"Cinzel"', 'G'], ['400', '"Cochin"', 'G', 'sys'],
     ['italic 800', '"EB Garamond"', 'G'], ['700', '"Futura"', 'G', 'sys'], ['400', '"American Typewriter"', 'g', 'sys'], ['400', '"Titan One"', 'g'],
     ['400', '"Bungee"', 'G'], ['700', '"DIN Alternate"', 'G', 'sys'], ['400', '"Charter"', 'g', 'sys'], ['400', '"Georgia"', 'G', 'sys'],
     ['400', '"Archivo Black"', 'G'], ['400', '"Alfa Slab One"', 'g'], ['900', '"Superclarendon"', 'g', 'sys'], ['900', '"Jost"', 'g'],
-    ['900', '"Avenir Next Condensed"', 'G', 'sys'], ['800', '"Syne"', 'G']]
+    ['900', '"Avenir Next Condensed"', 'G', 'sys'], ['800', '"Syne"', 'G'], ['500', '"Futura"', 'g', 'sys']]
 });
 
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ HERO.build(); });
