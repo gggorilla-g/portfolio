@@ -884,6 +884,10 @@ html.reduce .lineup .pouch{animation:none}
 .sf .bkf{transform-style:flat; perspective:1800px}
 .sf .bkf .pg2,.sf .cal .sheet{transform:none}
 .sf .cal{transform-style:flat; perspective:1800px}
+.sf .bkf .pg2{transition:opacity .22s ease}
+.sf .bkf.swap .pg2{opacity:0}
+/* スマホ：英語の名前を少し下げる */
+@media (max-width:820px){ .pg-hero .name{position:relative; top:10px} }
 </style>
 <style>/* serif: 明朝・セリフ体用の補正 */
 body{font-weight:400}
@@ -2279,6 +2283,12 @@ var CAT = (function(){
     function turn(dir){
       var to = st + dir; if (busy || to < minS || to > MAX) return false;
       busy = true;
+      /* iPhone・iPad：3Dでめくると下の紙とめくる紙がちらつくので、めくらずに紙をさっと入れ替える */
+      if (document.documentElement.classList.contains('sf')){
+        b.classList.add('swap');
+        setTimeout(function(){ show(to); ready([PA, PB]).then(function(){ requestAnimationFrame(function(){ b.classList.remove('swap'); busy = false; }); }); }, 220);
+        return true;
+      }
       leaf.style.transition = 'none';
       if (dir > 0){ face(lf, st, SB); face(lb, to, SA); if (to > N) b.classList.add('proff'); else face(PB, to, SB); leaf.style.transform = 'translateZ(1px) rotateY(0deg)'; }
       else { face(lb, st, SA); face(lf, to, SB); if (to > 0) face(PA, to, SA); if (st > N){ face(PB, to, SB); b.classList.add('proff'); setTimeout(function(){ b.classList.remove('backc'); }, 60); } leaf.style.transform = 'translateZ(1px) rotateY(' + DEG + 'deg)'; }
