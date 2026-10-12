@@ -1493,7 +1493,7 @@ function makeField(boxId, canvasId, opt){
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
     var cfg = opt.layout(W, H); poles = cfg.poles; deco = cfg.deco || null; tick = cfg.tick || null;
     /* 砂鉄は格子に1本ずつ。長さは間隔より短く、重ならない */
-    SP = W < 700 ? 11 : 13;
+    SP = opt.sp ? opt.sp(W) : (W < 700 ? 11 : 13);
     var nx = Math.floor(W / SP), ny = Math.floor((H - 50) / SP), ox = (W - (nx - 1) * SP) / 2, oy = 50 + ((H - 50) - (ny - 1) * SP) / 2;
     var xs = [], ys = [], ls = [], as = [];
     for (var gy = 0; gy < ny; gy++){
@@ -1532,7 +1532,7 @@ function makeField(boxId, canvasId, opt){
     }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = typeof opt.bg === 'function' ? opt.bg() : opt.bg; ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = opt.fg; ctx.lineWidth = SP > 12 ? 1.6 : 1.4; ctx.lineCap = 'butt';
+    ctx.strokeStyle = opt.fg; ctx.lineWidth = SP > 12 ? 1.6 : SP > 9 ? 1.4 : 1.1; ctx.lineCap = 'butt';
     /* 2トン：針の片側（S極側）を fg2 で、もう片側（N極側）を fg で描く */
     var two = !!opt.fg2, P2 = two ? new Path2D() : null;
     ctx.beginPath();
@@ -1683,7 +1683,13 @@ function makeSea(boxId, canvasId, opt){
   function closeAll(){
     var cx = CUR ? CUR.cx : W / 2, cy = CUR ? CUR.cy : H / 2, diag = Math.sqrt(W * W + H * H), far = 0, i, d = new Float32Array(N + NB);
     for (i = 0; i < N + NB; i++){ var ex = HX[i] - cx, ey = HY[i] - cy; d[i] = Math.sqrt(ex * ex + ey * ey); if (d[i] > far) far = d[i]; }
-    for (i = 0; i < N + NB; i++){ TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = RB[i]; DL[i] = (far - d[i]) / diag * 12 + Math.random() * 3; }
+    /* 一気に閉じる：遅れはほとんど付けず、押しのけられていた油ほど強く元の場所へ引き戻す */
+    SNAP = 1;
+    for (i = 0; i < N + NB; i++){
+      TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = RB[i]; DL[i] = (far - d[i]) / diag * 5 + Math.random();
+      var bx = HX[i] - PX[i], by = HY[i] - PY[i];
+      if (bx * bx + by * by > SP * SP){ VX[i] += bx * 0.07; VY[i] += by * 0.07; }
+    }
   }
   function build(){
     var w = box.clientWidth, h = box.clientHeight;
@@ -1871,6 +1877,8 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(function()
 /* 扉：見えない磁極（白い砂鉄、黒地） */
 var AI = makeField('aiimg', 'aifield', {
   bg: '#000000', fg: '#ffffff',
+  /* 引きで見せる：針を細かく */
+  sp: function(W){ return W < 700 ? 7 : 8; },
   /* 穴の大きさは、その磁極の強さで呼吸する */
   hole: function(P, W, H){ var base = Math.max(22, Math.min(W, H) * 0.075); return base * (0.55 + 0.45 * Math.abs(P.q) / (H * H * 0.7)); },
   layout: function(W, H){
