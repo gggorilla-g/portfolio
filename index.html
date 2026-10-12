@@ -1707,7 +1707,7 @@ function makeSea(boxId, canvasId, opt){
       KX[i] = 0; KY[i] = 0;
       if (bx * bx + by * by > SP * SP){ KX[i] += bx * 0.09; KY[i] += by * 0.09; }
       /* g のまわりの油ほど、中心へ向かって強く流れ込む */
-      var ix = cx - HX[i], iy = cy - HY[i], il = Math.sqrt(ix * ix + iy * iy) || 1, mg = 7 * Math.exp(-il / lam) * Math.min(1, il / (SP * 4));
+      var ix = cx - HX[i], iy = cy - HY[i], il = Math.sqrt(ix * ix + iy * iy) || 1, mg = Math.min(7 * Math.exp(-il / lam), il * 0.035); /* 中心を突き抜けないよう、中心に近いほど弱く（突き抜けると中心に白い穴が残る） */
       KX[i] += ix / il * mg; KY[i] += iy / il * mg;
     }
   }
