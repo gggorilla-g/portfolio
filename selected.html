@@ -505,6 +505,8 @@ html.reduce .lineup .pouch{animation:none}
 .dash dd b{font:100 clamp(64px,8vw,132px)/.9 var(--display); letter-spacing:-.04em; font-variant-numeric:tabular-nums}
 .dash dd b::after{content:"+"; font-size:.5em; vertical-align:.7em; margin-left:.04em}
 .dash div:last-child dd b::after{content:none}
+.dash div.np dd b::after{content:none} /* ちょうどの数は「+」を付けない */
+.dash div.neg dd b::before{content:"\2212"; margin-right:.02em} /* 減らした数はマイナスで */
 .dash div:last-child:nth-child(odd){grid-column:1/-1} /* 数が奇数のとき、最後の1つは横いっぱいに */
 /* 5項目で3段になるので、数字と段の間を少し詰めて1画面に収める */
 .dash:has(> div:nth-child(5)){gap:clamp(18px,2.6vh,36px) clamp(24px,3vw,48px)}
@@ -879,6 +881,11 @@ html.reduce .lineup .pouch{animation:none}
 <style>/* 冊子：下の紙をめくる紙より少し奥に置く。同じ面に重なると Safari で手前・奥が1コマごとに入れ替わってちらつく */
 .bkf .pg2{transform:translateZ(-2px)}
 .cal .sheet{transform:translateZ(-2px)}
+/* iPhone：冊子とカレンダーの中は奥行きで重ね順を決めない。めくる紙と下の紙が同じ面で重なると、
+   手前・奥の判定が1コマごとに入れ替わってちらつくので、重ね順は書いた順（z-index）で固定する。めくりの遠近は perspective で残す */
+.sf .bkf{transform-style:flat; perspective:1800px}
+.sf .bkf .pg2,.sf .cal .sheet{transform:none}
+.sf .cal{transform-style:flat; perspective:1800px}
 </style>
 <style>/* serif: 明朝・セリフ体用の補正 */
 body{font-weight:400}
@@ -965,8 +972,8 @@ body{font-weight:400}
         <div class="f"><dt>担当した案件</dt><dd><b data-n="1500">1,500</b><i>件</i></dd><p>4年間</p></div>
         <div class="f"><dt>使っているショートカット</dt><dd><b data-n="200">200</b><i>個</i></dd><p>Illustrator ほか</p></div>
         <div class="f"><dt>作ったIllustratorスクリプト</dt><dd><b data-n="70">70</b><i>本</i></dd><p>ExtendScript（JavaScript）</p></div>
-        <div class="f"><dt>コンペの勝率</dt><dd><b data-n="60">60</b><i>%</i></dd><p>戦績 12/20</p></div>
-        <div class="f"><dt>ツールで削減した時間</dt><dd><b data-n="800">800</b><i>時間／年</i></dd><p>部内。自作のツールとスクリプトによる、およその合計</p></div>
+        <div class="f np"><dt>コンペの勝率</dt><dd><b data-n="60">60</b><i>%</i></dd><p>戦績 12/20</p></div>
+        <div class="f np neg"><dt>ツールで削減した時間</dt><dd><b data-n="800">800</b><i>時間／年</i></dd><p>部内。自作のツールとスクリプトによる、およその合計</p></div>
       </dl>
     </div>
   </section>
