@@ -1836,8 +1836,12 @@ function makeSea(boxId, canvasId, opt){
     }
     ctx.putImageData(img, 0, 0);
   }
+  /* 枠の大きさが変わったら作り直す。iPhone はアドレスバーの出入りなどで、resize が来ないまま枠の高さが変わることがあり、
+     そのままだと絵が縦につぶれて引き伸ばされる */
+  var miss = 0;
   function step(dt, visible){
     if (!built || !visible) return;
+    if (Math.abs(box.clientWidth - W) > 1 || Math.abs(box.clientHeight - H) > 1){ miss += dt; if (miss > 6){ miss = 0; build(); return; } } else miss = 0;
     sim(dt);
     draw();
   }
