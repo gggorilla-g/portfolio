@@ -1625,7 +1625,7 @@ function makeSea(boxId, canvasId, opt){
       else if (bub){ TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = 0; }
       else if (Math.random() < 0.02){ TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = SP * (0.08 + Math.random() * 0.12); }
       else {
-        var ox = (M.nx[c] + 0.5) * G, oy = (M.ny[c] + 0.5) * G, dx = ox - HX[i], dy = oy - HY[i], dl = Math.sqrt(dx * dx + dy * dy) || 1, push = SP * (0.4 + Math.random() * 1.4);
+        var ox = (M.nx[c] + 0.5) * G, oy = (M.ny[c] + 0.5) * G, dx = ox - HX[i], dy = oy - HY[i], dl = Math.sqrt(dx * dx + dy * dy) || 1, push = RB[i] * 1.05 + Math.random() * SP * 1.2;
         TX[i] = ox + dx / dl * push; TY[i] = oy + dy / dl * push; RR[i] = RB[i];
       }
       /* 一滴を落とした中心から、波のように広がる */
@@ -1638,27 +1638,40 @@ function makeSea(boxId, canvasId, opt){
     var w = box.clientWidth, h = box.clientHeight;
     if (!w || !h) return;
     W = w; H = h; masks = {};
-    SP = Math.max(6, Math.min(11, Math.min(W, H) / 62));
-    C = Math.max(1 / Math.min(window.devicePixelRatio || 1, 2), Math.sqrt(W * H / (opt.cells || 320000)));
+    SP = Math.max(7, Math.min(13, Math.min(W, H) / 52));
+    C = Math.max(1 / Math.min(window.devicePixelRatio || 1, 2), Math.sqrt(W * H / (opt.cells || 700000)));
     FW = Math.ceil(W / C); STAMPS = {}; FH = Math.ceil(H / C);
     off.width = FW; off.height = FH; img = octx.createImageData(FW, FH); buf = new Uint32Array(img.data.buffer); FLD = new Float32Array(FW * FH);
     cv.width = FW; cv.height = FH;
-    /* 油の粒は画面全体に敷きつめる。泡（穴）は粗めの間隔で */
-    var hx = [], hy = [], bx = [], by = [], m = SP * 1.5, sb = SP * (opt.foam || 2.7), x, y;
-    /* 上端はナビの文字が読めるよう、油を張らない（油の面のふちになる） */
-    var top = opt.top || 60;
-    for (y = top + SP * 0.5; y < H + m; y += SP) for (x = -m; x < W + m; x += SP){ hx.push(x + (Math.random() - 0.5) * SP * 0.9); hy.push(y + (Math.random() - 0.5) * SP * 0.9); }
-    for (y = top + sb; y < H; y += sb) for (x = sb * 0.5; x < W; x += sb){ bx.push(x + (Math.random() - 0.5) * sb * 0.9); by.push(y + (Math.random() - 0.5) * sb * 0.9); }
-    N = hx.length; NB = bx.length; var T = N + NB;
-    HX = new Float32Array(hx.concat(bx)); HY = new Float32Array(hy.concat(by));
-    PX = new Float32Array(HX); PY = new Float32Array(HY); VX = new Float32Array(T); VY = new Float32Array(T);
-    TX = new Float32Array(HX); TY = new Float32Array(HY); RR = new Float32Array(T); RB = new Float32Array(T); WT = new Float32Array(T); PH = new Float32Array(T); DL = new Float32Array(T);
-    for (var i = 0; i < T; i++){
-      PH[i] = Math.random() * 6.283;
-      if (i < N){ WT[i] = 1; RB[i] = SP * (0.56 + Math.random() * 0.28); }
-      else { WT[i] = -1.8; RB[i] = SP * (0.5 + Math.random() * Math.random() * 1.1); }
-      RR[i] = RB[i];
+    /* 油は、大小の丸い滴を、重ならないように敷きつめる（大きい滴から順に置き、すき間を小さい滴で埋める）。
+       滴どうしは少しだけ離して置くので、ひとつずつ丸く独立して見え、近づいたときだけ溶け合う */
+    var top = opt.top || 60, rmax = SP * 1.5, rmin = SP * 0.28, gap = opt.gap || 1.0;
+    var cs = rmax * 2 * gap, gw = Math.ceil((W + 2 * rmax) / cs) + 1, gh = Math.ceil((H - top + 2 * rmax) / cs) + 1, cells = [];
+    for (var c0 = 0; c0 < gw * gh; c0++) cells.push([]);
+    var hx = [], hy = [], hr = [];
+    var area = (W + 2 * rmax) * (H - top + rmax), want = Math.round(area / (SP * SP) * 1.2);
+    var rs = [];
+    for (var k0 = 0; k0 < want; k0++){ var u0 = Math.random(); rs.push(rmin + (rmax - rmin) * u0 * u0 * u0); }
+    rs.sort(function(p, q){ return q - p; });
+    for (var k = 0; k < rs.length; k++){
+      var r = rs[k];
+      for (var tr = 0; tr < 24; tr++){
+        var x = -rmax + Math.random() * (W + 2 * rmax), y = top + r * 0.6 + Math.random() * (H - top + rmax);
+        var gx = Math.floor((x + rmax) / cs), gy = Math.floor((y - top) / cs), ok = true;
+        for (var oy = -1; oy <= 1 && ok; oy++) for (var ox = -1; ox <= 1 && ok; ox++){
+          var X = gx + ox, Y = gy + oy;
+          if (X < 0 || Y < 0 || X >= gw || Y >= gh) continue;
+          var L0 = cells[Y * gw + X];
+          for (var m0 = 0; m0 < L0.length; m0++){ var j0 = L0[m0], dx0 = hx[j0] - x, dy0 = hy[j0] - y, mm = (hr[j0] + r) * gap; if (dx0 * dx0 + dy0 * dy0 < mm * mm){ ok = false; break; } }
+        }
+        if (ok && gx >= 0 && gy >= 0 && gx < gw && gy < gh){ cells[gy * gw + gx].push(hx.length); hx.push(x); hy.push(y); hr.push(r); break; }
+      }
     }
+    N = hx.length; NB = 0; var T = N;
+    HX = new Float32Array(hx); HY = new Float32Array(hy);
+    PX = new Float32Array(HX); PY = new Float32Array(HY); VX = new Float32Array(T); VY = new Float32Array(T);
+    TX = new Float32Array(HX); TY = new Float32Array(HY); RR = new Float32Array(T); RB = new Float32Array(hr); WT = new Float32Array(T).fill(1); PH = new Float32Array(T); DL = new Float32Array(T);
+    for (var i = 0; i < T; i++){ PH[i] = Math.random() * 6.283; RR[i] = RB[i]; }
     if (started){ fi = (Math.max(fi, 0) - 1 + FONTS.length) % FONTS.length; retarget(0); for (var q = 0; q < T; q++){ PX[q] = TX[q]; PY[q] = TY[q]; DL[q] = 0; } }
     built = true; draw();
   }
@@ -1669,11 +1682,11 @@ function makeSea(boxId, canvasId, opt){
       if (hold > (opt.hold || 190)){ hold = 0; retarget(0.8); }
     }
     var wantM = ptr.on ? 1 : 0; ptr.m += (wantM - ptr.m) * Math.min(1, 0.1 * dt);
-    var pr = Math.min(W, H) * 0.14, pr2 = pr * pr, t = simT * 0.035, wob = SP * 0.38, dm = Math.pow(0.8, dt);
+    var pr = Math.min(W, H) * 0.14, pr2 = pr * pr, t = simT * 0.035, dm = Math.pow(0.8, dt);
     for (var i = 0, T = N + NB; i < T; i++){
       if (DL[i] > 0){ DL[i] -= dt; VX[i] *= dm; VY[i] *= dm; PX[i] += VX[i] * dt; PY[i] += VY[i] * dt; continue; }
       /* 自分の居場所のまわりで、ゆっくり煮え立つようにゆれる */
-      var tx = TX[i] + Math.sin(t * (0.7 + (i % 7) * 0.09) + PH[i]) * wob, ty = TY[i] + Math.cos(t * (0.6 + (i % 5) * 0.11) + PH[i] * 1.3) * wob;
+      var wob = RB[i] * 0.22, tx = TX[i] + Math.sin(t * (0.7 + (i % 7) * 0.09) + PH[i]) * wob, ty = TY[i] + Math.cos(t * (0.6 + (i % 5) * 0.11) + PH[i] * 1.3) * wob;
       var ax = (tx - PX[i]) * 0.03, ay = (ty - PY[i]) * 0.03;
       /* 指やマウスも洗剤の一滴：近くの油を押しのける */
       if (ptr.m > 0.01){
@@ -1697,7 +1710,7 @@ function makeSea(boxId, canvasId, opt){
   }
   function draw(){
     FLD.fill(0);
-    var inv = 1 / C, T0 = 0.5, kr = 1 / 0.541;
+    var inv = 1 / C, T0 = 0.17, kr = 1.3;
     for (var i = 0, T = N + NB; i < T; i++){
       if (RR[i] <= 0) continue;
       var w = WT[i], st = stamp(RR[i] * kr * inv), n = st.n, sz = st.s, sa = st.a, cx = Math.round(PX[i] * inv), cy = Math.round(PY[i] * inv);
@@ -1713,7 +1726,7 @@ function makeSea(boxId, canvasId, opt){
       var a = s / 32, r = Math.round(bg[0] + (fg[0] - bg[0]) * a), g = Math.round(bg[1] + (fg[1] - bg[1]) * a), b = Math.round(bg[2] + (fg[2] - bg[2]) * a);
       lut[s] = (255 << 24) | (b << 16) | (g << 8) | r;
     }
-    var e = 0.09 * Math.max(1, 1.4 / C), lo = T0 - e, span = 2 * e, full = lut[32], none = lut[0];
+    var e = 0.028 * Math.max(1, 1.2 / C), lo = T0 - e, span = 2 * e, full = lut[32], none = lut[0];
     for (var p = 0, L = FW * FH; p < L; p++){
       var v = FLD[p];
       buf[p] = v <= lo ? none : v >= lo + span ? full : lut[((v - lo) / span * 32) | 0];
