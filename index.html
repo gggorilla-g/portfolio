@@ -1697,18 +1697,28 @@ function makeSea(boxId, canvasId, opt){
     var cx = CUR ? CUR.cx : W / 2, cy = CUR ? CUR.cy : H / 2, diag = Math.sqrt(W * W + H * H), far = 0, i, d = new Float32Array(N + NB);
     for (i = 0; i < N + NB; i++){ var ex = HX[i] - cx, ey = HY[i] - cy; d[i] = Math.sqrt(ex * ex + ey * ey); if (d[i] > far) far = d[i]; }
     /* 一気に閉じる：遅れはほとんど付けず、押しのけられていた油ほど強く元の場所へ引き戻す */
-    /* どぷん：空いていた g に油がなだれ込み、中心で行き過ぎてから押し返され、揺れながら元に戻る */
+    /* どぷん：空いていた g に油がなだれ込み、行き過ぎてから押し返され、揺れながら元に戻る。
+       流れ込む先は1つの中心ではなく、それぞれの油からいちばん近い文字の線（文字の形そのものに沿って埋まる） */
     SNAP = 1; WOB = 1;
-    var lam = Math.min(W, H) * 0.22;
+    var lam = Math.min(W, H) * 0.09, M = CUR;
     for (i = 0; i < N + NB; i++){
-      TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = RB[i]; DL[i] = (far - d[i]) / diag * 5 + Math.random();
+      TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = RB[i]; DL[i] = Math.random() * 3;
       var bx = HX[i] - PX[i], by = HY[i] - PY[i];
       /* 勢いは、その油が動き出す瞬間にまとめて与える（待っている間に弱まらないように） */
       KX[i] = 0; KY[i] = 0;
       if (bx * bx + by * by > SP * SP){ KX[i] += bx * 0.09; KY[i] += by * 0.09; }
-      /* g のまわりの油ほど、中心へ向かって強く流れ込む */
-      var ix = cx - HX[i], iy = cy - HY[i], il = Math.sqrt(ix * ix + iy * iy) || 1, mg = Math.min(7 * Math.exp(-il / lam), il * 0.035); /* 中心を突き抜けないよう、中心に近いほど弱く（突き抜けると中心に白い穴が残る） */
-      KX[i] += ix / il * mg; KY[i] += iy / il * mg;
+      /* 文字の線に近い油ほど、その線へ向かって強く流れ込む（線から離れた油は少し遅れて動く） */
+      if (M){
+        var gx = (HX[i] / G) | 0, gy = (HY[i] / G) | 0;
+        if (gx >= 0 && gy >= 0 && gx < M.w && gy < M.h){
+          var c = gy * M.w + gx;
+          if (!M.ins[c] && M.q[c] < 1e9){
+            var od = Math.sqrt(M.q[c]) * G, ix = (M.qx[c] + 0.5) * G - HX[i], iy = (M.qy[c] + 0.5) * G - HY[i], il = Math.sqrt(ix * ix + iy * iy) || 1;
+            var mg = Math.min(5 * Math.exp(-od / lam), (od + SP * 3) * 0.06);
+            KX[i] += ix / il * mg; KY[i] += iy / il * mg; DL[i] += od / 18;
+          }
+        }
+      }
     }
   }
   function build(){
@@ -1759,7 +1769,7 @@ function makeSea(boxId, canvasId, opt){
       hold += dt;
       /* 開いた g は、一度油が戻って完全に閉じてから、次の書体で開く */
       if (phase === 0 && hold > (opt.hold || 170)){ hold = 0; phase = 1; closeAll(); }
-      else if (phase === 1 && hold > (opt.shut || 70)){ hold = 0; phase = 0; retarget(0.8); }
+      else if (phase === 1 && hold > (opt.shut || 100)){ hold = 0; phase = 0; retarget(0.8); }
     }
     var wantM = ptr.on ? 1 : 0; ptr.m += (wantM - ptr.m) * Math.min(1, 0.1 * dt);
     /* 指の速さ：なぞった向きに油を掃く */
