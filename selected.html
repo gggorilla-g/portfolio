@@ -1577,7 +1577,7 @@ function makeSea(boxId, canvasId, opt){
   var box = document.getElementById(boxId), cv = document.getElementById(canvasId), ctx = cv.getContext('2d');
   var FONTS = opt.fonts, fi = -1, masks = {}, W = 0, H = 0, built = false, started = false;
   var off = document.createElement('canvas'), octx = off.getContext('2d'), img = null, buf = null, FLD = null, FW = 0, FH = 0, C = 1;
-  var KX = null, KY = null, CUR = null, phase = 0, RMX = 4, CH = null, CN = null, CI = null, pvx = 0, pvy = 0, plx = 0, ply = 0, N = 0, NB = 0, HX, HY, PX, PY, VX, VY, TX, TY, RR, RB, WT, PH, DL, SP = 9, hold = 0, simT = 0;
+  var KX = null, KY = null, SNAP = 0, CUR = null, phase = 0, RMX = 4, CH = null, CN = null, CI = null, pvx = 0, pvy = 0, plx = 0, ply = 0, N = 0, NB = 0, HX, HY, PX, PY, VX, VY, TX, TY, RR, RB, WT, PH, DL, SP = 9, hold = 0, simT = 0;
   var ptr = { x: 0, y: 0, on: false, m: 0 };
   /* 書体は [太さ・斜体, 書体名, 文字]。'logo' は自分のロゴの g（ページ内のロゴのSVGをそのまま使う） */
   function fs(f, px){ return f[0] + ' ' + px + 'px ' + f[1]; }
@@ -1651,7 +1651,7 @@ function makeSea(boxId, canvasId, opt){
   function retarget(kick){
     var tries = 0, f;
     do { fi = (fi + 1) % FONTS.length; f = FONTS[fi]; tries++; } while (!ready(f) && tries < FONTS.length);
-    var M = glyph(f), diag = Math.sqrt(W * W + H * H); CUR = M;
+    var M = glyph(f), diag = Math.sqrt(W * W + H * H); CUR = M; if (kick) SNAP = 1;
     for (var i = 0; i < N + NB; i++){
       var gx = (HX[i] / G) | 0, gy = (HY[i] / G) | 0, c = gy * M.w + gx, bub = i >= N;
       var inside = gx >= 0 && gy >= 0 && gx < M.w && gy < M.h && M.ins[c];
@@ -1662,10 +1662,10 @@ function makeSea(boxId, canvasId, opt){
         if (kick && gx >= 0 && gy >= 0 && gx < M.w && gy < M.h && M.q[c] < 1e9){
           var od = Math.sqrt(M.q[c]) * G, lam = Math.min(W, H) * (opt.wave || 0.09);
           if (od < lam * 4){
-            var px0 = (M.qx[c] + 0.5) * G, py0 = (M.qy[c] + 0.5) * G, wx = HX[i] - px0, wy = HY[i] - py0, wl = Math.sqrt(wx * wx + wy * wy) || 1, mg = 3.4 * Math.exp(-od / lam);
+            var px0 = (M.qx[c] + 0.5) * G, py0 = (M.qy[c] + 0.5) * G, wx = HX[i] - px0, wy = HY[i] - py0, wl = Math.sqrt(wx * wx + wy * wy) || 1, mg = 5.2 * Math.exp(-od / lam);
             KX[i] = wx / wl * mg; KY[i] = wy / wl * mg;
             var sx0 = px0 - M.cx, sy0 = py0 - M.cy;
-            DL[i] = Math.sqrt(sx0 * sx0 + sy0 * sy0) / diag * 34 + od / 5 + Math.random() * 2;
+            DL[i] = Math.sqrt(sx0 * sx0 + sy0 * sy0) / diag * 12 + od / 16 + Math.random();
             continue;
           }
         }
@@ -1677,7 +1677,7 @@ function makeSea(boxId, canvasId, opt){
       }
       /* 一滴を落とした中心から、波のように広がる */
       var ex = HX[i] - M.cx, ey = HY[i] - M.cy;
-      DL[i] = Math.sqrt(ex * ex + ey * ey) / diag * 34 + Math.random() * 4;
+      DL[i] = Math.sqrt(ex * ex + ey * ey) / diag * 12 + Math.random() * 2;
       if (kick){ var b = Math.random() * 6.283, s = Math.random() * kick; VX[i] += Math.cos(b) * s; VY[i] += Math.sin(b) * s; }
     }
   }
@@ -1742,6 +1742,9 @@ function makeSea(boxId, canvasId, opt){
     plx = ptr.x; ply = ptr.y;
     var pvm = Math.sqrt(pvx * pvx + pvy * pvy), pcap = pvm > 30 ? 30 / pvm : 1;
     var pr = Math.min(W, H) * 0.14, pr2 = pr * pr, t = simT * 0.035, dm = Math.pow(0.8, dt);
+    /* 開いた直後だけバネを硬くする：一気に開いて少し行き過ぎ、跳ね返って止まる */
+    SNAP *= Math.pow(0.965, dt);
+    var ks = 0.03 + 0.09 * SNAP;
     for (var i = 0, T = N + NB; i < T; i++){
       if (DL[i] > 0){
         DL[i] -= dt;
@@ -1750,7 +1753,7 @@ function makeSea(boxId, canvasId, opt){
       }
       /* 自分の居場所のまわりで、ゆっくり煮え立つようにゆれる */
       var wob = RB[i] * 0.22, tx = TX[i] + Math.sin(t * (0.7 + (i % 7) * 0.09) + PH[i]) * wob, ty = TY[i] + Math.cos(t * (0.6 + (i % 5) * 0.11) + PH[i] * 1.3) * wob;
-      var ax = (tx - PX[i]) * 0.03, ay = (ty - PY[i]) * 0.03;
+      var ax = (tx - PX[i]) * ks, ay = (ty - PY[i]) * ks;
       /* 指やマウスも洗剤の一滴：近くの油を押しのける */
       if (ptr.m > 0.01){
         var dx = PX[i] - ptr.x, dy = PY[i] - ptr.y, d2 = dx * dx + dy * dy;
