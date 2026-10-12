@@ -1574,7 +1574,7 @@ function makeSea(boxId, canvasId, opt){
   var box = document.getElementById(boxId), cv = document.getElementById(canvasId), ctx = cv.getContext('2d');
   var FONTS = opt.fonts, fi = -1, masks = {}, W = 0, H = 0, built = false, started = false;
   var off = document.createElement('canvas'), octx = off.getContext('2d'), img = null, buf = null, FLD = null, FW = 0, FH = 0, C = 1;
-  var N = 0, NB = 0, HX, HY, PX, PY, VX, VY, TX, TY, RR, RB, WT, PH, DL, SP = 9, hold = 0, simT = 0;
+  var CUR = null, phase = 0, N = 0, NB = 0, HX, HY, PX, PY, VX, VY, TX, TY, RR, RB, WT, PH, DL, SP = 9, hold = 0, simT = 0;
   var ptr = { x: 0, y: 0, on: false, m: 0 };
   function fs(f, px){ return f[0] + ' ' + px + 'px ' + f[1]; }
   FONTS.forEach(function(f){ if (document.fonts && document.fonts.load) document.fonts.load(fs(f, 200), 'g').catch(function(){}); });
@@ -1617,7 +1617,7 @@ function makeSea(boxId, canvasId, opt){
   function retarget(kick){
     var tries = 0, f;
     do { fi = (fi + 1) % FONTS.length; f = FONTS[fi]; tries++; } while (!ready(f) && tries < FONTS.length);
-    var M = glyph(f), diag = Math.sqrt(W * W + H * H);
+    var M = glyph(f), diag = Math.sqrt(W * W + H * H); CUR = M;
     for (var i = 0; i < N + NB; i++){
       var gx = (HX[i] / G) | 0, gy = (HY[i] / G) | 0, c = gy * M.w + gx, bub = i >= N;
       var inside = gx >= 0 && gy >= 0 && gx < M.w && gy < M.h && M.ins[c];
@@ -1634,11 +1634,17 @@ function makeSea(boxId, canvasId, opt){
       if (kick){ var b = Math.random() * 6.283, s = Math.random() * kick; VX[i] += Math.cos(b) * s; VY[i] += Math.sin(b) * s; }
     }
   }
+  /* 閉じる：油は外側から順に戻り、最後に g の中心でふさがる */
+  function closeAll(){
+    var cx = CUR ? CUR.cx : W / 2, cy = CUR ? CUR.cy : H / 2, diag = Math.sqrt(W * W + H * H), far = 0, i, d = new Float32Array(N + NB);
+    for (i = 0; i < N + NB; i++){ var ex = HX[i] - cx, ey = HY[i] - cy; d[i] = Math.sqrt(ex * ex + ey * ey); if (d[i] > far) far = d[i]; }
+    for (i = 0; i < N + NB; i++){ TX[i] = HX[i]; TY[i] = HY[i]; RR[i] = RB[i]; DL[i] = (far - d[i]) / diag * 12 + Math.random() * 3; }
+  }
   function build(){
     var w = box.clientWidth, h = box.clientHeight;
     if (!w || !h) return;
     W = w; H = h; masks = {};
-    SP = Math.max(7, Math.min(13, Math.min(W, H) / 52));
+    SP = Math.max(4.5, Math.min(8, Math.min(W, H) / 88));
     C = Math.max(1 / Math.min(window.devicePixelRatio || 1, 2), Math.sqrt(W * H / (opt.cells || 700000)));
     FW = Math.ceil(W / C); STAMPS = {}; FH = Math.ceil(H / C);
     off.width = FW; off.height = FH; img = octx.createImageData(FW, FH); buf = new Uint32Array(img.data.buffer); FLD = new Float32Array(FW * FH);
@@ -1672,14 +1678,16 @@ function makeSea(boxId, canvasId, opt){
     PX = new Float32Array(HX); PY = new Float32Array(HY); VX = new Float32Array(T); VY = new Float32Array(T);
     TX = new Float32Array(HX); TY = new Float32Array(HY); RR = new Float32Array(T); RB = new Float32Array(hr); WT = new Float32Array(T).fill(1); PH = new Float32Array(T); DL = new Float32Array(T);
     for (var i = 0; i < T; i++){ PH[i] = Math.random() * 6.283; RR[i] = RB[i]; }
-    if (started){ fi = (Math.max(fi, 0) - 1 + FONTS.length) % FONTS.length; retarget(0); for (var q = 0; q < T; q++){ PX[q] = TX[q]; PY[q] = TY[q]; DL[q] = 0; } }
+    if (started){ fi = (Math.max(fi, 0) - 1 + FONTS.length) % FONTS.length; phase = 0; hold = 0; retarget(0); for (var q = 0; q < T; q++){ PX[q] = TX[q]; PY[q] = TY[q]; DL[q] = 0; } }
     built = true; draw();
   }
   function sim(dt){
     simT += dt;
     if (started && !REDUCE){
       hold += dt;
-      if (hold > (opt.hold || 190)){ hold = 0; retarget(0.8); }
+      /* 開いた g は、一度油が戻って完全に閉じてから、次の書体で開く */
+      if (phase === 0 && hold > (opt.hold || 170)){ hold = 0; phase = 1; closeAll(); }
+      else if (phase === 1 && hold > (opt.shut || 70)){ hold = 0; phase = 0; retarget(0.8); }
     }
     var wantM = ptr.on ? 1 : 0; ptr.m += (wantM - ptr.m) * Math.min(1, 0.1 * dt);
     var pr = Math.min(W, H) * 0.14, pr2 = pr * pr, t = simT * 0.035, dm = Math.pow(0.8, dt);
