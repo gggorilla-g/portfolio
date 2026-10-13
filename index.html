@@ -1746,7 +1746,7 @@ function makeSea(boxId, canvasId, opt){
     cv.width = FW; cv.height = FH;
     /* 油は、大小の丸い滴を、重ならないように敷きつめる（大きい滴から順に置き、すき間を小さい滴で埋める）。
        滴どうしは少しだけ離して置くので、ひとつずつ丸く独立して見え、近づいたときだけ溶け合う */
-    var top = opt.top || 60, rmax = SP * 0.62, rmin = SP * 0.3, gap = opt.gap || (W < 700 ? 1.0 : 1.4); RMX = rmax;
+    var top = opt.top || 60, rmax = SP * 0.62, rmin = SP * (W < 700 ? 0.3 : 0.46), gap = opt.gap || (W < 700 ? 1.0 : 1.55); RMX = rmax;
     var cs = rmax * 2 * gap, gw = Math.ceil((W + 2 * rmax) / cs) + 1, gh = Math.ceil((H - top + 2 * rmax) / cs) + 1, cells = [];
     for (var c0 = 0; c0 < gw * gh; c0++) cells.push([]);
     var hx = [], hy = [], hr = [];
