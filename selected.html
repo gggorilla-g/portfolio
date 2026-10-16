@@ -1747,13 +1747,14 @@ function makeSea(boxId, canvasId, opt){
     W = w; H = h; masks = {};
     /* スマホは引きで見せる：滴を細かく、g を小さめに */
     SP = W < 700 ? Math.max(2.8, Math.min(W, H) / 135) : Math.max(2.25, Math.min(4, Math.min(W, H) / 176));
-    C = Math.max(1 / Math.min(window.devicePixelRatio || 1, 2), Math.sqrt(W * H / (opt.cells || (W < 700 ? 600000 : 1000000))));
+    SP /= Math.SQRT2; /* 滴の数を2倍に：同じ面積に倍の数を敷くため、ひと粒を 1/√2 に */
+    C = 1 / Math.min(window.devicePixelRatio || 1, 2); /* 丸をくっきり描くため、画面の解像度で描く */
     FW = Math.ceil(W / C); STAMPS = {}; FH = Math.ceil(H / C);
     off.width = FW; off.height = FH; img = octx.createImageData(FW, FH); buf = new Uint32Array(img.data.buffer); FLD = new Float32Array(FW * FH);
     cv.width = FW; cv.height = FH;
     /* 油は、大小の丸い滴を、重ならないように敷きつめる（大きい滴から順に置き、すき間を小さい滴で埋める）。
        滴どうしは少しだけ離して置くので、ひとつずつ丸く独立して見え、近づいたときだけ溶け合う */
-    var top = opt.top || 60, rmax = SP * 0.62, rmin = SP * (W < 700 ? 0.3 : 0.46), gap = opt.gap || (W < 700 ? 1.0 : 1.55); RMX = rmax;
+    var top = opt.top || 60, rmax = SP * 0.62, rmin = SP * (W < 700 ? 0.3 : 0.46), gap = opt.gap || (W < 700 ? 1.35 : 1.55); RMX = rmax;
     var cs = rmax * 2 * gap, gw = Math.ceil((W + 2 * rmax) / cs) + 1, gh = Math.ceil((H - top + 2 * rmax) / cs) + 1, cells = [];
     for (var c0 = 0; c0 < gw * gh; c0++) cells.push([]);
     var hx = [], hy = [], hr = [];
@@ -1872,29 +1873,17 @@ function makeSea(boxId, canvasId, opt){
     return (STAMPS[key] = { n: n, s: size, a: a, sp: sp });
   }
   function draw(){
-    FLD.fill(0);
-    var inv = 1 / C, T0 = 0.17, kr = 1.3;
+    /* 滴はすべて独立した丸で描く（溶け合わせない） */
+    var inv = 1 / C, bg = typeof opt.bg === 'function' ? opt.bg() : opt.bg;
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, FW, FH);
+    ctx.fillStyle = opt.fg || 'rgb(0,0,0)'; ctx.beginPath();
     for (var i = 0, T = N + NB; i < T; i++){
       if (RR[i] <= 0) continue;
-      var w = WT[i], st = stamp(RR[i] * kr * inv), n = st.n, sz = st.s, sa = st.a, cx = Math.round(PX[i] * inv), cy = Math.round(PY[i] * inv);
-      var y0 = Math.max(0, cy - n), y1 = Math.min(FH - 1, cy + n), ssp = st.sp;
-      for (var yy = y0; yy <= y1; yy++){
-        var hw = ssp[yy - cy + n], x0 = Math.max(0, cx - hw), x1 = Math.min(FW - 1, cx + hw), row = yy * FW, srow = (yy - cy + n) * sz - cx + n;
-        for (var xx = x0; xx <= x1; xx++) FLD[row + xx] += w * sa[srow + xx];
-      }
+      var x = PX[i] * inv, y = PY[i] * inv, r = RR[i] * inv;
+      if (x < -r || y < -r || x > FW + r || y > FH + r) continue;
+      ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, 6.2832);
     }
-    var bg = rgb(typeof opt.bg === 'function' ? opt.bg() : opt.bg), fg = rgb(opt.fg || 'rgb(0,0,0)');
-    var lut = new Uint32Array(33);
-    for (var s = 0; s <= 32; s++){
-      var a = s / 32, r = Math.round(bg[0] + (fg[0] - bg[0]) * a), g = Math.round(bg[1] + (fg[1] - bg[1]) * a), b = Math.round(bg[2] + (fg[2] - bg[2]) * a);
-      lut[s] = (255 << 24) | (b << 16) | (g << 8) | r;
-    }
-    var e = 0.05, lo = T0 - e, span = 2 * e, full = lut[32], none = lut[0];
-    for (var p = 0, L = FW * FH; p < L; p++){
-      var v = FLD[p];
-      buf[p] = v <= lo ? none : v >= lo + span ? full : lut[((v - lo) / span * 32) | 0];
-    }
-    ctx.putImageData(img, 0, 0);
+    ctx.fill();
   }
   /* 枠の大きさが変わったら作り直す。iPhone はアドレスバーの出入りなどで、resize が来ないまま枠の高さが変わることがあり、
      そのままだと絵が縦につぶれて引き伸ばされる */
