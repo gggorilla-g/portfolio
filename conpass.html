@@ -198,6 +198,32 @@ details td.n{font-family:var(--mono);color:var(--ink)}
 
 .end{margin-top:clamp(72px,10vw,120px);padding:28px 0 64px;border-top:1px solid var(--line);font-size:12px;color:var(--dim)}
 .end .btn{margin-top:18px;font-size:13px}
+
+/* 判断の記録 */
+.turnbig{display:grid;grid-template-columns:1fr 56px 1.2fr;align-items:stretch;gap:0}
+@media (max-width:760px){.turnbig{grid-template-columns:1fr}}
+.turnbig .x{border:1px solid var(--line);border-radius:18px;padding:22px 24px}
+.turnbig .x .k{font:400 11px/1.6 var(--mono);letter-spacing:.2em;color:var(--dim)}
+.turnbig .x p.v{font-size:clamp(17px,2vw,21px);font-weight:700;line-height:1.6;margin-top:8px}
+.turnbig .x.to{background:var(--coral);border-color:var(--coral);color:#2a0e08;position:relative}
+.turnbig .x.to .k{color:#7b3a2c}
+.turnbig .x.to img{position:absolute;right:14px;bottom:10px;width:72px}
+.turnbig .x.to p.v{padding-right:70px}
+.turnbig .ar{display:flex;align-items:center;justify-content:center;font:400 26px/1 var(--dot);color:var(--mute)}
+@media (max-width:760px){.turnbig .ar{transform:rotate(90deg);height:44px}}
+.fixes{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (max-width:760px){.fixes{grid-template-columns:1fr}}
+.fixes li{border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.fixes .q{font-size:13px;color:var(--mute);line-height:1.7}
+.fixes .q b{display:block;font:400 10.5px/1.6 var(--mono);letter-spacing:.18em;color:var(--dim);font-weight:400}
+.fixes .f{font-size:15px;font-weight:700;line-height:1.65;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.fixes .f b{display:block;font:400 10.5px/1.6 var(--mono);letter-spacing:.18em;color:var(--teal-d);color:#5ee6d0;font-weight:400}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,3vw,36px)}
+@media (max-width:760px){.cols2{grid-template-columns:1fr}}
+.cols2 h3{font-size:15px;font-weight:700;margin-bottom:8px}
+.dl li{padding:11px 0;border-top:1px solid var(--line);font-size:14px;font-weight:500;line-height:1.6}
+.dl li:first-child{border-top:0}
+.dl li span{display:block;font-size:12.5px;font-weight:400;color:var(--mute);margin-top:2px}
 </style>
 </head>
 <body>
@@ -308,6 +334,48 @@ details td.n{font-family:var(--mono);color:var(--ink)}
     </div>
   </section>
 
+  <!-- 判断の記録 -->
+  <section class="sec" id="turn">
+    <h2>制約から生まれた「守る」</h2>
+    <p class="say">相棒に「守る」役目を持たせたいと考えたとき、壁がありました。</p>
+    <div class="turnbig">
+      <div class="x"><p class="k">行き詰まり</p><p class="v">ブラウザで動くアプリなので、端末を監視する本物のセキュリティソフトは作れない。</p></div>
+      <div class="ar">→</div>
+      <div class="x to"><p class="k">打開</p><p class="v">本物の防衛はしない。現実で見つけた不審な連絡を、コンが戦う「敵」に変える。</p><img class="px" src="img/cp/s/en_login.png" alt=""></div>
+    </div>
+    <p class="note" style="margin-top:14px">「セキュリティソフトのような役割もできたら」という自分の発想に、AIが「貼る → 判定 → 対戦 → 見分け方を記録」の形を提案し、それを採用しました。戦いのときだけコンが一時的に進化する演出は、そのあと自分から足した指示です。</p>
+  </section>
+
+  <section class="sec" id="fixes">
+    <h2>使いながら直したこと</h2>
+    <p class="say">78版までの改修のうち、使っていて自分が気になった点の例です。</p>
+    <ul class="fixes">
+      <li><p class="q"><b>気になったこと</b>見張りの戦いが終わっても、貼った文面と判定が画面に残り続けた。勝っても何の一言もなかった。</p><p class="f"><b>直したこと</b>決着の時点で文面と判定を消す。勝つと、コンが手口について一言言うようにしました。</p></li>
+      <li><p class="q"><b>気になったこと</b>対戦中に画面を横にスライドすると、タブが切りかわって対戦が終わってしまう。</p><p class="f"><b>直したこと</b>対戦中は横スライドを受け付けないようにしました。</p></li>
+      <li><p class="q"><b>気になったこと</b>別の系統に進化すると、口調まで変わってしまう。</p><p class="f"><b>直したこと</b>喋り方を、生まれたときの系統で固定しました。</p></li>
+      <li><p class="q"><b>気になったこと</b>最終段階のキャラクターの形が似通っていて、個性が足りない。</p><p class="f"><b>直したこと</b>11系統を専用の造形に描き直し、人型の輪郭を大きくして、動物のモチーフを頭や装いに残しました。</p></li>
+    </ul>
+  </section>
+
+  <section class="sec" id="decide">
+    <h2>決めたこと、捨てたこと</h2>
+    <div class="cols2" style="margin-top:24px">
+      <div><h3>決めたこと</h3><ul class="dl">
+        <li>予定の本体はGoogleカレンダー、見る画面はアプリの中<span>話しているところから別のアプリに移ると、気持ちが切れるため</span></li>
+        <li>性格の軸や体力などの数値は、画面に出さない<span>操作は昔の携帯育成ゲームくらいの簡単さにするため</span></li>
+        <li>ローズ期から先は、現実での達成がないと進化しない</li>
+        <li>判定は目安として出し、最後は自分で確かめてもらう<span>結果を保証する言い方は誇大になるため</span></li>
+        <li>対戦の強さはシミュレーションで調整<span>同じ段階なら、鍛えた側の勝率は約53%</span></li>
+      </ul></div>
+      <div><h3>捨てたこと</h3><ul class="dl">
+        <li>有料のAPIで会話をつなぐ<span>費用がかかりすぎるため。Claude上で動かす形に変えました</span></li>
+        <li>本物のセキュリティソフトにする<span>ブラウザの中からは端末に手が届かないため</span></li>
+        <li>既存のキャラクターに似てしまった案<span>採らずに、元の案を磨き込みました</span></li>
+        <li>3Dのキャラクター<span>ドット絵に切りかえました</span></li>
+      </ul></div>
+    </div>
+  </section>
+
   <!-- 数字 -->
   <div class="nums">
     <div><b>12<small>問</small></b><span>診断</span></div>
@@ -320,7 +388,7 @@ details td.n{font-family:var(--mono);color:var(--ink)}
   <!-- 64体 -->
   <section class="sec" id="dex">
     <h2>64体のキャラクター</h2>
-    <p class="say">12問のタイプ診断で、16の系統のどれかが生まれます。段階を切りかえて見られます。</p>
+    <p class="say">12問のタイプ診断で、16の系統のどれかが生まれます。16の系統はコンパスの16方位に割り当てていて、アプリ名のCONPASSと対応させています。段階を切りかえて見られます。</p>
     <div class="dex">
       <div class="tabs" role="group" aria-label="段階">
         <button type="button" data-s="1">ニードル期</button>
@@ -331,7 +399,7 @@ details td.n{font-family:var(--mono);color:var(--ink)}
       <div class="grid16" id="grid16"></div>
       <div class="extra">
         <div class="row"><img class="px" src="img/cp/s/tabi_1.png" alt="" loading="lazy"><img class="px" src="img/cp/s/tabi_2.png" alt="" loading="lazy"><img class="px" src="img/cp/s/tabi_3.png" alt="" loading="lazy"><img class="px" src="img/cp/s/tabi_4.png" alt="" loading="lazy"></div>
-        <p><b style="color:var(--ink)">隠れキャラ「旅の子」</b>　性格の傾きがどの軸でも真ん中に近いまま育つと、進化のときにこの姿になります。診断では出てきません。</p>
+        <p><b style="color:var(--ink)">隠れキャラ「旅の子」</b>　コンパスの中心に置いた17体目です。性格の傾きがどの軸でも真ん中に近いまま育つと、進化のときにこの姿になります。診断では出てきません。</p>
       </div>
     </div>
   </section>
