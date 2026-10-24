@@ -9,11 +9,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;500;700;900&family=Share+Tech+Mono&display=swap">
 <style>
 :root{
-  --bg:#000;
-  --ink:#f2f3f7;
-  --mute:#9aa1b2;
-  --dim:#626a7d;
-  --line:#22283a;
+  --bg:#ffffff;
+  --ink:#111111;
+  --mute:#5d6372;
+  --dim:#8a909c;
+  --line:#e3e5ea;
   --teal:#cdeee6;  --teal-d:#11786a;
   --amber:#f7e3bd; --amber-d:#9a5b06;
   --coral:#f8d4ca; --coral-d:#b23a22;
@@ -23,7 +23,7 @@
   --mono:"Share Tech Mono",ui-monospace,monospace;
   --w:1080px;
   --gut:clamp(16px,5vw,48px);
-  color-scheme:dark;
+  color-scheme:light;
 }
 *{box-sizing:border-box}
 html{background:var(--bg);-webkit-text-size-adjust:100%;scroll-behavior:smooth}
@@ -37,13 +37,13 @@ img{display:block;max-width:100%;height:auto}
 .lbl{font:400 11px/1.6 var(--mono);letter-spacing:.22em;color:var(--mute);text-transform:uppercase}
 
 /* 帯 */
-.top{position:sticky;top:0;z-index:20;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);border-bottom:1px solid var(--line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .top .wrap{display:flex;justify-content:space-between;align-items:center;height:52px;font-size:12px}
 .top a{text-decoration:none;color:var(--mute)}
 .top a:hover{color:var(--ink)}
 .top nav{display:flex;gap:18px}
-.top .try-link{color:#000;background:var(--ink);padding:7px 12px;border-radius:999px}
-.top .try-link:hover{color:#000;background:#fff}
+.top .try-link{color:#fff;background:var(--ink);padding:7px 12px;border-radius:999px}
+.top .try-link:hover{color:#fff;background:#333}
 @media (max-width:560px){.top nav .opt{display:none}}
 
 /* 冒頭 */
@@ -60,7 +60,7 @@ img{display:block;max-width:100%;height:auto}
 .chips .c1{background:var(--teal)} .chips .c2{background:var(--amber)} .chips .c3{background:var(--coral)}
 .cta{display:flex;justify-content:center;gap:12px;margin-top:30px;flex-wrap:wrap}
 .btn{display:inline-block;text-decoration:none;font-size:14px;font-weight:700;padding:13px 22px;border-radius:999px;border:1px solid var(--line)}
-.btn.main{background:var(--ink);color:#000;border-color:var(--ink)}
+.btn.main{background:var(--ink);color:#fff;border-color:var(--ink)}
 .btn:hover{border-color:var(--ink)}
 .credit{margin-top:22px;font-size:12px;color:var(--dim)}
 
@@ -70,7 +70,10 @@ img{display:block;max-width:100%;height:auto}
 .peek{position:absolute;width:clamp(84px,12vw,140px);pointer-events:none}
 .peek.br{right:-10px;bottom:-14px} .peek.tl{left:-14px;top:-30px} .peek.tr{right:-8px;top:-40px} .peek.bl{left:-12px;bottom:-16px}
 @media (max-width:640px){.peek{width:72px}.peek.br{right:-4px}.peek.tl{left:-4px}}
-.phone{border-radius:18px;overflow:hidden;box-shadow:0 24px 50px -20px rgba(0,0,0,.45);background:#05080f}
+.phone{position:relative;background:#16181d;border-radius:clamp(26px,5.2vw,46px);padding:clamp(6px,1.1vw,10px);box-shadow:0 0 0 1px #2a2d34 inset,0 26px 50px -22px rgba(0,0,0,.45)}
+.phone::before{content:"";position:absolute;z-index:2;top:calc(clamp(6px,1.1vw,10px) + 7px);left:50%;transform:translateX(-50%);width:30%;height:clamp(10px,1.8vw,18px);background:#000;border-radius:999px}
+.phone .scr{border-radius:clamp(20px,4.2vw,37px);overflow:hidden;background:#05080f;padding-top:clamp(14px,2.6vw,24px)}
+.phone .scr img{width:100%;height:auto;display:block}
 
 /* 3つのこと */
 .feat{padding:clamp(56px,9vw,104px) 0 0}
@@ -124,17 +127,17 @@ img{display:block;max-width:100%;height:auto}
 /* 64体 */
 .dex{background:#0b1020;border:1px solid var(--line);border-radius:22px;padding:clamp(18px,3vw,36px)}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
-.tabs button{font:400 13px/1 var(--dot);color:var(--mute);background:transparent;border:1px solid var(--line);border-radius:999px;padding:9px 14px;cursor:pointer}
-.tabs button[aria-pressed="true"]{color:#000;background:var(--ink);border-color:var(--ink)}
+.tabs button{font:400 13px/1 var(--dot);color:#9aa1b2;background:transparent;border:1px solid #2a3044;border-radius:999px;padding:9px 14px;cursor:pointer}
+.tabs button[aria-pressed="true"]{color:#000;background:#f2f3f7;border-color:#f2f3f7}
 .grid16{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
 @media (max-width:760px){.grid16{grid-template-columns:repeat(4,1fr)}}
 .grid16 figure{text-align:center;padding:6px 2px 8px;border-radius:10px}
 .grid16 img{width:100%;max-width:96px;margin:0 auto}
-.grid16 figcaption{font:400 11px/1.3 var(--dot);color:var(--mute);margin-top:4px}
+.grid16 figcaption{font:400 11px/1.3 var(--dot);color:#9aa1b2;margin-top:4px}
 .extra{display:flex;align-items:center;gap:16px;margin-top:18px;padding-top:18px;border-top:1px dashed var(--line);flex-wrap:wrap}
 .extra .row{display:flex;gap:2px}
 .extra img{width:56px}
-.extra p{font-size:13px;color:var(--mute);flex:1;min-width:16em}
+.extra p{font-size:13px;color:#9aa1b2;flex:1;min-width:16em}
 
 /* 敵 */
 .foes{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
@@ -147,7 +150,7 @@ img{display:block;max-width:100%;height:auto}
 /* 触る */
 .try{display:grid;grid-template-columns:minmax(0,380px) 1fr;gap:clamp(22px,4vw,48px);align-items:start}
 @media (max-width:800px){.try{grid-template-columns:1fr}}
-.frame{position:relative;width:100%;max-width:380px;margin:0 auto;aspect-ratio:390/780;border-radius:28px;overflow:hidden;background:#05080f;border:1px solid var(--line)}
+.frame{position:relative;width:100%;max-width:380px;margin:0 auto;aspect-ratio:390/800;border-radius:44px;overflow:hidden;background:#05080f;border:10px solid #16181d;box-shadow:0 26px 50px -22px rgba(0,0,0,.45)}
 .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .frame .start{position:absolute;inset:0;width:100%;border:0;cursor:pointer;color:var(--ink);background:#05080f center/cover no-repeat;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font:inherit}
 .frame .start::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.5)}
@@ -238,7 +241,7 @@ details td.n{font-family:var(--mono);color:var(--ink)}
 .lf-h span{font:400 11px/1.6 var(--mono);letter-spacing:.12em;color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:3px 9px}
 .loopfig ol{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 @media (max-width:760px){.loopfig ol{grid-template-columns:1fr}}
-.loopfig li{position:relative;background:#0b1020;border-radius:14px;padding:16px 16px 18px}
+.loopfig li{position:relative;background:#f4f5f8;border-radius:14px;padding:16px 16px 18px}
 .loopfig li i{font:400 12px/1 var(--mono);font-style:normal;color:var(--mute)}
 .loopfig li b{display:block;font-size:16px;margin:8px 0 6px}
 .loopfig li span{font-size:12.5px;color:var(--mute);line-height:1.75}
@@ -247,6 +250,10 @@ details td.n{font-family:var(--mono);color:var(--ink)}
 .demo{display:flex;flex-direction:column;align-items:center;margin-bottom:clamp(24px,4vw,40px)}
 .demo .phone{width:min(300px,70vw)}
 .demo p{font-size:12px;color:#5a2014;margin-top:10px;text-align:center}
+
+.kind{display:inline-flex;align-items:center;gap:12px;margin:0 0 16px}
+.kind span{font:700 13px/1 var(--sans);background:var(--ink);color:#fff;padding:7px 13px;border-radius:999px;letter-spacing:.06em}
+.kind b{font:400 22px/1 var(--dot);letter-spacing:.08em}
 </style>
 </head>
 <body>
@@ -270,7 +277,7 @@ details td.n{font-family:var(--mono);color:var(--ink)}
   <section class="hero">
     <div class="mon"><img id="mon" class="px" src="img/cp/s/t06_1.png" width="80" height="80" alt="CONPASSのキャラクター「コン」"></div>
     <p class="stage" id="stage" aria-live="polite">ルナコン ・ ニードル期</p>
-    <p class="lbl" style="margin-bottom:10px">CONPASS</p>
+    <p class="kind"><span>自主制作アプリ</span><b>CONPASS</b></p>
     <h1 class="lead1">愛着で、日々の小さな行動を<br>後押しするAIアプリ</h1>
     <p class="what">話しかけて予定を入れ、達成を報告して育て、不審な連絡を一緒に確かめるAIの相棒です。</p>
     <div class="chips">
@@ -312,8 +319,8 @@ details td.n{font-family:var(--mono);color:var(--ink)}
     <div class="panel teal">
       <img class="peek br px" src="img/cp/s/t06_3.png" alt="">
       <div class="pair">
-        <figure><div class="phone"><img src="img/cp/chat.webp" width="780" height="1000" alt="コンに話しかけた画面" loading="lazy"></div><figcaption>話しかけます</figcaption></figure>
-        <figure><div class="phone"><img src="img/cp/sched.webp" width="780" height="1533" alt="予定が入った画面" loading="lazy"></div><figcaption>予定に入ります</figcaption></figure>
+        <figure><div class="phone"><div class="scr"><img src="img/cp/f_chat.webp" width="780" height="1688" alt="コンに話しかけた画面" loading="lazy"></div></div><figcaption>話しかけます</figcaption></figure>
+        <figure><div class="phone"><div class="scr"><img src="img/cp/f_sched.webp" width="780" height="1688" alt="予定が入った画面" loading="lazy"></div></div><figcaption>予定に入ります</figcaption></figure>
       </div>
     </div>
     <p class="voice"><b>本人の実感</b>いちばん使っているのは予定の機能です。会話から登録して見直せて、ふだんの話し言葉のまま頼めるのが便利で、それが愛着にもつながっていると感じています。</p>
@@ -340,14 +347,14 @@ details td.n{font-family:var(--mono);color:var(--ink)}
     <p class="say">届いたSMSやメールを貼ると、相棒キャラクターの「コン」が文面を判定します。<b>「あやしい」と判定したときだけ、手口ごとの敵が現れます。</b>この考え方を、最後に不審な連絡の確認まで広げた機能です。</p>
     <div class="panel coral">
       <div class="demo">
-        <div class="phone"><img src="img/cp/guard.webp" width="360" height="779" alt="架空のSMSを貼って判定し、コンが一時的に進化して敵と戦い、勝ったあと手口を解説する動き" loading="lazy"></div>
+        <div class="phone"><div class="scr"><img src="img/cp/guard.webp" width="360" height="779" alt="架空のSMSを貼って判定し、コンが一時的に進化して敵と戦い、勝ったあと手口を解説する動き" loading="lazy"></div></div>
         <p>架空のSMSによる操作例です。端末の監視や、文面の削除は行いません。</p>
       </div>
       <div class="steps">
-        <figure><span class="n">1 貼る</span><div class="phone"><img src="img/cp/judge.webp" width="780" height="1688" alt="文面を貼り、「あやしい」と判定された画面" loading="lazy"></div><figcaption>判定と確かめ方が出ます</figcaption></figure>
-        <figure><span class="n">2 進化</span><div class="phone"><img src="img/cp/temp.webp" width="780" height="540" alt="一時進化したコン" loading="lazy"></div><figcaption>コンが一時的に進化します</figcaption></figure>
-        <figure><span class="n">3 戦う</span><div class="phone"><img src="img/cp/vs.webp" width="780" height="540" alt="VSのカットイン" loading="lazy"></div><div class="phone" style="margin-top:10px"><img src="img/cp/battle.webp" width="780" height="887" alt="戦闘画面" loading="lazy"></div><figcaption>ため・撃つ・守るで戦います</figcaption></figure>
-        <figure><span class="n">4 勝利</span><div class="phone"><img src="img/cp/win.webp" width="780" height="840" alt="撃退したあとのコンの一言" loading="lazy"></div><figcaption>勝つと手口をひとこと解説します</figcaption></figure>
+        <figure><span class="n">1 貼る</span><div class="phone"><div class="scr"><img src="img/cp/f_judge.webp" width="780" height="1688" alt="文面を貼り、「あやしい」と判定された画面" loading="lazy"></div></div><figcaption>判定と確かめ方が出ます</figcaption></figure>
+        <figure><span class="n">2 進化</span><div class="phone"><div class="scr"><img src="img/cp/f_temp.webp" width="780" height="1688" alt="一時進化したコン" loading="lazy"></div></div><figcaption>コンが一時的に進化します</figcaption></figure>
+        <figure><span class="n">3 戦う</span><div class="phone"><div class="scr"><img src="img/cp/f_battle.webp" width="780" height="1688" alt="戦闘画面" loading="lazy"></div></div><figcaption>VSのカットインのあと、ため・撃つ・守るで戦います</figcaption></figure>
+        <figure><span class="n">4 勝利</span><div class="phone"><div class="scr"><img src="img/cp/f_win.webp" width="780" height="1688" alt="撃退したあとのコンの一言" loading="lazy"></div></div><figcaption>勝つと手口をひとこと解説します</figcaption></figure>
       </div>
       <p class="swipe">横にスワイプ</p>
       <p style="font-size:12px;color:#5a2014;margin-top:14px">画面は撮影用のデータです。名前・予定・URLは架空で、返事と判定の文面は撮影用に用意したものです。</p>
@@ -431,7 +438,7 @@ details td.n{font-family:var(--mono);color:var(--ink)}
       <div class="grid16" id="grid16"></div>
       <div class="extra">
         <div class="row"><img class="px" src="img/cp/s/tabi_1.png" alt="" loading="lazy"><img class="px" src="img/cp/s/tabi_2.png" alt="" loading="lazy"><img class="px" src="img/cp/s/tabi_3.png" alt="" loading="lazy"><img class="px" src="img/cp/s/tabi_4.png" alt="" loading="lazy"></div>
-        <p><b style="color:var(--ink)">隠れキャラ「旅の子」</b>　コンパスの中心に置いた17体目です。性格の傾きがどの軸でも真ん中に近いまま育つと、進化のときにこの姿になります。診断では出てきません。</p>
+        <p><b style="color:#f2f3f7">隠れキャラ「旅の子」</b>　コンパスの中心に置いた17体目です。性格の傾きがどの軸でも真ん中に近いまま育つと、進化のときにこの姿になります。診断では出てきません。</p>
       </div>
     </div>
   </section>
