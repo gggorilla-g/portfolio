@@ -75,7 +75,7 @@ img{display:block;max-width:100%;height:auto}
 /* 3つのこと */
 .feat{padding:clamp(56px,9vw,104px) 0 0}
 .feat .head{display:flex;align-items:baseline;gap:16px;margin-bottom:18px}
-.feat .no{font:400 13px/1 var(--mono);color:var(--mute);letter-spacing:.2em}
+.feat .no{font:500 14px/1 var(--sans);color:var(--mute);letter-spacing:.12em;white-space:nowrap}
 .feat h2{font-size:clamp(26px,4.4vw,44px);font-weight:900;line-height:1.3;letter-spacing:.02em}
 .feat .say{font-size:clamp(15px,1.8vw,17px);color:var(--mute);margin:0 0 26px;max-width:36em}
 .feat .say b{color:var(--ink);font-weight:500}
@@ -206,9 +206,9 @@ details td.n{font-family:var(--mono);color:var(--ink)}
   <div class="wrap">
     <a href="./">山﨑源大 ポートフォリオ</a>
     <nav>
-      <a class="opt" href="#talk">予定</a>
-      <a class="opt" href="#grow">育成</a>
-      <a class="opt" href="#guard">見張り</a>
+      <a class="opt" href="#talk">助ける</a>
+      <a class="opt" href="#grow">遊ぶ</a>
+      <a class="opt" href="#guard">守る</a>
       <a class="try-link" href="#try">動かす</a>
     </nav>
   </div>
@@ -222,11 +222,11 @@ details td.n{font-family:var(--mono);color:var(--ink)}
     <div class="mon"><img id="mon" class="px" src="img/cp/s/t06_1.png" width="80" height="80" alt="CONPASSのキャラクター「コン」"></div>
     <p class="stage" id="stage" aria-live="polite">ルナコン ・ ニードル期</p>
     <h1>CONPASS</h1>
-    <p class="what">会話で予定を管理し、キャラクターを育て、不審なSMS・メールを確かめる。<br>この3つをまとめたAIの相棒アプリ「CONPASS」を企画し、AIで制作しました。</p>
+    <p class="what">助けてくれる、遊んでくれる、守ってくれる。<br>そんな相棒として、AIアプリ「CONPASS」を企画しました。</p>
     <div class="chips">
-      <a class="c1" href="#talk"><img class="px" src="img/cp/s/t06_2.png" alt="">話すと、予定が入ります</a>
-      <a class="c2" href="#grow"><img class="px" src="img/cp/s/t16_2.png" alt="">会話と行動の報告で、育ちます</a>
-      <a class="c3" href="#guard"><img class="px" src="img/cp/s/en_deliv.png" alt="">不審な連絡の確認を、対戦ゲームに</a>
+      <a class="c1" href="#talk"><img class="px" src="img/cp/s/t06_2.png" alt=""><b>助ける</b>　話すと予定が入ります</a>
+      <a class="c2" href="#grow"><img class="px" src="img/cp/s/t16_2.png" alt=""><b>遊ぶ</b>　会話と達成報告で育ちます</a>
+      <a class="c3" href="#guard"><img class="px" src="img/cp/s/en_deliv.png" alt=""><b>守る</b>　不審な連絡を一緒に確かめます</a>
     </div>
     <div class="cta">
       <a class="btn main" href="#try">このページで動かす</a>
@@ -249,12 +249,12 @@ details td.n{font-family:var(--mono);color:var(--ink)}
       <li><p class="b">世話の量で育ち方が決まる</p><p class="a">進化を世話から切り離しました</p><p class="r">進化の条件は、会話と達成報告の数だけです。世話をしなくても進化は止まりません。</p></li>
       <li><p class="b">不審な連絡を自分で調べる</p><p class="a">貼ると、判定のあとに戦いが始まるようにしました</p><p class="r">面倒で、聞ける人もいなくて、だんだん確かめなくなっていました。</p></li>
     </ul>
-    <p class="note" style="margin-top:14px">起点にした考えは「相棒の使命は、守ること」です。課題はどれも自分の実感からです。</p>
+    <p class="note" style="margin-top:14px">相棒は、助けてくれたり、遊んでくれたり、守ってくれたりする存在として企画しました。課題はどれも自分の実感からです。</p>
   </section>
 
   <!-- 1 予定 -->
   <section class="feat" id="talk">
-    <div class="head"><span class="no">01</span><h2>話すと、予定が入ります。</h2></div>
+    <div class="head"><span class="no">01 助ける</span><h2>話すと、予定が入ります。</h2></div>
     <p class="say">「明日の15時に歯医者」と話すだけで、<b>Googleカレンダーに入ります</b>。打ち込む必要はありません。</p>
     <div class="panel teal">
       <img class="peek br px" src="img/cp/s/t06_3.png" alt="">
@@ -267,8 +267,8 @@ details td.n{font-family:var(--mono);color:var(--ink)}
 
   <!-- 2 進化 -->
   <section class="feat" id="grow">
-    <div class="head"><span class="no">02</span><h2>会話と行動の報告で、育ちます。</h2></div>
-    <p class="say">会話と、「走った」「勉強した」などの達成報告で育ちます。<b>進化の条件に、世話の量は入っていません。</b></p>
+    <div class="head"><span class="no">02 遊ぶ</span><h2>会話と行動の報告で、育ちます。</h2></div>
+    <p class="say">会話と、「走った」「勉強した」などの達成報告で育ちます。「おせわ」「きたえる」「たいせん」でも遊べます。<b>進化の条件に、世話の量は入っていません。</b></p>
     <div class="panel amber">
       <div class="evo4">
         <figure><img class="px" src="img/cp/s/t06_1.png" width="80" height="80" alt="ニードル期" loading="lazy"><figcaption>ニードル期</figcaption></figure>
@@ -282,7 +282,7 @@ details td.n{font-family:var(--mono);color:var(--ink)}
 
   <!-- 3 見張り -->
   <section class="feat" id="guard">
-    <div class="head"><span class="no">03</span><h2>不審な連絡の確認を、対戦ゲームにしました。</h2></div>
+    <div class="head"><span class="no">03 守る</span><h2>不審な連絡の確認を、対戦ゲームにしました。</h2></div>
     <p class="say">届いたSMSやメールを貼ると、相棒キャラクターの「コン」が文面を判定します。<b>「あやしい」と判定したときだけ、手口ごとの敵が現れます。</b></p>
     <div class="panel coral">
       <div class="steps">
