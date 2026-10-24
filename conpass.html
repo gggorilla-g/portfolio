@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CONPASS 山﨑源大 ポートフォリオ</title>
+<meta name="description" content="予定と雑談で育つAIの相棒。怪しい連絡が届いたら、相棒と一緒に倒す。企画・設計・制作：山﨑源大">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Shippori+Mincho:wght@400;500;600&family=Share+Tech+Mono&display=swap">
+<style>
+:root{
+  --bg:#05080f;
+  --bg2:#0b1120;
+  --line:#1d2740;
+  --ink:#e9ecf3;
+  --mute:#8a93a8;
+  --dim:#5a647b;
+  --blue:#8fb6ff;
+  --teal:#5ee6d0;
+  --coral:#f87360;
+  --amber:#f5b352;
+  --serif:"EB Garamond","Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --dot:"DotGothic16",monospace;
+  --mono:"Share Tech Mono",ui-monospace,monospace;
+  --gut:clamp(16px,6vw,96px);
+  --max:1120px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/2.05 var(--serif);letter-spacing:.03em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+p,h1,h2,h3,h4,ul,ol,dl,dd,figure{margin:0}
+ul,ol{padding:0;list-style:none}
+a{color:inherit}
+img{display:block;max-width:100%;height:auto}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gut)}
+.lbl{font:400 11px/1.6 var(--mono);letter-spacing:.24em;color:var(--mute);text-transform:uppercase}
+.dot{font-family:var(--dot)}
+
+/* 上の帯 */
+.top{position:sticky;top:0;z-index:10;background:rgba(5,8,15,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;justify-content:space-between;align-items:center;height:52px;font-size:12px}
+.top a{text-decoration:none;color:var(--mute)}
+.top a:hover{color:var(--ink)}
+.top nav{display:flex;gap:18px}
+@media (max-width:560px){.top nav .opt{display:none}}
+
+/* 冒頭 */
+.hero{padding:clamp(48px,9vw,120px) 0 clamp(40px,6vw,72px);position:relative}
+.hero .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center}
+@media (max-width:860px){.hero .grid{grid-template-columns:1fr}}
+.hero h1{font:400 clamp(52px,9vw,112px)/.95 var(--dot);letter-spacing:.04em;margin:18px 0 26px}
+.hero h1 span{color:var(--teal)}
+.hero .one{font-size:clamp(19px,2.4vw,25px);line-height:1.75;font-weight:500;margin-bottom:22px}
+.hero .sub{color:var(--mute);font-size:14px;max-width:34em}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;margin-top:30px;font-size:13px;line-height:1.8}
+.meta dt{color:var(--dim);font:400 11px/1.9 var(--mono);letter-spacing:.18em}
+.meta dd{color:var(--ink)}
+.screen{position:relative;border:1px solid var(--line);background:#000;overflow:hidden}
+.screen img{width:100%}
+.hero figure{width:100%;max-width:560px;justify-self:center}
+.hero .screen{border-radius:22px;box-shadow:0 30px 80px -30px rgba(94,230,208,.25)}
+.cap{font-size:12px;color:var(--dim);margin-top:10px;line-height:1.8}
+
+/* 3つの判断 */
+.pillars{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.pillars ol{display:grid;grid-template-columns:repeat(3,1fr)}
+.pillars li{padding:30px clamp(14px,2.4vw,30px) 32px;border-left:1px solid var(--line)}
+.pillars li:first-child{border-left:0;padding-left:0}
+.pillars .n{font:400 12px/1 var(--mono);color:var(--teal);letter-spacing:.2em}
+.pillars h3{font-size:clamp(17px,1.9vw,20px);font-weight:500;line-height:1.6;margin:14px 0 8px}
+.pillars p{color:var(--mute);font-size:13.5px;line-height:1.95}
+@media (max-width:760px){.pillars ol{grid-template-columns:1fr}.pillars li{border-left:0;border-top:1px solid var(--line);padding-left:0}.pillars li:first-child{border-top:0}}
+
+/* 章 */
+section.ch{padding:clamp(64px,10vw,128px) 0 0}
+.ch-h{display:grid;grid-template-columns:136px 1fr;gap:16px;margin-bottom:clamp(28px,4vw,48px)}
+.ch-h .num{font:400 12px/1.5 var(--mono);color:var(--teal);letter-spacing:.2em;padding-top:12px}
+.ch-h h2{font-size:clamp(26px,4vw,44px);font-weight:400;line-height:1.35;letter-spacing:.04em}
+.ch-h .lead{grid-column:2;color:var(--mute);max-width:38em;font-size:15px}
+@media (max-width:640px){.ch-h{grid-template-columns:1fr;gap:6px}.ch-h .lead{grid-column:1}.ch-h .num{padding-top:0}}
+.body{margin-left:136px;max-width:44em}
+.indent{margin-left:136px}
+@media (max-width:640px){.indent{margin-left:0}}
+@media (max-width:640px){.body{margin-left:0}}
+.body p+p{margin-top:1.1em}
+.note{font-size:12px;color:var(--dim);line-height:1.9}
+.tag{display:inline-block;font:400 10px/1 var(--mono);letter-spacing:.14em;padding:4px 7px 3px;border:1px solid var(--line);color:var(--mute);vertical-align:2px;margin-left:6px;white-space:nowrap}
+.tag.fact{border-color:#2b5f58;color:var(--teal)}
+
+/* 課題 */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,32px);margin-left:136px}
+@media (max-width:760px){.two{grid-template-columns:1fr;margin-left:0}}
+.card{border:1px solid var(--line);background:var(--bg2);padding:24px 24px 26px}
+.card h3{font-size:17px;font-weight:500;line-height:1.6;margin:10px 0 10px}
+.card p{color:var(--mute);font-size:14px;line-height:1.95}
+.chain{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:14px;font-size:13px;line-height:1.6}
+.chain span{border:1px solid var(--line);padding:5px 10px;color:var(--ink)}
+.chain i{font-style:normal;color:var(--dim);align-self:center}
+.chain span.end{border-color:var(--coral);color:var(--coral)}
+
+/* 発想 */
+.turn{margin-left:136px;display:grid;gap:14px}
+@media (max-width:640px){.turn{margin-left:0}}
+.turn .row{display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;gap:10px}
+.turn .from,.turn .to{padding:18px 20px;border:1px solid var(--line);font-size:15px;line-height:1.75}
+.turn .from{color:var(--mute)}
+.turn .from b,.turn .to b{display:block;font:400 10px/1.6 var(--mono);letter-spacing:.2em;color:var(--dim);font-weight:400;margin-bottom:4px}
+.turn .to{border-color:#2b5f58;background:linear-gradient(180deg,rgba(94,230,208,.06),transparent)}
+.turn .to b{color:var(--teal)}
+.turn .arw{text-align:center;color:var(--teal);font:400 20px/1 var(--dot)}
+@media (max-width:640px){.turn .row{grid-template-columns:1fr}.turn .arw{transform:rotate(90deg);height:24px}}
+.origin{margin:36px 0 0 136px;padding:22px 0 0;border-top:1px solid var(--line);max-width:44em}
+@media (max-width:640px){.origin{margin-left:0}}
+.origin q{font-size:clamp(18px,2.2vw,22px);font-weight:500;quotes:"「" "」"}
+
+/* 生まれる */
+.flow{display:flex;align-items:stretch;gap:0;margin:0 0 30px 136px;flex-wrap:wrap}
+@media (max-width:640px){.flow{margin-left:0}}
+.flow .st{flex:1 1 150px;border:1px solid var(--line);padding:16px 16px 18px;margin:-1px 0 0 -1px}
+.flow .st .k{font:400 11px/1 var(--mono);letter-spacing:.18em;color:var(--teal)}
+.flow .st .v{font-size:16px;font-weight:500;margin:8px 0 4px;line-height:1.5}
+.flow .st .d{font-size:12.5px;color:var(--mute);line-height:1.8}
+.evo{margin-top:36px}
+.evo .frame{border:1px solid var(--line);background:#050912;overflow:hidden}
+.evo .frame img{width:100%}
+.scroller{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.scroller img{min-width:900px}
+.stages{display:grid;grid-template-columns:repeat(4,1fr);font:400 11px/1 var(--mono);letter-spacing:.14em;color:var(--mute);margin-top:10px;text-align:center}
+.side{display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(18px,3vw,40px);margin-top:36px;align-items:start}
+@media (max-width:760px){.side{grid-template-columns:1fr}}
+
+/* 育つ */
+.meter{margin:6px 0 0 136px;max-width:760px}
+@media (max-width:640px){.meter{margin-left:0}}
+.meter table{width:100%;border-collapse:collapse;font-size:14px}
+.meter th,.meter td{border-bottom:1px solid var(--line);padding:12px 8px;text-align:left;font-weight:400;vertical-align:top}
+.meter th{font:400 11px/1.6 var(--mono);letter-spacing:.16em;color:var(--dim)}
+.meter td.s{font-family:var(--dot);font-size:15px;white-space:nowrap}
+.meter td.n{font-family:var(--mono);color:var(--teal);white-space:nowrap}
+.bars{display:flex;gap:4px;margin-top:22px;align-items:flex-end;height:64px}
+.bars div{flex:1;background:var(--line);position:relative}
+.bars div span{position:absolute;bottom:-22px;left:0;font:400 10px/1 var(--mono);color:var(--dim);white-space:nowrap}
+
+/* 画面の列 */
+.shots{display:grid;gap:clamp(14px,2vw,22px)}
+.shots.c2{grid-template-columns:repeat(2,1fr)}
+.shots.c3{grid-template-columns:repeat(3,1fr)}
+.shots.c4{grid-template-columns:repeat(4,1fr)}
+@media (max-width:860px){.shots.c4{grid-template-columns:repeat(2,1fr)}.shots.c3{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:420px){.shots.c2,.shots.c3{grid-template-columns:1fr}}
+.shots figure .screen{border-radius:14px}
+.shots figcaption{margin-top:10px;font-size:13px;line-height:1.8}
+.shots figcaption b{display:block;font:400 10.5px/1.6 var(--mono);letter-spacing:.18em;color:var(--teal);font-weight:400}
+.shots figcaption span{color:var(--mute);font-size:12.5px}
+
+/* 見張りの流れ */
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);margin:0 0 40px 136px;counter-reset:p}
+@media (max-width:760px){.pipe{grid-template-columns:1fr 1fr;margin-left:0}}
+.pipe li{border-top:2px solid var(--line);padding:16px 14px 6px 0;position:relative}
+.pipe li.hot{border-top-color:var(--coral)}
+.pipe li .k{font:400 11px/1 var(--mono);letter-spacing:.18em;color:var(--dim)}
+.pipe li.hot .k{color:var(--coral)}
+.pipe li .v{font-family:var(--dot);font-size:20px;margin:8px 0 6px}
+.pipe li .d{font-size:12.5px;color:var(--mute);line-height:1.8}
+.score{margin:0 0 0 136px;max-width:640px;border:1px solid var(--line);padding:18px 20px}
+@media (max-width:640px){.score{margin-left:0}}
+.score ul{display:grid;grid-template-columns:1fr auto;gap:6px 18px;font-size:13.5px;margin-top:10px}
+.score ul li:nth-child(even){font-family:var(--mono);color:var(--amber);text-align:right}
+.score .th{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--mute)}
+.score .th b{color:var(--coral);font-weight:500}
+
+.enemies{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:20px}
+@media (max-width:860px){.enemies{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:420px){.enemies{grid-template-columns:repeat(3,1fr)}}
+.enemies figure{border:1px solid var(--line);background:#0a1020;padding:8px 6px 10px;text-align:center}
+.enemies img{margin:0 auto;width:100%;image-rendering:auto}
+.enemies figcaption{font-size:12px;line-height:1.5;margin-top:6px}
+.enemies figcaption span{display:block;font-size:10.5px;color:var(--dim)}
+
+.loop{margin:40px 0 0 136px;display:grid;grid-template-columns:minmax(0,520px) 1fr;gap:clamp(16px,3vw,36px);align-items:end}
+@media (max-width:760px){.loop{grid-template-columns:1fr;margin-left:0}}
+.loop .screen{border-radius:14px}
+
+/* 線引き */
+.rules{margin-left:136px;display:grid;grid-template-columns:1fr 1fr;gap:0 clamp(18px,3vw,40px)}
+@media (max-width:760px){.rules{grid-template-columns:1fr;margin-left:0}}
+.rules li{padding:16px 0 16px 34px;border-top:1px solid var(--line);position:relative;font-size:14.5px;line-height:1.85}
+.rules li::before{content:"";position:absolute;left:4px;top:25px;width:12px;height:12px;border:1px solid var(--teal);transform:rotate(45deg)}
+.rules li small{display:block;color:var(--mute);font-size:12.5px;margin-top:4px}
+.rules q{quotes:"「" "」";color:var(--amber)}
+
+/* 結果 */
+.res{margin-left:136px;display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,32px)}
+@media (max-width:760px){.res{grid-template-columns:1fr;margin-left:0}}
+.res .card h3{margin-top:4px}
+.res ul li{font-size:14px;padding:8px 0;border-top:1px solid var(--line);line-height:1.8}
+.res ul li:first-child{border-top:0}
+.res ul li span{color:var(--mute);font-size:12.5px;display:block}
+
+.end{margin-top:clamp(80px,12vw,140px);border-top:1px solid var(--line);padding:36px 0 60px;font-size:12.5px;color:var(--dim);line-height:2}
+.end a{color:var(--mute)}
+.back{display:inline-block;margin-top:18px;font:400 12px/1 var(--mono);letter-spacing:.18em;text-decoration:none;border:1px solid var(--line);padding:12px 16px;color:var(--ink)}
+.back:hover{border-color:var(--teal);color:var(--teal)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a href="./">山﨑源大 ポートフォリオ</a>
+    <nav>
+      <a class="opt" href="#idea">発想</a>
+      <a class="opt" href="#how">仕組み</a>
+      <a href="#guard">見張り</a>
+      <a href="#result">結果</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <!-- 冒頭 -->
+  <section class="hero">
+    <div class="grid">
+      <div>
+        <p class="lbl">Case study / 個人制作 / 2026</p>
+        <h1>CON<span>PASS</span></h1>
+        <p class="one">予定と雑談で育つ、AIの相棒。<br>怪しい連絡が届いたら、相棒と一緒に倒す。</p>
+        <p class="sub">16タイプ診断から生まれるキャラクター「コン」と話すだけで、予定が入り、相棒が育ちます。届いたSMSやメールを貼ると、コンが見て、あやしければ敵として現れます。企画から設計、画面、キャラクター、実装まで、AIを使いながらひとりで作りました。</p>
+        <dl class="meta">
+          <dt>ROLE</dt><dd>企画、設計、画面とキャラクターのデザイン、開発（AI を使って制作）</dd>
+          <dt>BUILD</dt><dd>Claude 上で動くスマホ向けWebアプリ。Googleカレンダーと連携</dd>
+          <dt>STATUS</dt><dd>自分で日常的に使用中。改修を重ねて現在78版</dd>
+        </dl>
+      </div>
+      <figure>
+        <div class="screen"><img src="img/cp/loop.webp" width="520" height="360" alt="CONPASSの戦闘画面の動き。コンが一時的に進化し、警報とVSのカットインのあと、再配達ウイルスと戦う"></div>
+        <figcaption class="cap">見張りから戦闘に入るまでの動き。コンが一時的に1段階進化し、警報とVSのカットインが入る。</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 3つの判断 -->
+  <div class="pillars">
+    <ol>
+      <li><span class="n">01</span><h3>入力をやめて、話すだけにした</h3><p>予定も、その日にやったことも、相棒との雑談から拾う。記録のための入力画面はつくらない。</p></li>
+      <li><span class="n">02</span><h3>世話の義務をなくした</h3><p>放っておいても弱らない。育てるゲームにありがちな「やらなきゃ」を、最初から外している。</p></li>
+      <li><span class="n">03</span><h3>確かめる手間を、戦いに置きかえた</h3><p>怪しい連絡を貼ると、手口ごとの敵が現れる。面倒な確認を、相棒を守る行動に変えた。</p></li>
+    </ol>
+  </div>
+
+  <!-- 01 課題 -->
+  <section class="ch" id="issue">
+    <div class="ch-h">
+      <span class="num">01 / ISSUE</span>
+      <h2>続かない記録と、<br>確かめなくなる連絡</h2>
+      <p class="lead">出発点は、自分が困っていた2つのことです。</p>
+    </div>
+    <div class="two">
+      <div class="card">
+        <span class="lbl">記録</span><span class="tag">本人の実感</span>
+        <h3>記録するアプリは、入力がつらくて続かなかった。</h3>
+        <p>予定や習慣を残すアプリはいくつも試したが、毎日入力すること自体が手間になり、やめてしまった。</p>
+      </div>
+      <div class="card">
+        <span class="lbl">連絡</span><span class="tag">本人の実感</span>
+        <h3>怪しいSMSやメールが来ても、だんだん確かめなくなる。</h3>
+        <div class="chain"><span>確かめるのが面倒</span><i>/</i><span>聞ける人がいない</span><i>/</i><span>調べても似た例が見つけにくい</span><i>→</i><span class="end">確かめなくなる</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 発想 -->
+  <section class="ch" id="idea">
+    <div class="ch-h">
+      <span class="num">02 / IDEA</span>
+      <h2>手間を、相棒との関係に<br>置きかえる</h2>
+      <p class="lead">やることを増やさずに、やりたくなる形に変えることを考えました。</p>
+    </div>
+    <div class="turn">
+      <div class="row"><div class="from"><b>BEFORE</b>アプリに予定や記録を入力する</div><div class="arw">→</div><div class="to"><b>AFTER</b>コンに話しかける。予定と達成は会話から拾う</div></div>
+      <div class="row"><div class="from"><b>BEFORE</b>キャラクターの世話をしないと弱る</div><div class="arw">→</div><div class="to"><b>AFTER</b>世話の義務はない。話したぶん、やったぶんだけ育つ</div></div>
+      <div class="row"><div class="from"><b>BEFORE</b>怪しい連絡を、自分で調べて判断する</div><div class="arw">→</div><div class="to"><b>AFTER</b>貼るだけ。あやしければ敵として現れ、倒すと相棒が少し強くなる</div></div>
+    </div>
+    <div class="origin">
+      <p class="lbl" style="margin-bottom:10px">起点にした考え</p>
+      <p><q>相棒の使命は、守ること</q></p>
+      <p class="note" style="margin-top:10px">ゲームにすることで確かめる行動へそっと背中を押す、ナッジの考え方も取り入れています。</p>
+    </div>
+  </section>
+
+  <!-- 03 仕組み：生まれる -->
+  <section class="ch" id="how">
+    <div class="ch-h">
+      <span class="num">03 / BIRTH</span>
+      <h2>12問から、16の系統の<br>どれかが生まれる</h2>
+      <p class="lead">相棒は選ぶのではなく、答えから生まれます。口調は生まれた系統で決まり、育っても変わりません。</p>
+    </div>
+    <ol class="flow">
+      <li class="st"><p class="k">STEP 1</p><p class="v">12問に答える</p><p class="d">4つの軸 × 3問の二択</p></li>
+      <li class="st"><p class="k">STEP 2</p><p class="v">16の系統が決まる</p><p class="d">16タイプ診断の考え方をもとにした系統</p></li>
+      <li class="st"><p class="k">STEP 3</p><p class="v">たまごをつつく</p><p class="d">つつくとかえる。名前をつける</p></li>
+      <li class="st"><p class="k">STEP 4</p><p class="v">話す・予定・育つ</p><p class="d">ここから毎日の相棒になる</p></li>
+    </ol>
+    <figure class="evo">
+      <div class="frame scroller"><img src="img/cp/evo64.webp" width="2000" height="561" alt="16の系統それぞれの、4段階の進化の姿。合計64体のドット絵" loading="lazy"></div>
+      <figcaption class="cap">16系統 × 4段階 ＝ 64体。上から ニードル期、ベアリング期、ローズ期、メリディアン期。</figcaption>
+    </figure>
+    <div class="side">
+      <figure>
+        <div class="frame" style="border:1px solid var(--line);background:#050912"><img src="img/cp/evo4.webp" width="988" height="1108" alt="4つの系統を取り出した、4段階の進化" loading="lazy"></div>
+        <figcaption class="cap">4つの系統を取り出したもの。同じ系統の中で、動物や道具のモチーフが段階ごとに育っていく。</figcaption>
+      </figure>
+      <div>
+        <p class="lbl" style="margin-bottom:12px">17体目</p>
+        <div style="border:1px solid var(--line);background:#050912"><img src="img/cp/tabi.webp" width="760" height="168" alt="旅の子の4段階" loading="lazy"></div>
+        <p style="margin-top:16px;font-size:14px">性格の傾きがどの軸でも真ん中に近いまま育つと、進化のときに、診断には出てこない17体目「旅の子」になります。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 育つ -->
+  <section class="ch" id="grow">
+    <div class="ch-h">
+      <span class="num">04 / GROW</span>
+      <h2>話したぶん、やったぶんで<br>進化する</h2>
+      <p class="lead">会話と、現実での達成の報告でゲージがたまります。数値は画面に出しません。</p>
+    </div>
+    <div class="meter">
+      <table>
+        <thead><tr><th>たまるもの</th><th>増え方</th><th>1日の上限</th></tr></thead>
+        <tbody>
+          <tr><td>会話</td><td class="n">+1</td><td>8回</td></tr>
+          <tr><td>達成の報告（走った、勉強した など）</td><td class="n">+2</td><td>3回</td></tr>
+        </tbody>
+      </table>
+      <table style="margin-top:28px">
+        <thead><tr><th>段階</th><th>ゲージ</th><th>達成の数</th></tr></thead>
+        <tbody>
+          <tr><td class="s">ニードル期</td><td class="n">0</td><td class="n">0</td></tr>
+          <tr><td class="s">ベアリング期</td><td class="n">20</td><td class="n">0</td></tr>
+          <tr><td class="s">ローズ期</td><td class="n">120</td><td class="n">8</td></tr>
+          <tr><td class="s">メリディアン期</td><td class="n">400</td><td class="n">40</td></tr>
+        </tbody>
+      </table>
+      <p class="note" style="margin-top:14px">上の段階は、話すだけでは届かず、現実での達成も要る。ほかに「おせわ」「きたえる」「たいせん」がそれぞれ1日5回まで。たいせんは「ため・撃つ・守る」の読み合いです。</p>
+    </div>
+  </section>
+
+  <!-- 05 予定 -->
+  <section class="ch" id="plan">
+    <div class="ch-h">
+      <span class="num">05 / PLAN</span>
+      <h2>話しかけると、<br>予定が入る</h2>
+      <p class="lead">「明日の15時に歯医者」と話すと、Googleカレンダーに入ります。変更や取り消しも会話でできます。予定が終わって6時間以内には、コンから「どうだった？」と聞いてきます。</p>
+    </div>
+    <div class="shots c2 indent" style="max-width:760px">
+      <figure><div class="screen"><img src="img/cp/chat.webp" width="780" height="1000" alt="コンに明日の15時に歯医者と話しかけた画面" loading="lazy"></div><figcaption><b>TALK</b>話すだけ。入力画面はない</figcaption></figure>
+      <figure><div class="screen"><img src="img/cp/sched.webp" width="780" height="1533" alt="よていタブに歯医者が入った画面" loading="lazy"></div><figcaption><b>SCHEDULE</b>会話から入った予定が並ぶ</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- 06 見張り -->
+  <section class="ch" id="guard">
+    <div class="ch-h">
+      <span class="num">06 / GUARD</span>
+      <h2>怪しい連絡を、<br>敵として倒す</h2>
+      <p class="lead">届いたSMS、メール、URLを貼ると、コンが見ます。あやしいときだけ、手口ごとの敵が現れます。</p>
+    </div>
+    <ol class="pipe">
+      <li><p class="k">01</p><p class="v">貼る</p><p class="d">届いた文面やURLをそのまま貼る</p></li>
+      <li><p class="k">02</p><p class="v">見る</p><p class="d">あやしい／わからない を判定し、理由と確かめ方を出す</p></li>
+      <li class="hot"><p class="k">03</p><p class="v">戦う</p><p class="d">あやしいときだけ。コンが一時的に進化して迎え撃つ</p></li>
+      <li><p class="k">04</p><p class="v">記録</p><p class="d">日付、敵、結果、確かめ方を残す（30件まで）</p></li>
+    </ol>
+
+    <div class="shots c4">
+      <figure><div class="screen"><img src="img/cp/judge.webp" width="780" height="1688" alt="再配達を装った文面を貼り、あやしいと判定された画面" loading="lazy"></div><figcaption><b>JUDGE</b>判定と確かめ方<span>理由と、取るべき行動を短く出す</span></figcaption></figure>
+      <figure><div class="screen"><img src="img/cp/evolve.webp" width="780" height="540" alt="コンが光に包まれて進化する瞬間" loading="lazy"></div><div class="screen" style="margin-top:12px"><img src="img/cp/temp.webp" width="780" height="540" alt="一時進化したコンの姿" loading="lazy"></div><figcaption><b>EVOLVE</b>一時的に1段階進化<span>約3.4秒</span></figcaption></figure>
+      <figure><div class="screen"><img src="img/cp/vs.webp" width="780" height="540" alt="警報 ウイルス出現 のVSカットイン" loading="lazy"></div><div class="screen" style="margin-top:12px"><img src="img/cp/battle.webp" width="780" height="887" alt="コンと再配達ウイルスが炎を撃ち合う戦闘画面" loading="lazy"></div><figcaption><b>BATTLE</b>警報とVSのカットイン<span>約2.1秒。そのあと、ため・撃つ・守るの戦い</span></figcaption></figure>
+      <figure><div class="screen"><img src="img/cp/win.webp" width="780" height="840" alt="撃退したあとのコンの一言" loading="lazy"></div><div class="screen" style="margin-top:12px"><img src="img/cp/lose.webp" width="780" height="840" alt="逃げられたときの画面" loading="lazy"></div><figcaption><b>RESULT</b>勝っても負けても、やることは同じ<span>勝つと手口をひとこと解説。負けても「リンクは開かない」は変わらない</span></figcaption></figure>
+    </div>
+
+    <div style="margin-top:48px">
+      <div>
+        <p class="lbl" style="margin-bottom:12px">手口ごとの敵（7種）</p>
+        <div class="enemies">
+          <figure><img src="img/cp/en_deliv.webp" width="300" height="292" alt="" loading="lazy"><figcaption>再配達ウイルス<span>宅配の偽通知</span></figcaption></figure>
+          <figure><img src="img/cp/en_bill.webp" width="300" height="292" alt="" loading="lazy"><figcaption>請求ワーム<span>未払い・料金請求</span></figcaption></figure>
+          <figure><img src="img/cp/en_prize.webp" width="300" height="292" alt="" loading="lazy"><figcaption>当選トロイ<span>当選・プレゼント</span></figcaption></figure>
+          <figure><img src="img/cp/en_login.webp" width="300" height="292" alt="" loading="lazy"><figcaption>なりすましフィッシュ<span>偽ログイン</span></figcaption></figure>
+          <figure><img src="img/cp/en_money.webp" width="300" height="292" alt="" loading="lazy"><figcaption>もうけ話ミミック<span>投資・副業の誘い</span></figcaption></figure>
+          <figure><img src="img/cp/en_mask.webp" width="300" height="292" alt="" loading="lazy"><figcaption>なりすましマスク<span>知人・機関のふり</span></figcaption></figure>
+          <figure><img src="img/cp/en_other.webp" width="300" height="292" alt="" loading="lazy"><figcaption>グリッチ<span>そのほか</span></figcaption></figure>
+        </div>
+        <p class="note" style="margin-top:12px">敵の強さはコンの段階の前後1段階。どれもオリジナルのデザインです。</p>
+      </div>
+    </div>
+
+    <div class="side" style="margin-top:56px">
+      <div>
+        <p class="lbl" style="margin-bottom:14px">判定のしくみ</p>
+        <p style="font-size:14.5px">ふだんは Claude が文面を読んで判定します。日本でよくある手口（再配達、未払い、当選、偽ログイン、投資や副業、なりすまし）と、URLのドメイン、急がせる言い方、お金や個人情報を求める言い方を見ます。</p>
+        <p style="font-size:14.5px;margin-top:1em">AIにつながらないときは、手元の言葉の点数で判定します。</p>
+        <div class="score" style="margin:18px 0 0">
+          <ul>
+            <li>手口に当てはまる言葉</li><li>1</li>
+            <li>急がせる言葉</li><li>1</li>
+            <li>お金・個人情報を求める言葉</li><li>1</li>
+            <li>あやしいURL</li><li>2</li>
+          </ul>
+          <p class="th">合計3点以上で <b>あやしい</b>。手元の判定は「安全」とは言わない。</p>
+        </div>
+        <p class="note" style="margin-top:16px">勝つと「守り」が+2（1日2回まで）。はじめての撃退は「おもいで」に残ります。見張りの戦いは、1日の対戦回数を使いません。</p>
+      </div>
+      <figure>
+        <div class="screen" style="border-radius:14px"><img src="img/cp/rec.webp" width="780" height="1688" alt="撃退記録の一覧" loading="lazy"></div>
+        <figcaption class="cap">撃退記録。日付、敵、結果、確かめ方の4つだけを残す。</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 07 線引き -->
+  <section class="ch" id="line">
+    <div class="ch-h">
+      <span class="num">07 / BOUNDARY</span>
+      <h2>ゲームにしても、<br>ゆずらないこと</h2>
+      <p class="lead">遊びにすると、判定を信じすぎたり、勝ち負けで行動が変わったりするおそれがあります。そこで次のことを決め、すべて実装しています。</p>
+    </div>
+    <ul class="rules">
+      <li>いつも <q>判定は目安。最後は自分で確かめる。</q> と出す</li>
+      <li>判断がつかないときは「保留」にして、戦わない</li>
+      <li>AIにつながらないときの判定は、「安全」とは言わない</li>
+      <li>負けても、取るべき行動は変えない<small><q>逃げられた。でも中身は変わらない。リンクは開かないでおこう。</q></small></li>
+      <li>貼った文面は保存しない</li>
+      <li>文面の中に書かれた指示には従わない<small>ただのデータとして扱う</small></li>
+      <li>見張りは、1日の対戦回数を減らさない</li>
+      <li>コンは診断や説教をしない</li>
+    </ul>
+  </section>
+
+  <!-- 08 結果 -->
+  <section class="ch" id="result">
+    <div class="ch-h">
+      <span class="num">08 / STATUS</span>
+      <h2>いま言えること、<br>まだ言えないこと</h2>
+    </div>
+    <div class="res">
+      <div class="card">
+        <span class="tag fact">事実</span>
+        <h3>いま言えること</h3>
+        <ul>
+          <li>使っているのは自分だけ<span>claude.ai 上の非公開のアプリとして、iPhone と PC で使っている</span></li>
+          <li>改修を重ねて現在78版</li>
+          <li>ここに書いた仕組みと線引きは、すべて実装済み</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="tag">未確認</span>
+        <h3>まだ言えないこと</h3>
+        <ul>
+          <li>判定の精度、会話の質、使う頻度<span>利用ログをとっていないため、数字では言えない</span></li>
+          <li>ほかの人に使ってもらった検証<span>想定している使い手は、高齢の人や若い人。まだ確かめていない</span></li>
+          <li>配ることはまだできない<span>AIは Claude を通して動かしている。配るには、組み込み方から考え直す必要がある</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="end">
+    <p>掲載している画面は、撮影用のデータで撮っています。名前（ソラ、テスト）、予定、URLは架空のものです。会話の返事と判定の文面は撮影用に用意したもので、実際には Claude がその都度書きます。勝ったとき・負けたときの台詞と、手口の名前はアプリのものです。画面右上のタイプ表示は省いています。</p>
+    <p style="margin-top:10px">企画・設計・デザイン・制作：山﨑源大（AI を使って制作）</p>
+    <a class="back" href="./">← ポートフォリオにもどる</a>
+  </footer>
+
+</div>
+</main>
+</body>
+</html>

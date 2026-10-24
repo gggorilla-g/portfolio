@@ -2227,7 +2227,7 @@ var CAT = (function(){
   { slug: 'base', t: 'BASE', k: 'ブライダルBGMの進行管理', kind: 'screen', g: 'ai', cap: '結婚式の進行表を読み取り、予定の登録とお客さんへの連絡を自動で行う', go: 'case:base' },
     { slug: 'jitan', t: '時短トラッカー', k: '削減時間の集計', kind: 'screen', g: 'ai', cap: 'ツールごとの削減時間を、月と年で集計する', go: 'case:jitan' },
     { slug: 'trace', t: '秒でトレース', k: '伝票のトレース', kind: 'screen', g: 'ai', cap: '撮影した伝票から、罫線と文字のSVGを作る', go: 'case:trace' },
-    { slug: 'conpass', t: 'CONPASS', k: 'スマホアプリ', kind: 'phone', g: 'ai', cap: '性格診断から生まれる相棒と、話して予定を見るアプリ', go: 'case:conpass' }
+    { slug: 'conpass', t: 'CONPASS', k: 'スマホアプリ', kind: 'phone', g: 'ai', cap: '話して育つ相棒と、怪しい連絡を一緒に倒すアプリ', go: 'case:conpass' }
   ]; window.LIST = LIST;
   (function(){ var SEL = ["police26", "kiyokawa", "kfg13", "hydrogen", "calendar", "aimo", "proposal", "kioi", "pancake", "kyodo", "denkadm", "canopu"]; var by = function(s){ return LIST.filter(function(d){ return d.slug === s; })[0]; }; LIST = SEL.map(by).filter(Boolean).concat(LIST.filter(function(d){ return d.g === 'ai'; })); })();
   LIST = LIST.filter(function(d){ return !d.hide; }); /* hide: 1 の作品は一覧に出さない（消すと元に戻る） */
@@ -3273,7 +3273,7 @@ var CASES = {
   },
   conpass: {
     title: 'CONPASS',
-    lead: '相棒のキャラクターと話しながら予定を扱う、スマホ向けのアプリです。日常的に運用しています。',
+    lead: '相棒のキャラクターと話しながら予定を扱う、スマホ向けのアプリです。怪しい連絡を貼ると、相棒が見て、敵として一緒に倒します。日常的に運用しています。<br><a href="conpass.html" style="display:inline-block;margin-top:18px;font-size:15px;letter-spacing:.06em;text-underline-offset:.4em">企画の全体を見る（ケーススタディ） →</a>',
     meta: [['形式', 'スマホ向けWebアプリ'], ['担当', '企画、設計、開発（AI を使って制作）']],
     about: ['Claude で作った、スマホ向けの自作アプリです。キャラクターの「コン」を、予定を一緒に扱う相棒として使います。趣味の要素が多いアプリですが、日常的に運用しています。',
       '最初に12問の質問に答えると、答えから性格のタイプが決まり、それに合ったコンがたまごから生まれます。',
