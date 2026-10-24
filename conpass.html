@@ -4,226 +4,200 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CONPASS 山﨑源大 ポートフォリオ</title>
-<meta name="description" content="予定と雑談で育つAIの相棒。怪しい連絡が届いたら、相棒と一緒に倒す。企画・設計・制作：山﨑源大">
+<meta name="description" content="話すと予定が入り、話すほど進化し、怪しい連絡を一緒に倒す。AIの相棒アプリ CONPASS。企画・設計・制作：山﨑源大">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Shippori+Mincho:wght@400;500;600&family=Share+Tech+Mono&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+JP:wght@400;500;700;900&family=Share+Tech+Mono&display=swap">
 <style>
 :root{
-  --bg:#05080f;
-  --bg2:#0b1120;
-  --line:#1d2740;
-  --ink:#e9ecf3;
-  --mute:#8a93a8;
-  --dim:#5a647b;
-  --blue:#8fb6ff;
-  --teal:#5ee6d0;
-  --coral:#f87360;
-  --amber:#f5b352;
-  --serif:"EB Garamond","Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+  --bg:#000;
+  --ink:#f2f3f7;
+  --mute:#9aa1b2;
+  --dim:#626a7d;
+  --line:#22283a;
+  --teal:#cdeee6;  --teal-d:#11786a;
+  --amber:#f7e3bd; --amber-d:#9a5b06;
+  --coral:#f8d4ca; --coral-d:#b23a22;
+  --lilac:#e0dbf8; --lilac-d:#4d3bb0;
+  --sans:"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN",sans-serif;
   --dot:"DotGothic16",monospace;
   --mono:"Share Tech Mono",ui-monospace,monospace;
-  --gut:clamp(16px,6vw,96px);
-  --max:1120px;
+  --w:1080px;
+  --gut:clamp(16px,5vw,48px);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{background:var(--bg);-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/2.05 var(--serif);letter-spacing:.03em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-p,h1,h2,h3,h4,ul,ol,dl,dd,figure{margin:0}
+html{background:var(--bg);-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.85 var(--sans);letter-spacing:.02em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,p,ul,ol,figure,dl,dd{margin:0}
 ul,ol{padding:0;list-style:none}
 a{color:inherit}
 img{display:block;max-width:100%;height:auto}
-.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gut)}
-.lbl{font:400 11px/1.6 var(--mono);letter-spacing:.24em;color:var(--mute);text-transform:uppercase}
-.dot{font-family:var(--dot)}
+.px{image-rendering:pixelated;image-rendering:crisp-edges}
+.wrap{max-width:var(--w);margin:0 auto;padding:0 var(--gut)}
+.lbl{font:400 11px/1.6 var(--mono);letter-spacing:.22em;color:var(--mute);text-transform:uppercase}
 
-/* 上の帯 */
-.top{position:sticky;top:0;z-index:10;background:rgba(5,8,15,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+/* 帯 */
+.top{position:sticky;top:0;z-index:20;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .top .wrap{display:flex;justify-content:space-between;align-items:center;height:52px;font-size:12px}
 .top a{text-decoration:none;color:var(--mute)}
 .top a:hover{color:var(--ink)}
 .top nav{display:flex;gap:18px}
+.top .try-link{color:#000;background:var(--ink);padding:7px 12px;border-radius:999px}
+.top .try-link:hover{color:#000;background:#fff}
 @media (max-width:560px){.top nav .opt{display:none}}
 
 /* 冒頭 */
-.hero{padding:clamp(48px,9vw,120px) 0 clamp(40px,6vw,72px);position:relative}
-.hero .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center}
-@media (max-width:860px){.hero .grid{grid-template-columns:1fr}}
-.hero h1{font:400 clamp(52px,9vw,112px)/.95 var(--dot);letter-spacing:.04em;margin:18px 0 26px}
-.hero h1 span{color:var(--teal)}
-.hero .one{font-size:clamp(19px,2.4vw,25px);line-height:1.75;font-weight:500;margin-bottom:22px}
-.hero .sub{color:var(--mute);font-size:14px;max-width:34em}
-.meta{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;margin-top:30px;font-size:13px;line-height:1.8}
-.meta dt{color:var(--dim);font:400 11px/1.9 var(--mono);letter-spacing:.18em}
-.meta dd{color:var(--ink)}
-.screen{position:relative;border:1px solid var(--line);background:#000;overflow:hidden}
-.screen img{width:100%}
-.hero figure{width:100%;max-width:560px;justify-self:center}
-.hero .screen{border-radius:22px;box-shadow:0 30px 80px -30px rgba(94,230,208,.25)}
-.cap{font-size:12px;color:var(--dim);margin-top:10px;line-height:1.8}
+.hero{text-align:center;padding:clamp(40px,8vw,96px) 0 clamp(40px,6vw,64px)}
+.hero .mon{height:clamp(150px,26vw,230px);display:flex;justify-content:center;align-items:flex-end;margin-bottom:18px}
+.hero .mon img{width:clamp(150px,26vw,230px);height:auto;transition:opacity .25s}
+.hero .mon img.fade{opacity:0}
+.hero .stage{font:400 11px/1 var(--mono);letter-spacing:.24em;color:var(--dim);margin-bottom:22px;min-height:11px}
+.hero h1{font:400 clamp(44px,9vw,88px)/1 var(--dot);letter-spacing:.06em}
+.hero .what{font-size:clamp(20px,3.2vw,30px);font-weight:700;line-height:1.5;margin:22px auto 0;max-width:20em}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:26px}
+.chips a{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-size:14px;font-weight:500;padding:9px 16px 9px 10px;border-radius:999px;color:#111}
+.chips a img{width:28px;height:28px}
+.chips .c1{background:var(--teal)} .chips .c2{background:var(--amber)} .chips .c3{background:var(--coral)}
+.cta{display:flex;justify-content:center;gap:12px;margin-top:30px;flex-wrap:wrap}
+.btn{display:inline-block;text-decoration:none;font-size:14px;font-weight:700;padding:13px 22px;border-radius:999px;border:1px solid var(--line)}
+.btn.main{background:var(--ink);color:#000;border-color:var(--ink)}
+.btn:hover{border-color:var(--ink)}
+.credit{margin-top:22px;font-size:12px;color:var(--dim)}
 
-/* 3つの判断 */
-.pillars{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.pillars ol{display:grid;grid-template-columns:repeat(3,1fr)}
-.pillars li{padding:30px clamp(14px,2.4vw,30px) 32px;border-left:1px solid var(--line)}
-.pillars li:first-child{border-left:0;padding-left:0}
-.pillars .n{font:400 12px/1 var(--mono);color:var(--teal);letter-spacing:.2em}
-.pillars h3{font-size:clamp(17px,1.9vw,20px);font-weight:500;line-height:1.6;margin:14px 0 8px}
-.pillars p{color:var(--mute);font-size:13.5px;line-height:1.95}
-@media (max-width:760px){.pillars ol{grid-template-columns:1fr}.pillars li{border-left:0;border-top:1px solid var(--line);padding-left:0}.pillars li:first-child{border-top:0}}
+/* パネル（dotsのように色面の上に画面） */
+.panel{position:relative;border-radius:22px;padding:clamp(22px,4vw,56px);overflow:visible}
+.panel.teal{background:var(--teal)} .panel.amber{background:var(--amber)} .panel.coral{background:var(--coral)} .panel.lilac{background:var(--lilac)}
+.peek{position:absolute;width:clamp(84px,12vw,140px);pointer-events:none}
+.peek.br{right:-10px;bottom:-14px} .peek.tl{left:-14px;top:-30px} .peek.tr{right:-8px;top:-40px} .peek.bl{left:-12px;bottom:-16px}
+@media (max-width:640px){.peek{width:72px}.peek.br{right:-4px}.peek.tl{left:-4px}}
+.phone{border-radius:18px;overflow:hidden;box-shadow:0 24px 50px -20px rgba(0,0,0,.45);background:#05080f}
 
-/* 章 */
-section.ch{padding:clamp(64px,10vw,128px) 0 0}
-.ch-h{display:grid;grid-template-columns:136px 1fr;gap:16px;margin-bottom:clamp(28px,4vw,48px)}
-.ch-h .num{font:400 12px/1.5 var(--mono);color:var(--teal);letter-spacing:.2em;padding-top:12px}
-.ch-h h2{font-size:clamp(26px,4vw,44px);font-weight:400;line-height:1.35;letter-spacing:.04em}
-.ch-h .lead{grid-column:2;color:var(--mute);max-width:38em;font-size:15px}
-@media (max-width:640px){.ch-h{grid-template-columns:1fr;gap:6px}.ch-h .lead{grid-column:1}.ch-h .num{padding-top:0}}
-.body{margin-left:136px;max-width:44em}
-.indent{margin-left:136px}
-@media (max-width:640px){.indent{margin-left:0}}
-@media (max-width:640px){.body{margin-left:0}}
-.body p+p{margin-top:1.1em}
-.note{font-size:12px;color:var(--dim);line-height:1.9}
-.tag{display:inline-block;font:400 10px/1 var(--mono);letter-spacing:.14em;padding:4px 7px 3px;border:1px solid var(--line);color:var(--mute);vertical-align:2px;margin-left:6px;white-space:nowrap}
-.tag.fact{border-color:#2b5f58;color:var(--teal)}
+/* 3つのこと */
+.feat{padding:clamp(56px,9vw,104px) 0 0}
+.feat .head{display:flex;align-items:baseline;gap:16px;margin-bottom:18px}
+.feat .no{font:400 13px/1 var(--mono);color:var(--mute);letter-spacing:.2em}
+.feat h2{font-size:clamp(26px,4.4vw,44px);font-weight:900;line-height:1.3;letter-spacing:.02em}
+.feat .say{font-size:clamp(15px,1.8vw,17px);color:var(--mute);margin:0 0 26px;max-width:36em}
+.feat .say b{color:var(--ink);font-weight:500}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,3vw,36px);max-width:760px;margin:0 auto;align-items:start}
+.pair figcaption,.steps figcaption{font-size:13px;font-weight:700;color:#111;margin-top:10px;text-align:center}
+.evo4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;align-items:end;max-width:820px;margin:0 auto}
+.evo4 figure{text-align:center}
+.evo4 img{width:100%;max-width:180px;margin:0 auto}
+.evo4 figcaption{font:400 13px/1.4 var(--dot);color:#3b2a06;margin-top:8px}
+.evo4 .arrow{display:none}
+.evo-note{display:flex;justify-content:center;gap:10px;margin-top:20px;flex-wrap:wrap}
+.evo-note span{font-size:13px;font-weight:500;color:#3b2a06;background:rgba(255,255,255,.55);padding:6px 12px;border-radius:999px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,2vw,22px);align-items:start}
+.steps .n{display:inline-block;font:400 12px/1 var(--mono);letter-spacing:.14em;color:#fff;background:var(--coral-d);padding:5px 8px;border-radius:999px;margin-bottom:10px}
+.steps figure{text-align:center}
+@media (max-width:760px){
+  .steps{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:8px;margin:0 calc(-1 * clamp(22px,4vw,56px));padding-left:clamp(22px,4vw,56px);padding-right:clamp(22px,4vw,56px)}
+  .steps figure{flex:0 0 62%;scroll-snap-align:center}
+  .pair{grid-template-columns:1fr 1fr;gap:12px}
+}
+.swipe{display:none;font-size:12px;color:#5a2014;text-align:center;margin-top:8px}
+@media (max-width:760px){.swipe{display:block}}
 
-/* 課題 */
-.two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,32px);margin-left:136px}
-@media (max-width:760px){.two{grid-template-columns:1fr;margin-left:0}}
-.card{border:1px solid var(--line);background:var(--bg2);padding:24px 24px 26px}
-.card h3{font-size:17px;font-weight:500;line-height:1.6;margin:10px 0 10px}
-.card p{color:var(--mute);font-size:14px;line-height:1.95}
-.chain{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:14px;font-size:13px;line-height:1.6}
-.chain span{border:1px solid var(--line);padding:5px 10px;color:var(--ink)}
-.chain i{font-style:normal;color:var(--dim);align-self:center}
-.chain span.end{border-color:var(--coral);color:var(--coral)}
+/* 数字 */
+.nums{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:clamp(64px,10vw,112px)}
+.nums div{padding:24px 10px;text-align:center;border-left:1px solid var(--line)}
+.nums div:first-child{border-left:0}
+.nums b{display:block;font:400 clamp(30px,5vw,48px)/1 var(--dot)}
+.nums b small{font-size:.45em;margin-left:2px}
+.nums span{display:block;font-size:12px;color:var(--mute);margin-top:10px;line-height:1.5}
+@media (max-width:640px){.nums{grid-template-columns:repeat(3,1fr)}.nums div:nth-child(4){border-left:0}.nums div:nth-child(n+4){border-top:1px solid var(--line)}}
 
-/* 発想 */
-.turn{margin-left:136px;display:grid;gap:14px}
-@media (max-width:640px){.turn{margin-left:0}}
-.turn .row{display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;gap:10px}
-.turn .from,.turn .to{padding:18px 20px;border:1px solid var(--line);font-size:15px;line-height:1.75}
-.turn .from{color:var(--mute)}
-.turn .from b,.turn .to b{display:block;font:400 10px/1.6 var(--mono);letter-spacing:.2em;color:var(--dim);font-weight:400;margin-bottom:4px}
-.turn .to{border-color:#2b5f58;background:linear-gradient(180deg,rgba(94,230,208,.06),transparent)}
-.turn .to b{color:var(--teal)}
-.turn .arw{text-align:center;color:var(--teal);font:400 20px/1 var(--dot)}
-@media (max-width:640px){.turn .row{grid-template-columns:1fr}.turn .arw{transform:rotate(90deg);height:24px}}
-.origin{margin:36px 0 0 136px;padding:22px 0 0;border-top:1px solid var(--line);max-width:44em}
-@media (max-width:640px){.origin{margin-left:0}}
-.origin q{font-size:clamp(18px,2.2vw,22px);font-weight:500;quotes:"「" "」"}
+/* 章（短文） */
+.sec{padding:clamp(64px,10vw,112px) 0 0}
+.sec h2{font-size:clamp(24px,3.6vw,36px);font-weight:900;line-height:1.35}
+.sec .say{color:var(--mute);margin:12px 0 28px;max-width:36em}
 
-/* 生まれる */
-.flow{display:flex;align-items:stretch;gap:0;margin:0 0 30px 136px;flex-wrap:wrap}
-@media (max-width:640px){.flow{margin-left:0}}
-.flow .st{flex:1 1 150px;border:1px solid var(--line);padding:16px 16px 18px;margin:-1px 0 0 -1px}
-.flow .st .k{font:400 11px/1 var(--mono);letter-spacing:.18em;color:var(--teal)}
-.flow .st .v{font-size:16px;font-weight:500;margin:8px 0 4px;line-height:1.5}
-.flow .st .d{font-size:12.5px;color:var(--mute);line-height:1.8}
-.evo{margin-top:36px}
-.evo .frame{border:1px solid var(--line);background:#050912;overflow:hidden}
-.evo .frame img{width:100%}
-.scroller{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
-.scroller img{min-width:900px}
-.stages{display:grid;grid-template-columns:repeat(4,1fr);font:400 11px/1 var(--mono);letter-spacing:.14em;color:var(--mute);margin-top:10px;text-align:center}
-.side{display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(18px,3vw,40px);margin-top:36px;align-items:start}
-@media (max-width:760px){.side{grid-template-columns:1fr}}
+/* なぜ */
+.why{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:760px){.why{grid-template-columns:1fr}}
+.why li{border:1px solid var(--line);border-radius:16px;padding:20px}
+.why .b{font-size:13px;color:var(--dim);text-decoration:line-through;text-decoration-color:#59607a}
+.why .a{font-size:17px;font-weight:700;margin-top:6px;line-height:1.55}
+.why .r{font-size:13px;color:var(--mute);margin-top:8px}
 
-/* 育つ */
-.meter{margin:6px 0 0 136px;max-width:760px}
-@media (max-width:640px){.meter{margin-left:0}}
-.meter table{width:100%;border-collapse:collapse;font-size:14px}
-.meter th,.meter td{border-bottom:1px solid var(--line);padding:12px 8px;text-align:left;font-weight:400;vertical-align:top}
-.meter th{font:400 11px/1.6 var(--mono);letter-spacing:.16em;color:var(--dim)}
-.meter td.s{font-family:var(--dot);font-size:15px;white-space:nowrap}
-.meter td.n{font-family:var(--mono);color:var(--teal);white-space:nowrap}
-.bars{display:flex;gap:4px;margin-top:22px;align-items:flex-end;height:64px}
-.bars div{flex:1;background:var(--line);position:relative}
-.bars div span{position:absolute;bottom:-22px;left:0;font:400 10px/1 var(--mono);color:var(--dim);white-space:nowrap}
+/* 64体 */
+.dex{background:#0b1020;border:1px solid var(--line);border-radius:22px;padding:clamp(18px,3vw,36px)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.tabs button{font:400 13px/1 var(--dot);color:var(--mute);background:transparent;border:1px solid var(--line);border-radius:999px;padding:9px 14px;cursor:pointer}
+.tabs button[aria-pressed="true"]{color:#000;background:var(--ink);border-color:var(--ink)}
+.grid16{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+@media (max-width:760px){.grid16{grid-template-columns:repeat(4,1fr)}}
+.grid16 figure{text-align:center;padding:6px 2px 8px;border-radius:10px}
+.grid16 img{width:100%;max-width:96px;margin:0 auto}
+.grid16 figcaption{font:400 11px/1.3 var(--dot);color:var(--mute);margin-top:4px}
+.extra{display:flex;align-items:center;gap:16px;margin-top:18px;padding-top:18px;border-top:1px dashed var(--line);flex-wrap:wrap}
+.extra .row{display:flex;gap:2px}
+.extra img{width:56px}
+.extra p{font-size:13px;color:var(--mute);flex:1;min-width:16em}
 
-/* 画面の列 */
-.shots{display:grid;gap:clamp(14px,2vw,22px)}
-.shots.c2{grid-template-columns:repeat(2,1fr)}
-.shots.c3{grid-template-columns:repeat(3,1fr)}
-.shots.c4{grid-template-columns:repeat(4,1fr)}
-@media (max-width:860px){.shots.c4{grid-template-columns:repeat(2,1fr)}.shots.c3{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:420px){.shots.c2,.shots.c3{grid-template-columns:1fr}}
-.shots figure .screen{border-radius:14px}
-.shots figcaption{margin-top:10px;font-size:13px;line-height:1.8}
-.shots figcaption b{display:block;font:400 10.5px/1.6 var(--mono);letter-spacing:.18em;color:var(--teal);font-weight:400}
-.shots figcaption span{color:var(--mute);font-size:12.5px}
+/* 敵 */
+.foes{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+@media (max-width:760px){.foes{grid-template-columns:repeat(4,1fr)}}
+.foes figure{text-align:center}
+.foes img{width:100%;max-width:110px;margin:0 auto}
+.foes figcaption{font-size:12px;font-weight:700;color:#3a130b;line-height:1.4;margin-top:4px}
+.foes figcaption span{display:block;font-weight:400;font-size:11px;color:#7b3a2c}
 
-/* 見張りの流れ */
-.pipe{display:grid;grid-template-columns:repeat(4,1fr);margin:0 0 40px 136px;counter-reset:p}
-@media (max-width:760px){.pipe{grid-template-columns:1fr 1fr;margin-left:0}}
-.pipe li{border-top:2px solid var(--line);padding:16px 14px 6px 0;position:relative}
-.pipe li.hot{border-top-color:var(--coral)}
-.pipe li .k{font:400 11px/1 var(--mono);letter-spacing:.18em;color:var(--dim)}
-.pipe li.hot .k{color:var(--coral)}
-.pipe li .v{font-family:var(--dot);font-size:20px;margin:8px 0 6px}
-.pipe li .d{font-size:12.5px;color:var(--mute);line-height:1.8}
-.score{margin:0 0 0 136px;max-width:640px;border:1px solid var(--line);padding:18px 20px}
-@media (max-width:640px){.score{margin-left:0}}
-.score ul{display:grid;grid-template-columns:1fr auto;gap:6px 18px;font-size:13.5px;margin-top:10px}
-.score ul li:nth-child(even){font-family:var(--mono);color:var(--amber);text-align:right}
-.score .th{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--mute)}
-.score .th b{color:var(--coral);font-weight:500}
-
-.enemies{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:20px}
-@media (max-width:860px){.enemies{grid-template-columns:repeat(4,1fr)}}
-@media (max-width:420px){.enemies{grid-template-columns:repeat(3,1fr)}}
-.enemies figure{border:1px solid var(--line);background:#0a1020;padding:8px 6px 10px;text-align:center}
-.enemies img{margin:0 auto;width:100%;image-rendering:auto}
-.enemies figcaption{font-size:12px;line-height:1.5;margin-top:6px}
-.enemies figcaption span{display:block;font-size:10.5px;color:var(--dim)}
-
-.loop{margin:40px 0 0 136px;display:grid;grid-template-columns:minmax(0,520px) 1fr;gap:clamp(16px,3vw,36px);align-items:end}
-@media (max-width:760px){.loop{grid-template-columns:1fr;margin-left:0}}
-.loop .screen{border-radius:14px}
+/* 触る */
+.try{display:grid;grid-template-columns:minmax(0,380px) 1fr;gap:clamp(22px,4vw,48px);align-items:start}
+@media (max-width:800px){.try{grid-template-columns:1fr}}
+.frame{position:relative;width:100%;max-width:380px;margin:0 auto;aspect-ratio:390/780;border-radius:28px;overflow:hidden;background:#05080f;border:1px solid var(--line)}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.frame .start{position:absolute;inset:0;width:100%;border:0;cursor:pointer;color:var(--ink);background:#05080f center/cover no-repeat;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font:inherit}
+.frame .start::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.5)}
+.frame .start b{position:relative;font-size:16px;font-weight:700;background:var(--ink);color:#000;padding:13px 24px;border-radius:999px}
+.frame .start small{position:relative;font-size:12px;color:#ccd}
+.how li{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:14px}
+.how li:first-child{border-top:0}
+.how li b{font:400 12px/2 var(--mono);color:var(--mute);font-weight:400}
+.samples{display:grid;gap:10px;margin-top:16px}
+.samples .s{border-radius:14px;padding:14px 16px;color:#111}
+.samples .s.r{background:var(--coral)} .samples .s.g{background:#e6e8ee}
+.samples .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.samples .row span{font-size:12px;font-weight:700}
+.samples p{font-size:13px;line-height:1.75;word-break:break-all}
+.samples button{font:700 12px/1 var(--sans);background:#111;color:#fff;border:0;border-radius:999px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+.note{font-size:12px;color:var(--dim);line-height:1.85}
 
 /* 線引き */
-.rules{margin-left:136px;display:grid;grid-template-columns:1fr 1fr;gap:0 clamp(18px,3vw,40px)}
-@media (max-width:760px){.rules{grid-template-columns:1fr;margin-left:0}}
-.rules li{padding:16px 0 16px 34px;border-top:1px solid var(--line);position:relative;font-size:14.5px;line-height:1.85}
-.rules li::before{content:"";position:absolute;left:4px;top:25px;width:12px;height:12px;border:1px solid var(--teal);transform:rotate(45deg)}
-.rules li small{display:block;color:var(--mute);font-size:12.5px;margin-top:4px}
-.rules q{quotes:"「" "」";color:var(--amber)}
+.rules{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (max-width:640px){.rules{grid-template-columns:1fr}}
+.rules li{border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:14px;font-weight:500;line-height:1.6}
+.rules li span{display:block;font-size:12.5px;font-weight:400;color:var(--mute);margin-top:4px}
 
-/* 結果 */
-.res{margin-left:136px;display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,32px)}
-@media (max-width:760px){.res{grid-template-columns:1fr;margin-left:0}}
-.res .card h3{margin-top:4px}
-.res ul li{font-size:14px;padding:8px 0;border-top:1px solid var(--line);line-height:1.8}
-.res ul li:first-child{border-top:0}
-.res ul li span{color:var(--mute);font-size:12.5px;display:block}
+/* 今 */
+.now{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.now{grid-template-columns:1fr}}
+.now > div{border:1px solid var(--line);border-radius:16px;padding:20px}
+.now h3{font-size:13px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.now h3 i{font-style:normal;font:400 10px/1 var(--mono);letter-spacing:.14em;padding:4px 7px;border-radius:999px}
+.now .ok h3 i{background:var(--teal);color:#0b3d35}
+.now .no h3 i{background:#2a3044;color:var(--mute)}
+.now li{font-size:14px;padding:8px 0;border-top:1px solid var(--line)}
+.now li:first-child{border-top:0}
+.now li span{display:block;font-size:12.5px;color:var(--mute)}
 
-.end{margin-top:clamp(80px,12vw,140px);border-top:1px solid var(--line);padding:36px 0 60px;font-size:12.5px;color:var(--dim);line-height:2}
-.end a{color:var(--mute)}
-.back{display:inline-block;margin-top:18px;font:400 12px/1 var(--mono);letter-spacing:.18em;text-decoration:none;border:1px solid var(--line);padding:12px 16px;color:var(--ink)}
-.back:hover{border-color:var(--teal);color:var(--teal)}
+/* 詳細 */
+details{border-top:1px solid var(--line)}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;list-style:none;padding:18px 0;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font:400 20px/1 var(--mono);color:var(--mute)}
+details[open] summary::after{content:"−"}
+details .in{padding:0 0 22px;font-size:14px;color:var(--mute)}
+details table{border-collapse:collapse;width:100%;max-width:560px;margin:6px 0 14px;font-size:13.5px}
+details th,details td{border-bottom:1px solid var(--line);padding:9px 6px;text-align:left;font-weight:400}
+details th{color:var(--dim);font-size:12px}
+details td.n{font-family:var(--mono);color:var(--ink)}
 
-/* 触ってみる */
-.try{display:grid;grid-template-columns:minmax(0,400px) 1fr;gap:clamp(24px,4vw,56px);align-items:start;margin-left:136px}
-@media (max-width:860px){.try{grid-template-columns:1fr;margin-left:0}}
-.phone{position:relative;width:100%;max-width:400px;aspect-ratio:390/780;border:1px solid var(--line);border-radius:28px;overflow:hidden;background:#05080f;box-shadow:0 30px 80px -30px rgba(94,230,208,.25)}
-.phone iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#05080f}
-.phone .start{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#05080f center/cover no-repeat;cursor:pointer;border:0;color:var(--ink);font:400 15px/1.6 var(--serif);width:100%}
-.phone .start::before{content:"";position:absolute;inset:0;background:rgba(5,8,15,.55)}
-.phone .start span{position:relative;font:400 18px/1 var(--dot);letter-spacing:.12em;border:1px solid var(--teal);color:var(--teal);padding:14px 22px;background:rgba(5,8,15,.7)}
-.phone .start small{position:relative;color:var(--mute);font-size:12px}
-.samples{display:grid;gap:12px}
-.samples .s{border:1px solid var(--line);background:var(--bg2);padding:14px 16px}
-.samples .s p{font-size:13px;line-height:1.85;color:var(--ink);word-break:break-all}
-.samples .s .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.samples button{font:400 11px/1 var(--mono);letter-spacing:.14em;background:transparent;color:var(--teal);border:1px solid #2b5f58;padding:7px 10px;cursor:pointer}
-.samples button.ok{color:var(--ink);border-color:var(--ink)}
-.howto{margin:0 0 18px;font-size:14px}
-.howto li{padding:6px 0 6px 28px;position:relative;border-top:1px solid var(--line)}
-.howto li:first-child{border-top:0}
-.howto li b{position:absolute;left:0;top:6px;font:400 12px/2 var(--mono);color:var(--teal);font-weight:400}
-.hero .go{display:inline-block;margin-top:28px;font:400 13px/1 var(--dot);letter-spacing:.14em;color:var(--teal);text-decoration:none;border:1px solid var(--teal);padding:13px 18px}
-.hero .go:hover{background:rgba(94,230,208,.08)}
+.end{margin-top:clamp(72px,10vw,120px);padding:28px 0 64px;border-top:1px solid var(--line);font-size:12px;color:var(--dim)}
+.end .btn{margin-top:18px;font-size:13px}
 </style>
 </head>
 <body>
@@ -232,11 +206,10 @@ section.ch{padding:clamp(64px,10vw,128px) 0 0}
   <div class="wrap">
     <a href="./">山﨑源大 ポートフォリオ</a>
     <nav>
-      <a class="opt" href="#idea">発想</a>
-      <a class="opt" href="#how">仕組み</a>
-      <a href="#guard">見張り</a>
-      <a href="#try">動かす</a>
-      <a href="#result">結果</a>
+      <a class="opt" href="#talk">予定</a>
+      <a class="opt" href="#grow">進化</a>
+      <a class="opt" href="#guard">見張り</a>
+      <a class="try-link" href="#try">動かす</a>
     </nav>
   </div>
 </header>
@@ -244,286 +217,217 @@ section.ch{padding:clamp(64px,10vw,128px) 0 0}
 <main>
 <div class="wrap">
 
-  <!-- 冒頭 -->
+  <!-- 冒頭：これは何か -->
   <section class="hero">
-    <div class="grid">
-      <div>
-        <p class="lbl">Case study / 個人制作 / 2026</p>
-        <h1>CON<span>PASS</span></h1>
-        <p class="one">予定と雑談で育つ、AIの相棒。<br>怪しい連絡が届いたら、相棒と一緒に倒す。</p>
-        <p class="sub">16タイプ診断から生まれるキャラクター「コン」と話すだけで、予定が入り、相棒が育ちます。届いたSMSやメールを貼ると、コンが見て、あやしければ敵として現れます。企画から設計、画面、キャラクター、実装まで、AIを使いながらひとりで作りました。</p>
-        <dl class="meta">
-          <dt>ROLE</dt><dd>企画、設計、画面とキャラクターのデザイン、開発（AI を使って制作）</dd>
-          <dt>BUILD</dt><dd>Claude 上で動くスマホ向けWebアプリ。Googleカレンダーと連携</dd>
-          <dt>STATUS</dt><dd>自分で日常的に使用中。改修を重ねて現在78版</dd>
-        </dl>
-        <a class="go" href="#try">実際に動かしてみる ↓</a>
-      </div>
-      <figure>
-        <div class="screen"><img src="img/cp/loop.webp" width="520" height="360" alt="CONPASSの戦闘画面の動き。コンが一時的に進化し、警報とVSのカットインのあと、再配達ウイルスと戦う"></div>
-        <figcaption class="cap">見張りから戦闘に入るまでの動き。コンが一時的に1段階進化し、警報とVSのカットインが入る。</figcaption>
-      </figure>
+    <div class="mon"><img id="mon" class="px" src="img/cp/s/t06_1.png" width="80" height="80" alt="CONPASSのキャラクター「コン」"></div>
+    <p class="stage" id="stage" aria-live="polite">ルナコン ・ ニードル期</p>
+    <h1>CONPASS</h1>
+    <p class="what">話しかけるだけの、AIの相棒アプリ。</p>
+    <div class="chips">
+      <a class="c1" href="#talk"><img class="px" src="img/cp/s/t06_2.png" alt="">話すと、予定が入る</a>
+      <a class="c2" href="#grow"><img class="px" src="img/cp/s/t16_2.png" alt="">話すほど、進化する</a>
+      <a class="c3" href="#guard"><img class="px" src="img/cp/s/en_deliv.png" alt="">怪しい連絡を、一緒に倒す</a>
     </div>
+    <div class="cta">
+      <a class="btn main" href="#try">このページで動かす</a>
+      <a class="btn" href="#why">なぜ作ったか</a>
+    </div>
+    <p class="credit">個人制作 / 2026 / 企画・設計・キャラクター・開発（AI を使って制作）</p>
   </section>
 
-  <!-- 3つの判断 -->
-  <div class="pillars">
-    <ol>
-      <li><span class="n">01</span><h3>入力をやめて、話すだけにした</h3><p>予定も、その日にやったことも、相棒との雑談から拾う。記録のための入力画面はつくらない。</p></li>
-      <li><span class="n">02</span><h3>世話の義務をなくした</h3><p>放っておいても弱らない。育てるゲームにありがちな「やらなきゃ」を、最初から外している。</p></li>
-      <li><span class="n">03</span><h3>確かめる手間を、戦いに置きかえた</h3><p>怪しい連絡を貼ると、手口ごとの敵が現れる。面倒な確認を、相棒を守る行動に変えた。</p></li>
-    </ol>
+  <div class="panel lilac">
+    <img class="peek tr px" src="img/cp/s/t05_3.png" alt="">
+    <div class="phone" style="max-width:640px;margin:0 auto"><img src="img/cp/loop.webp" width="520" height="360" alt="コンが一時的に進化し、警報とVSのカットインのあと、敵と戦う動き"></div>
   </div>
 
-  <!-- 01 課題 -->
-  <section class="ch" id="issue">
-    <div class="ch-h">
-      <span class="num">01 / ISSUE</span>
-      <h2>続かない記録と、<br>確かめなくなる連絡</h2>
-      <p class="lead">出発点は、自分が困っていた2つのことです。</p>
-    </div>
-    <div class="two">
-      <div class="card">
-        <span class="lbl">記録</span><span class="tag">本人の実感</span>
-        <h3>記録するアプリは、入力がつらくて続かなかった。</h3>
-        <p>予定や習慣を残すアプリはいくつも試したが、毎日入力すること自体が手間になり、やめてしまった。</p>
-      </div>
-      <div class="card">
-        <span class="lbl">連絡</span><span class="tag">本人の実感</span>
-        <h3>怪しいSMSやメールが来ても、だんだん確かめなくなる。</h3>
-        <div class="chain"><span>確かめるのが面倒</span><i>/</i><span>聞ける人がいない</span><i>/</i><span>調べても似た例が見つけにくい</span><i>→</i><span class="end">確かめなくなる</span></div>
+  <!-- 1 予定 -->
+  <section class="feat" id="talk">
+    <div class="head"><span class="no">01</span><h2>話すと、予定が入る。</h2></div>
+    <p class="say">「明日の15時に歯医者」と話すだけで、<b>Googleカレンダーに入ります</b>。打ち込まなくていい。</p>
+    <div class="panel teal">
+      <img class="peek br px" src="img/cp/s/t06_3.png" alt="">
+      <div class="pair">
+        <figure><div class="phone"><img src="img/cp/chat.webp" width="780" height="1000" alt="コンに話しかけた画面" loading="lazy"></div><figcaption>話しかける</figcaption></figure>
+        <figure><div class="phone"><img src="img/cp/sched.webp" width="780" height="1533" alt="予定が入った画面" loading="lazy"></div><figcaption>予定に入る</figcaption></figure>
       </div>
     </div>
   </section>
 
-  <!-- 02 発想 -->
-  <section class="ch" id="idea">
-    <div class="ch-h">
-      <span class="num">02 / IDEA</span>
-      <h2>手間を、相棒との関係に<br>置きかえる</h2>
-      <p class="lead">やることを増やさずに、やりたくなる形に変えることを考えました。</p>
-    </div>
-    <div class="turn">
-      <div class="row"><div class="from"><b>BEFORE</b>アプリに予定や記録を入力する</div><div class="arw">→</div><div class="to"><b>AFTER</b>コンに話しかける。予定と達成は会話から拾う</div></div>
-      <div class="row"><div class="from"><b>BEFORE</b>キャラクターの世話をしないと弱る</div><div class="arw">→</div><div class="to"><b>AFTER</b>世話の義務はない。話したぶん、やったぶんだけ育つ</div></div>
-      <div class="row"><div class="from"><b>BEFORE</b>怪しい連絡を、自分で調べて判断する</div><div class="arw">→</div><div class="to"><b>AFTER</b>貼るだけ。あやしければ敵として現れ、倒すと相棒が少し強くなる</div></div>
-    </div>
-    <div class="origin">
-      <p class="lbl" style="margin-bottom:10px">起点にした考え</p>
-      <p><q>相棒の使命は、守ること</q></p>
-      <p class="note" style="margin-top:10px">ゲームにすることで確かめる行動へそっと背中を押す、ナッジの考え方も取り入れています。</p>
-    </div>
-  </section>
-
-  <!-- 03 仕組み：生まれる -->
-  <section class="ch" id="how">
-    <div class="ch-h">
-      <span class="num">03 / BIRTH</span>
-      <h2>12問から、16の系統の<br>どれかが生まれる</h2>
-      <p class="lead">相棒は選ぶのではなく、答えから生まれます。口調は生まれた系統で決まり、育っても変わりません。</p>
-    </div>
-    <ol class="flow">
-      <li class="st"><p class="k">STEP 1</p><p class="v">12問に答える</p><p class="d">4つの軸 × 3問の二択</p></li>
-      <li class="st"><p class="k">STEP 2</p><p class="v">16の系統が決まる</p><p class="d">16タイプ診断の考え方をもとにした系統</p></li>
-      <li class="st"><p class="k">STEP 3</p><p class="v">たまごをつつく</p><p class="d">つつくとかえる。名前をつける</p></li>
-      <li class="st"><p class="k">STEP 4</p><p class="v">話す・予定・育つ</p><p class="d">ここから毎日の相棒になる</p></li>
-    </ol>
-    <figure class="evo">
-      <div class="frame scroller"><img src="img/cp/evo64.webp" width="2000" height="561" alt="16の系統それぞれの、4段階の進化の姿。合計64体のドット絵" loading="lazy"></div>
-      <figcaption class="cap">16系統 × 4段階 ＝ 64体。上から ニードル期、ベアリング期、ローズ期、メリディアン期。</figcaption>
-    </figure>
-    <div class="side">
-      <figure>
-        <div class="frame" style="border:1px solid var(--line);background:#050912"><img src="img/cp/evo4.webp" width="988" height="1108" alt="4つの系統を取り出した、4段階の進化" loading="lazy"></div>
-        <figcaption class="cap">4つの系統を取り出したもの。同じ系統の中で、動物や道具のモチーフが段階ごとに育っていく。</figcaption>
-      </figure>
-      <div>
-        <p class="lbl" style="margin-bottom:12px">17体目</p>
-        <div style="border:1px solid var(--line);background:#050912"><img src="img/cp/tabi.webp" width="760" height="168" alt="旅の子の4段階" loading="lazy"></div>
-        <p style="margin-top:16px;font-size:14px">性格の傾きがどの軸でも真ん中に近いまま育つと、進化のときに、診断には出てこない17体目「旅の子」になります。</p>
+  <!-- 2 進化 -->
+  <section class="feat" id="grow">
+    <div class="head"><span class="no">02</span><h2>話すほど、進化する。</h2></div>
+    <p class="say">会話と、現実での「走った」「勉強した」の報告で育ちます。<b>世話をしなくても弱りません。</b></p>
+    <div class="panel amber">
+      <div class="evo4">
+        <figure><img class="px" src="img/cp/s/t06_1.png" width="80" height="80" alt="ニードル期" loading="lazy"><figcaption>ニードル期</figcaption></figure>
+        <figure><img class="px" src="img/cp/s/t06_2.png" width="80" height="80" alt="ベアリング期" loading="lazy"><figcaption>ベアリング期</figcaption></figure>
+        <figure><img class="px" src="img/cp/s/t06_3.png" width="80" height="80" alt="ローズ期" loading="lazy"><figcaption>ローズ期</figcaption></figure>
+        <figure><img class="px" src="img/cp/s/t06_4.png" width="80" height="80" alt="メリディアン期" loading="lazy"><figcaption>メリディアン期</figcaption></figure>
       </div>
+      <div class="evo-note"><span>12問の診断で 16系統のどれかが生まれる</span><span>4段階 × 16系統 ＝ 64体</span><a href="#dex" style="font-size:13px;font-weight:700;color:#3b2a06">全部見る ↓</a></div>
     </div>
   </section>
 
-  <!-- 04 育つ -->
-  <section class="ch" id="grow">
-    <div class="ch-h">
-      <span class="num">04 / GROW</span>
-      <h2>話したぶん、やったぶんで<br>進化する</h2>
-      <p class="lead">会話と、現実での達成の報告でゲージがたまります。数値は画面に出しません。</p>
-    </div>
-    <div class="meter">
-      <table>
-        <thead><tr><th>たまるもの</th><th>増え方</th><th>1日の上限</th></tr></thead>
-        <tbody>
-          <tr><td>会話</td><td class="n">+1</td><td>8回</td></tr>
-          <tr><td>達成の報告（走った、勉強した など）</td><td class="n">+2</td><td>3回</td></tr>
-        </tbody>
-      </table>
-      <table style="margin-top:28px">
-        <thead><tr><th>段階</th><th>ゲージ</th><th>達成の数</th></tr></thead>
-        <tbody>
-          <tr><td class="s">ニードル期</td><td class="n">0</td><td class="n">0</td></tr>
-          <tr><td class="s">ベアリング期</td><td class="n">20</td><td class="n">0</td></tr>
-          <tr><td class="s">ローズ期</td><td class="n">120</td><td class="n">8</td></tr>
-          <tr><td class="s">メリディアン期</td><td class="n">400</td><td class="n">40</td></tr>
-        </tbody>
-      </table>
-      <p class="note" style="margin-top:14px">上の段階は、話すだけでは届かず、現実での達成も要る。ほかに「おせわ」「きたえる」「たいせん」がそれぞれ1日5回まで。たいせんは「ため・撃つ・守る」の読み合いです。</p>
-    </div>
-  </section>
-
-  <!-- 05 予定 -->
-  <section class="ch" id="plan">
-    <div class="ch-h">
-      <span class="num">05 / PLAN</span>
-      <h2>話しかけると、<br>予定が入る</h2>
-      <p class="lead">「明日の15時に歯医者」と話すと、Googleカレンダーに入ります。変更や取り消しも会話でできます。予定が終わって6時間以内には、コンから「どうだった？」と聞いてきます。</p>
-    </div>
-    <div class="shots c2 indent" style="max-width:760px">
-      <figure><div class="screen"><img src="img/cp/chat.webp" width="780" height="1000" alt="コンに明日の15時に歯医者と話しかけた画面" loading="lazy"></div><figcaption><b>TALK</b>話すだけ。入力画面はない</figcaption></figure>
-      <figure><div class="screen"><img src="img/cp/sched.webp" width="780" height="1533" alt="よていタブに歯医者が入った画面" loading="lazy"></div><figcaption><b>SCHEDULE</b>会話から入った予定が並ぶ</figcaption></figure>
-    </div>
-  </section>
-
-  <!-- 06 見張り -->
-  <section class="ch" id="guard">
-    <div class="ch-h">
-      <span class="num">06 / GUARD</span>
-      <h2>怪しい連絡を、<br>敵として倒す</h2>
-      <p class="lead">届いたSMS、メール、URLを貼ると、コンが見ます。あやしいときだけ、手口ごとの敵が現れます。</p>
-    </div>
-    <ol class="pipe">
-      <li><p class="k">01</p><p class="v">貼る</p><p class="d">届いた文面やURLをそのまま貼る</p></li>
-      <li><p class="k">02</p><p class="v">見る</p><p class="d">あやしい／わからない を判定し、理由と確かめ方を出す</p></li>
-      <li class="hot"><p class="k">03</p><p class="v">戦う</p><p class="d">あやしいときだけ。コンが一時的に進化して迎え撃つ</p></li>
-      <li><p class="k">04</p><p class="v">記録</p><p class="d">日付、敵、結果、確かめ方を残す（30件まで）</p></li>
-    </ol>
-
-    <div class="shots c4">
-      <figure><div class="screen"><img src="img/cp/judge.webp" width="780" height="1688" alt="再配達を装った文面を貼り、あやしいと判定された画面" loading="lazy"></div><figcaption><b>JUDGE</b>判定と確かめ方<span>理由と、取るべき行動を短く出す</span></figcaption></figure>
-      <figure><div class="screen"><img src="img/cp/evolve.webp" width="780" height="540" alt="コンが光に包まれて進化する瞬間" loading="lazy"></div><div class="screen" style="margin-top:12px"><img src="img/cp/temp.webp" width="780" height="540" alt="一時進化したコンの姿" loading="lazy"></div><figcaption><b>EVOLVE</b>一時的に1段階進化<span>約3.4秒</span></figcaption></figure>
-      <figure><div class="screen"><img src="img/cp/vs.webp" width="780" height="540" alt="警報 ウイルス出現 のVSカットイン" loading="lazy"></div><div class="screen" style="margin-top:12px"><img src="img/cp/battle.webp" width="780" height="887" alt="コンと再配達ウイルスが炎を撃ち合う戦闘画面" loading="lazy"></div><figcaption><b>BATTLE</b>警報とVSのカットイン<span>約2.1秒。そのあと、ため・撃つ・守るの戦い</span></figcaption></figure>
-      <figure><div class="screen"><img src="img/cp/win.webp" width="780" height="840" alt="撃退したあとのコンの一言" loading="lazy"></div><div class="screen" style="margin-top:12px"><img src="img/cp/lose.webp" width="780" height="840" alt="逃げられたときの画面" loading="lazy"></div><figcaption><b>RESULT</b>勝っても負けても、やることは同じ<span>勝つと手口をひとこと解説。負けても「リンクは開かない」は変わらない</span></figcaption></figure>
-    </div>
-
-    <div style="margin-top:48px">
-      <div>
-        <p class="lbl" style="margin-bottom:12px">手口ごとの敵（7種）</p>
-        <div class="enemies">
-          <figure><img src="img/cp/en_deliv.webp" width="300" height="292" alt="" loading="lazy"><figcaption>再配達ウイルス<span>宅配の偽通知</span></figcaption></figure>
-          <figure><img src="img/cp/en_bill.webp" width="300" height="292" alt="" loading="lazy"><figcaption>請求ワーム<span>未払い・料金請求</span></figcaption></figure>
-          <figure><img src="img/cp/en_prize.webp" width="300" height="292" alt="" loading="lazy"><figcaption>当選トロイ<span>当選・プレゼント</span></figcaption></figure>
-          <figure><img src="img/cp/en_login.webp" width="300" height="292" alt="" loading="lazy"><figcaption>なりすましフィッシュ<span>偽ログイン</span></figcaption></figure>
-          <figure><img src="img/cp/en_money.webp" width="300" height="292" alt="" loading="lazy"><figcaption>もうけ話ミミック<span>投資・副業の誘い</span></figcaption></figure>
-          <figure><img src="img/cp/en_mask.webp" width="300" height="292" alt="" loading="lazy"><figcaption>なりすましマスク<span>知人・機関のふり</span></figcaption></figure>
-          <figure><img src="img/cp/en_other.webp" width="300" height="292" alt="" loading="lazy"><figcaption>グリッチ<span>そのほか</span></figcaption></figure>
+  <!-- 3 見張り -->
+  <section class="feat" id="guard">
+    <div class="head"><span class="no">03</span><h2>怪しい連絡を、一緒に倒す。</h2></div>
+    <p class="say">届いたSMSやメールを貼ると、コンが見ます。<b>あやしいときだけ、手口ごとの敵が現れます。</b></p>
+    <div class="panel coral">
+      <div class="steps">
+        <figure><span class="n">1 貼る</span><div class="phone"><img src="img/cp/judge.webp" width="780" height="1688" alt="文面を貼り、あやしいと判定された画面" loading="lazy"></div><figcaption>判定と、確かめ方が出る</figcaption></figure>
+        <figure><span class="n">2 進化</span><div class="phone"><img src="img/cp/temp.webp" width="780" height="540" alt="一時進化したコン" loading="lazy"></div><figcaption>コンが一時的に進化</figcaption></figure>
+        <figure><span class="n">3 戦う</span><div class="phone"><img src="img/cp/vs.webp" width="780" height="540" alt="VSのカットイン" loading="lazy"></div><div class="phone" style="margin-top:10px"><img src="img/cp/battle.webp" width="780" height="887" alt="戦闘画面" loading="lazy"></div><figcaption>ため・撃つ・守る</figcaption></figure>
+        <figure><span class="n">4 撃退</span><div class="phone"><img src="img/cp/win.webp" width="780" height="840" alt="撃退したあとのコンの一言" loading="lazy"></div><figcaption>手口をひとこと解説</figcaption></figure>
+      </div>
+      <p class="swipe">横にスワイプ</p>
+      <div style="margin-top:clamp(28px,4vw,44px);padding-top:clamp(22px,3vw,32px);border-top:1px solid rgba(90,32,20,.18)">
+        <p style="font-size:13px;font-weight:700;color:#3a130b;margin-bottom:12px">手口ごとの敵 7種</p>
+        <div class="foes">
+          <figure><img class="px" src="img/cp/s/en_deliv.png" width="112" height="112" alt="" loading="lazy"><figcaption>再配達ウイルス<span>宅配の偽通知</span></figcaption></figure>
+          <figure><img class="px" src="img/cp/s/en_bill.png" width="112" height="112" alt="" loading="lazy"><figcaption>請求ワーム<span>未払い・料金請求</span></figcaption></figure>
+          <figure><img class="px" src="img/cp/s/en_prize.png" width="112" height="112" alt="" loading="lazy"><figcaption>当選トロイ<span>当選・プレゼント</span></figcaption></figure>
+          <figure><img class="px" src="img/cp/s/en_login.png" width="112" height="112" alt="" loading="lazy"><figcaption>なりすましフィッシュ<span>偽ログイン</span></figcaption></figure>
+          <figure><img class="px" src="img/cp/s/en_money.png" width="112" height="112" alt="" loading="lazy"><figcaption>もうけ話ミミック<span>投資・副業</span></figcaption></figure>
+          <figure><img class="px" src="img/cp/s/en_mask.png" width="112" height="112" alt="" loading="lazy"><figcaption>なりすましマスク<span>知人・機関のふり</span></figcaption></figure>
+          <figure><img class="px" src="img/cp/s/en_other.png" width="112" height="112" alt="" loading="lazy"><figcaption>グリッチ<span>そのほか</span></figcaption></figure>
         </div>
-        <p class="note" style="margin-top:12px">敵の強さはコンの段階の前後1段階。どれもオリジナルのデザインです。</p>
       </div>
-    </div>
-
-    <div class="side" style="margin-top:56px">
-      <div>
-        <p class="lbl" style="margin-bottom:14px">判定のしくみ</p>
-        <p style="font-size:14.5px">ふだんは Claude が文面を読んで判定します。日本でよくある手口（再配達、未払い、当選、偽ログイン、投資や副業、なりすまし）と、URLのドメイン、急がせる言い方、お金や個人情報を求める言い方を見ます。</p>
-        <p style="font-size:14.5px;margin-top:1em">AIにつながらないときは、手元の言葉の点数で判定します。</p>
-        <div class="score" style="margin:18px 0 0">
-          <ul>
-            <li>手口に当てはまる言葉</li><li>1</li>
-            <li>急がせる言葉</li><li>1</li>
-            <li>お金・個人情報を求める言葉</li><li>1</li>
-            <li>あやしいURL</li><li>2</li>
-          </ul>
-          <p class="th">合計3点以上で <b>あやしい</b>。手元の判定は「安全」とは言わない。</p>
-        </div>
-        <p class="note" style="margin-top:16px">勝つと「守り」が+2（1日2回まで）。はじめての撃退は「おもいで」に残ります。見張りの戦いは、1日の対戦回数を使いません。</p>
-      </div>
-      <figure>
-        <div class="screen" style="border-radius:14px"><img src="img/cp/rec.webp" width="780" height="1688" alt="撃退記録の一覧" loading="lazy"></div>
-        <figcaption class="cap">撃退記録。日付、敵、結果、確かめ方の4つだけを残す。</figcaption>
-      </figure>
     </div>
   </section>
 
-  <!-- 07 触ってみる -->
-  <section class="ch" id="try">
-    <div class="ch-h">
-      <span class="num">07 / TRY</span>
-      <h2>このページで、<br>実際に動かせます</h2>
-      <p class="lead">アプリ本体をそのまま入れています。診断から、コンが生まれ、見張りで戦うところまで、ひと通り試せます。</p>
+  <!-- 数字 -->
+  <div class="nums">
+    <div><b>12<small>問</small></b><span>診断</span></div>
+    <div><b>64<small>体</small></b><span>16系統 × 4段階<br>＋隠れキャラ</span></div>
+    <div><b>7<small>種</small></b><span>手口ごとの敵</span></div>
+    <div><b>4<small>段階</small></b><span>話したぶん、<br>やったぶんで進化</span></div>
+    <div><b>78<small>版</small></b><span>自分で使いながら改修</span></div>
+  </div>
+
+  <!-- なぜ -->
+  <section class="sec" id="why">
+    <h2>なぜ作ったか</h2>
+    <p class="say">自分が困っていたことを、やることを増やさずに、やりたくなる形に置きかえました。</p>
+    <ul class="why">
+      <li><p class="b">記録アプリに毎日入力する</p><p class="a">話しかければ入るようにした</p><p class="r">入力が手間で、記録アプリは続かなかった。</p></li>
+      <li><p class="b">世話をしないと弱る</p><p class="a">世話の義務をなくした</p><p class="r">放っておいても弱らない。話したぶん、やったぶんで育つ。</p></li>
+      <li><p class="b">怪しい連絡を自分で調べる</p><p class="a">貼るだけで、戦いになる</p><p class="r">面倒で、聞ける人もいなくて、だんだん確かめなくなっていた。</p></li>
+    </ul>
+    <p class="note" style="margin-top:14px">起点にした考えは「相棒の使命は、守ること」。どれも本人の実感から。</p>
+  </section>
+
+  <!-- 64体 -->
+  <section class="sec" id="dex">
+    <h2>64体、すべて描き分け</h2>
+    <p class="say">12問の答えで、16の系統のどれかが生まれます。段階を切りかえて見られます。</p>
+    <div class="dex">
+      <div class="tabs" role="group" aria-label="段階">
+        <button type="button" data-s="1">ニードル期</button>
+        <button type="button" data-s="2">ベアリング期</button>
+        <button type="button" data-s="3">ローズ期</button>
+        <button type="button" data-s="4" aria-pressed="true">メリディアン期</button>
+      </div>
+      <div class="grid16" id="grid16"></div>
+      <div class="extra">
+        <div class="row"><img class="px" src="img/cp/s/tabi_1.png" alt="" loading="lazy"><img class="px" src="img/cp/s/tabi_2.png" alt="" loading="lazy"><img class="px" src="img/cp/s/tabi_3.png" alt="" loading="lazy"><img class="px" src="img/cp/s/tabi_4.png" alt="" loading="lazy"></div>
+        <p><b style="color:var(--ink)">隠れキャラ「旅の子」</b>　性格の傾きがどの軸でも真ん中に近いまま育つと、進化のときにこの姿になります。診断では出てきません。</p>
+      </div>
     </div>
+  </section>
+
+  <!-- 触る -->
+  <section class="sec" id="try">
+    <h2>このページで、動かせます</h2>
+    <p class="say">アプリ本体をそのまま入れています。診断から、見張りで戦うところまで試せます。</p>
     <div class="try">
-      <div class="phone" id="phone">
-        <button class="start" type="button" id="start" style="background-image:url(img/cp/chat.webp)"><span>起動する</span><small>押すと、この枠の中でアプリが立ち上がります</small></button>
+      <div class="frame" id="frame">
+        <button class="start" type="button" id="start" style="background-image:url(img/cp/chat.webp)"><b>起動する</b><small>この枠の中でアプリが立ち上がります</small></button>
       </div>
       <div>
-        <ol class="howto">
-          <li><b>01</b>12問に答えて、たまごをつつく（右上の「とばす」で冒頭は飛ばせます）</li>
-          <li><b>02</b>名前をつけて、話しかけてみる。「明日の15時に歯医者」など</li>
-          <li><b>03</b>「たいせん」→「見張り」に、下の文面を貼って「見てもらう」</li>
+        <ol class="how">
+          <li><b>01</b><span>12問に答えて、たまごをつつく（冒頭は右上の「とばす」で飛ばせます）</span></li>
+          <li><b>02</b><span>名前をつけて話しかける。「明日の15時に歯医者」など</span></li>
+          <li><b>03</b><span>「たいせん」→「見張り」に下の文面を貼って「見てもらう」</span></li>
         </ol>
         <div class="samples">
-          <div class="s"><div class="row"><span class="lbl">宅配の偽通知</span><button type="button" data-t="お荷物のお届けにあがりましたが、不在のため持ち帰りました。本日中に下記より再配達のお手続きをお願いします。http://takuhai-jp.example/r/8x2k">コピー</button></div><p>お荷物のお届けにあがりましたが、不在のため持ち帰りました。本日中に下記より再配達のお手続きをお願いします。http://takuhai-jp.example/r/8x2k</p></div>
-          <div class="s"><div class="row"><span class="lbl">料金請求の偽通知</span><button type="button" data-t="【重要】ご利用料金の未払いがあります。24時間以内にお支払いがない場合、ご利用を停止します。http://pay-check-jp.example/">コピー</button></div><p>【重要】ご利用料金の未払いがあります。24時間以内にお支払いがない場合、ご利用を停止します。http://pay-check-jp.example/</p></div>
-          <div class="s"><div class="row"><span class="lbl">ふつうの連絡</span><button type="button" data-t="明日の飲み会、19時に駅前でいい？">コピー</button></div><p>明日の飲み会、19時に駅前でいい？</p></div>
+          <div class="s r"><div class="row"><span>宅配の偽通知</span><button type="button" data-t="お荷物のお届けにあがりましたが、不在のため持ち帰りました。本日中に下記より再配達のお手続きをお願いします。http://takuhai-jp.example/r/8x2k">コピー</button></div><p>お荷物のお届けにあがりましたが、不在のため持ち帰りました。本日中に下記より再配達のお手続きをお願いします。http://takuhai-jp.example/r/8x2k</p></div>
+          <div class="s r"><div class="row"><span>料金請求の偽通知</span><button type="button" data-t="【重要】ご利用料金の未払いがあります。24時間以内にお支払いがない場合、ご利用を停止します。http://pay-check-jp.example/">コピー</button></div><p>【重要】ご利用料金の未払いがあります。24時間以内にお支払いがない場合、ご利用を停止します。http://pay-check-jp.example/</p></div>
+          <div class="s g"><div class="row"><span>ふつうの連絡</span><button type="button" data-t="明日の飲み会、19時に駅前でいい？">コピー</button></div><p>明日の飲み会、19時に駅前でいい？</p></div>
         </div>
-        <p class="note" style="margin-top:16px">このページでは AI につながらないため、判定は手元の言葉の点数による「かんたん判定」、会話もかんたんな返事になります。Googleカレンダーにはつながりません。文面とURLは試し用の架空のものです。</p>
+        <p class="note" style="margin-top:14px">このページでは AI につながらないので、判定は手元の言葉の点数による「かんたん判定」、会話もかんたんな返事になります。Googleカレンダーにはつながりません。</p>
       </div>
     </div>
   </section>
 
-  <!-- 08 線引き -->
-  <section class="ch" id="line">
-    <div class="ch-h">
-      <span class="num">08 / BOUNDARY</span>
-      <h2>ゲームにしても、<br>ゆずらないこと</h2>
-      <p class="lead">遊びにすると、判定を信じすぎたり、勝ち負けで行動が変わったりするおそれがあります。そこで次のことを決め、すべて実装しています。</p>
-    </div>
+  <!-- 線引き -->
+  <section class="sec" id="line">
+    <h2>ゲームにしても、ゆずらないこと</h2>
+    <p class="say">遊びにした分、判定を信じすぎないように決めたことです。すべて実装しています。</p>
     <ul class="rules">
-      <li>いつも <q>判定は目安。最後は自分で確かめる。</q> と出す</li>
+      <li>いつも「判定は目安。最後は自分で確かめる。」と出す</li>
       <li>判断がつかないときは「保留」にして、戦わない</li>
-      <li>AIにつながらないときの判定は、「安全」とは言わない</li>
-      <li>負けても、取るべき行動は変えない<small><q>逃げられた。でも中身は変わらない。リンクは開かないでおこう。</q></small></li>
-      <li>貼った文面は保存しない</li>
-      <li>文面の中に書かれた指示には従わない<small>ただのデータとして扱う</small></li>
-      <li>見張りは、1日の対戦回数を減らさない</li>
+      <li>負けても、取るべき行動は変えない<span>「逃げられた。でも中身は変わらない。リンクは開かないでおこう。」</span></li>
+      <li>AIにつながらないときは「安全」と言わない</li>
+      <li>貼った文面は保存しない。文面の中の指示には従わない</li>
       <li>コンは診断や説教をしない</li>
     </ul>
   </section>
 
-  <!-- 09 結果 -->
-  <section class="ch" id="result">
-    <div class="ch-h">
-      <span class="num">09 / STATUS</span>
-      <h2>いま言えること、<br>まだ言えないこと</h2>
-    </div>
-    <div class="res">
-      <div class="card">
-        <span class="tag fact">事実</span>
-        <h3>いま言えること</h3>
-        <ul>
-          <li>使っているのは自分だけ<span>claude.ai 上の非公開のアプリとして、iPhone と PC で使っている</span></li>
-          <li>改修を重ねて現在78版</li>
-          <li>ここに書いた仕組みと線引きは、すべて実装済み</li>
-        </ul>
-      </div>
-      <div class="card">
-        <span class="tag">未確認</span>
-        <h3>まだ言えないこと</h3>
-        <ul>
-          <li>判定の精度、会話の質、使う頻度<span>利用ログをとっていないため、数字では言えない</span></li>
-          <li>ほかの人に使ってもらった検証<span>想定している使い手は、高齢の人や若い人。まだ確かめていない</span></li>
-          <li>配ることはまだできない<span>AIは Claude を通して動かしている。配るには、組み込み方から考え直す必要がある</span></li>
-        </ul>
-      </div>
+  <!-- 今 -->
+  <section class="sec" id="now">
+    <h2>いま言えること、まだ言えないこと</h2>
+    <div class="now" style="margin-top:24px">
+      <div class="ok"><h3><i>事実</i>いま言えること</h3><ul>
+        <li>自分で、iPhone と PC で日常的に使っている<span>claude.ai 上の非公開アプリとして</span></li>
+        <li>改修を重ねて、現在78版</li>
+        <li>このページに書いた仕組みは、すべて実装済み</li>
+      </ul></div>
+      <div class="no"><h3><i>未確認</i>まだ言えないこと</h3><ul>
+        <li>判定の精度、使う頻度<span>利用ログをとっていない</span></li>
+        <li>ほかの人での検証<span>想定は高齢の人や若い人。まだ試していない</span></li>
+        <li>配布<span>AIを Claude 経由で動かしているため、このままでは配れない</span></li>
+      </ul></div>
     </div>
   </section>
 
+  <!-- 詳細 -->
+  <section class="sec" id="more">
+    <h2 style="font-size:20px;margin-bottom:12px">くわしい仕組み</h2>
+    <details>
+      <summary>育ち方の数字</summary>
+      <div class="in">
+        <table><tr><th>たまるもの</th><th>増え方</th><th>1日の上限</th></tr>
+          <tr><td>会話</td><td class="n">+1</td><td>8回</td></tr>
+          <tr><td>達成の報告</td><td class="n">+2</td><td>3回</td></tr></table>
+        <table><tr><th>段階</th><th>ゲージ</th><th>達成の数</th></tr>
+          <tr><td>ニードル期</td><td class="n">0</td><td class="n">0</td></tr>
+          <tr><td>ベアリング期</td><td class="n">20</td><td class="n">0</td></tr>
+          <tr><td>ローズ期</td><td class="n">120</td><td class="n">8</td></tr>
+          <tr><td>メリディアン期</td><td class="n">400</td><td class="n">40</td></tr></table>
+        <p>数値は画面に出しません。「おせわ」「きたえる」「たいせん」は各1日5回まで。口調は生まれた系統で決まり、育っても変わりません。</p>
+      </div>
+    </details>
+    <details>
+      <summary>見張りの判定</summary>
+      <div class="in">
+        <p>ふだんは Claude が文面を読んで判定します。日本でよくある手口、URLのドメイン、急がせる言い方、お金や個人情報を求める言い方を見ます。</p>
+        <p style="margin-top:10px">AIにつながらないときは手元の点数で判定します。手口の言葉 1点、急がせる言葉 1点、お金・個人情報 1点、あやしいURL 2点。合計3点以上で「あやしい」。</p>
+        <p style="margin-top:10px">戦う前にコンが約3.4秒だけ1段階進化し、警報とVSのカットインが約2.1秒入ります。敵の強さはコンの段階の前後1段階。勝つと「守り」+2（1日2回まで）。見張りの戦いは1日の対戦回数を使いません。記録は日付・敵・結果・確かめ方の4つを30件まで。</p>
+      </div>
+    </details>
+    <details>
+      <summary>予定の連携</summary>
+      <div class="in"><p>会話から予定の登録、変更、取り消しができます（Googleカレンダー）。予定が終わって6時間以内に、コンから「どうだった？」と聞いてきます。</p></div>
+    </details>
+    <details>
+      <summary>掲載画面について</summary>
+      <div class="in"><p>画面は撮影用のデータで撮っています。名前（ソラ、テスト）、予定、URLは架空です。会話の返事と判定の文面は撮影用に用意したもので、実際には Claude がその都度書きます。勝ち負けの台詞、手口の名前、キャラクターはアプリのものです。画面右上のタイプ表示は省いています。</p></div>
+    </details>
+  </section>
+
   <footer class="end">
-    <p>掲載している画面は、撮影用のデータで撮っています。名前（ソラ、テスト）、予定、URLは架空のものです。会話の返事と判定の文面は撮影用に用意したもので、実際には Claude がその都度書きます。勝ったとき・負けたときの台詞と、手口の名前はアプリのものです。画面右上のタイプ表示は省いています。</p>
-    <p style="margin-top:10px">企画・設計・デザイン・制作：山﨑源大（AI を使って制作）</p>
-    <a class="back" href="./">← ポートフォリオにもどる</a>
+    <p>CONPASS　企画・設計・キャラクター・開発：山﨑源大（AI を使って制作）</p>
+    <a class="btn" href="./">← ポートフォリオにもどる</a>
   </footer>
 
 </div>
@@ -531,24 +435,50 @@ section.ch{padding:clamp(64px,10vw,128px) 0 0}
 
 <script>
 (function(){
-  var st=document.getElementById('start');
-  st.addEventListener('click',function(){
-    st.querySelector('span').textContent='読み込み中';
+  var NAMES=['ノクスコン','プリズコン','レギスコン','ボルトコン','オーロコン','ルナコン','ソルコン','イリスコン','フォートコン','ラムコン','ピラーコン','ハースコン','リンクスコン','パレットコン','ダッシュコン','ミラーコン'];
+  var ST=['ニードル期','ベアリング期','ローズ期','メリディアン期'];
+  function src(i,s){return 'img/cp/s/t'+(i<10?'0':'')+i+'_'+s+'.png';}
+  /* 冒頭：コンが段階ごとに進化し、ひと回りすると別の系統に替わる */
+  var mon=document.getElementById('mon'),lab=document.getElementById('stage');
+  var order=[6,16,1,13,8,9,4,14,5,11,2,15,7,10,3,12],oi=0,s=1;
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for(var k=0;k<order.length;k++)for(var j=1;j<=4;j++){var p=new Image();p.src=src(order[k],j);}
+  if(!reduce)setInterval(function(){
+    s++; if(s>4){s=1;oi=(oi+1)%order.length;}
+    mon.classList.add('fade');
+    setTimeout(function(){var t=order[oi];mon.src=src(t,s);lab.textContent=NAMES[t-1]+' ・ '+ST[s-1];mon.classList.remove('fade');},250);
+  },1400);
+  /* 64体 */
+  var g=document.getElementById('grid16'),h='';
+  for(var i=1;i<=16;i++)h+='<figure><img class="px" width="80" height="80" loading="lazy" alt="'+NAMES[i-1]+'" data-i="'+i+'" src="'+src(i,4)+'"><figcaption>'+NAMES[i-1]+'</figcaption></figure>';
+  g.innerHTML=h;
+  document.querySelectorAll('.tabs button').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('.tabs button').forEach(function(x){x.setAttribute('aria-pressed','false')});
+      b.setAttribute('aria-pressed','true');
+      var st=b.getAttribute('data-s');
+      g.querySelectorAll('img').forEach(function(im){im.src=src(+im.getAttribute('data-i'),st);});
+    });
+  });
+  /* デモ */
+  var stt=document.getElementById('start');
+  stt.addEventListener('click',function(){
+    stt.querySelector('b').textContent='読み込み中';
     fetch('demo/conpass.txt').then(function(r){return r.text()}).then(function(t){
       var f=document.createElement('iframe');
       f.setAttribute('sandbox','allow-scripts allow-forms allow-modals allow-popups');
       f.setAttribute('title','CONPASS デモ');
-      f.srcdoc=t; document.getElementById('phone').appendChild(f); st.remove();
-    }).catch(function(){st.querySelector('span').textContent='読み込めませんでした';});
+      f.srcdoc=t;document.getElementById('frame').appendChild(f);stt.remove();
+    }).catch(function(){stt.querySelector('b').textContent='読み込めませんでした';});
   });
+  function fb(t){var a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove();}
   document.querySelectorAll('.samples button').forEach(function(b){
     b.addEventListener('click',function(){
       var t=b.getAttribute('data-t');
-      var done=function(){b.textContent='コピーした';b.classList.add('ok');setTimeout(function(){b.textContent='コピー';b.classList.remove('ok')},1600)};
-      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,function(){fb(t);done()})}else{fb(t);done()}
+      var done=function(){b.textContent='コピーした';setTimeout(function(){b.textContent='コピー'},1600)};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){fb(t);done()});else{fb(t);done()}
     });
   });
-  function fb(t){var a=document.createElement('textarea');a.value=t;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove()}
 })();
 </script>
 </body>
