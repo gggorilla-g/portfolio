@@ -725,6 +725,26 @@ html.reduce .lineup .pouch{animation:none}
 .c-heads{display:flex; gap:clamp(10px,1.4vw,18px); align-items:flex-end; flex-wrap:wrap}
 .c-heads .c-pic{width:auto; max-width:100%; height:clamp(200px,34vh,340px); max-height:none; background:none; box-shadow:0 0 0 .5px rgba(0,0,0,.08), 0 18px 18px -12px rgba(0,0,0,.22)}
 .c-about .c-body p{max-width:38em}
+/* 数字で見る（県警：受験者数の推移） */
+.c-fig{grid-column:4/13; min-width:0; display:grid; grid-template-columns:minmax(0,4fr) minmax(0,7fr); gap:clamp(24px,4vw,64px); align-items:end}
+.c-fig .cf-big{margin:0; letter-spacing:normal}
+.c-fig .cf-big dt{font-size:11px; color:var(--steel)}
+.c-fig .cf-big dd{margin:6px 0 0; font:100 clamp(80px,9.5vw,156px)/.9 var(--display); letter-spacing:-.05em; font-variant-numeric:lining-nums tabular-nums; white-space:nowrap}
+.c-fig .cf-big dd i{font-style:normal; font-size:.28em; letter-spacing:0; margin-left:.12em}
+.c-fig svg{display:block; width:100%; height:auto; overflow:visible}
+.c-fig .ax{stroke:var(--hair); stroke-width:1}
+.c-fig .ln{fill:none; stroke:var(--ink); stroke-width:2.2; stroke-linejoin:round; stroke-linecap:round}
+.c-fig .dt{fill:var(--paper); stroke:var(--ink); stroke-width:2}
+.c-fig .dt.on{fill:var(--ink)}
+.c-fig .v{font:400 15px/1 var(--text); fill:var(--ink); font-variant-numeric:lining-nums tabular-nums}
+.c-fig .v.on{font-size:22px}
+.c-fig .yr{font:400 12px/1 var(--text); fill:var(--steel)}
+.c-fig .tag{font:400 12px/1 var(--text); fill:var(--ink)}
+.c-fig .src{grid-column:1/-1; margin:0; font-size:11px; line-height:1.8; color:var(--steel); max-width:none}
+.c-fig.go .ln{animation:cfDraw 1.6s cubic-bezier(.6,0,.2,1) both}
+@keyframes cfDraw{from{stroke-dashoffset:var(--len)} to{stroke-dashoffset:0}}
+@media (max-width:820px){ .c-fig{grid-column:1/-1; grid-template-columns:minmax(0,1fr)} }
+@media (prefers-reduced-motion:reduce){ .c-fig .ln{stroke-dashoffset:0 !important} .c-fig.go .ln{animation:none} }
 
 /* 解決したこと・流れ・デモ */
 .c-solve{margin:0}
@@ -2935,6 +2955,10 @@ var CASES = {
   police26: {
     title: '鹿児島県警察<br>採用パンフレット',
     meta: [['クライアント', '鹿児島県警察'], ['形式', 'パンフレット　A4、プロモーションムービー'], ['担当', 'アートディレクション、エディトリアルデザイン、コピーライティング、映像ディレクション'], ['経緯', 'コンペで採択'], ['受験倍率（警察官B）', '2025年度 1.7倍 → 2026年度 4.0倍'], ['受験者数（警察官全体）', '2025年度 230人 → 2026年度 341人']],
+    fig: { h: '受験者数', bigLabel: '警察官採用試験の受験者数　2025年度 → 2026年度', big: '+111', unit: '人', min: 200, max: 350,
+      pts: [['2023年度', 266], ['2024年度', 226], ['2025年度', 230], ['2026年度', 341, 'このパンフレットの年度']],
+      aria: '警察官採用試験の受験者数。2023年度266人、2024年度226人、2025年度230人、2026年度341人',
+      src: '第1次試験の受験者数。警察官A・Bの合計（先行実施枠、職務経験者対象、第2回を含む。再採用と技術職員は除く）。試験の区分は年度によって異なる。出典：鹿児島県警察「警察官等採用試験の状況」令和5〜8年度' },
     about: ['鹿児島県警察の職員募集用パンフレットです。企画提案のコンペで採択され、表紙から巻末までの構成、コピー、アートディレクション、デザインを担当しました。',
       '前年度版は、かっこよさを前に出し、斜めのレイアウトを多く使いました。ただ、警察への信頼が問われていた時期で、受験するかどうかには本人だけでなく保護者の同意も同じくらい必要だと考えました。そこで今回は、本人が家に持ち帰り、親にも読んでもらえるように組み立て直しています。',
       '表紙のコピーは、手紙の調子の「次の君へ」です。巻頭の「君こそが鹿児島の未来」は、まず読む人を認めるところから入って、そのあとの情報を受け取ってもらいやすくするためのコピーです。中面は部署ごとに職員1人の経歴と仕事内容を見開きで紹介し、離島勤務、国際社会に向けたキャリア、女性職員の対談、ワークライフバランスの特集4本、給与・福利厚生・採用までの流れで締めます。',
@@ -3426,6 +3450,30 @@ var CASE = (function(){
     var u = MOCK.url(k);
     return '<div class="c-img' + (k.indexOf('cap') === 0 ? ' tall' : '') + '"' + (u ? ' style="background-image:url(' + u + ')"' : '') + ' role="img" aria-label="仮の画像"></div>';
   }
+  /* 数字で見る：大きい数字と、自作の折れ線グラフ（SVG） */
+  function figHTML(f){
+    var W = 640, H = 320, L = 24, R = 24, T = 44, B = 58, n = f.pts.length;
+    var lo = f.min, hi = f.max;
+    var X = function(i){ return L + (W - L - R) * i / (n - 1); };
+    var Y = function(v){ return T + (H - T - B) * (1 - (v - lo) / (hi - lo)); };
+    var d = f.pts.map(function(p, i){ return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(p[1]).toFixed(1); }).join(' ');
+    var len = 0; for (var i = 1; i < n; i++){ len += Math.hypot(X(i) - X(i - 1), Y(f.pts[i][1]) - Y(f.pts[i - 1][1])); }
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + f.aria + '">';
+    s += '<line class="ax" x1="0" x2="' + W + '" y1="' + (H - B + 10) + '" y2="' + (H - B + 10) + '"/>';
+    s += '<path class="ln" d="' + d + '" style="stroke-dasharray:' + len.toFixed(0) + ';stroke-dashoffset:' + len.toFixed(0) + ';--len:' + len.toFixed(0) + '"/>';
+    f.pts.forEach(function(p, i){
+      var on = i === n - 1, x = X(i), y = Y(p[1]);
+      s += '<circle class="dt' + (on ? ' on' : '') + '" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + (on ? 6 : 4.5) + '"/>';
+      s += '<text class="v' + (on ? ' on' : '') + '" x="' + x.toFixed(1) + '" y="' + (y - (on ? 16 : 13)).toFixed(1) + '" text-anchor="' + (i === 0 ? 'start' : on ? 'end' : 'middle') + '">' + p[1] + '人</text>';
+      s += '<text class="yr" x="' + x.toFixed(1) + '" y="' + (H - 26) + '" text-anchor="' + (i === 0 ? 'start' : on ? 'end' : 'middle') + '">' + p[0] + '</text>';
+      if (p[2]) s += '<text class="tag" x="' + x.toFixed(1) + '" y="' + (H - 6) + '" text-anchor="end">' + p[2] + '</text>';
+    });
+    s += '</svg>';
+    return '<section class="c-sec c-fig-sec"><h2>' + f.h + '</h2><div class="c-fig">' +
+      '<dl class="cf-big"><dt>' + f.bigLabel + '</dt><dd>' + f.big + '<i>' + f.unit + '</i></dd></dl>' +
+      '<div class="chart">' + s + '</div>' +
+      '<p class="src">' + f.src + '</p></div></section>';
+  }
   function render(key){
     var c = CASES[key], h = '';
     var awi = (window.LIST || []).filter(function(x){ return x.go === 'case:' + key && x.aw; })[0];
@@ -3436,6 +3484,7 @@ var CASE = (function(){
       c.meta.forEach(function(m){ h += '<div><dt>' + m[0] + '</dt><dd>' + m[1] + '</dd></div>'; });
       h += '</dl>';
     }
+    if (c.fig) h += figHTML(c.fig);
     if (c.about) h += '<section class="c-sec c-about"><h2>概要</h2><div class="c-body">' + c.about.map(function(t){ return '<p>' + t + '</p>'; }).join('') + '</div></section>';
     if (c.solve) h += '<section class="c-sec"><h2>解決したこと</h2><div class="c-body"><dl class="c-solve">' + c.solve.map(function(t){ return '<div><dt>' + t[0] + '</dt><dd>' + t[1] + '</dd></div>'; }).join('') + '</dl></div></section>';
     if (false && c.flow) h += '<section class="c-sec"><h2>流れ</h2><div class="c-body"><ol class="c-flow">' + c.flow.map(function(t, i){ return '<li><span class="no">' + pad2(i + 1) + '</span><span class="tx">' + t + '</span></li>'; }).join('') + '</ol></div></section>';
@@ -3471,6 +3520,11 @@ var CASE = (function(){
     box.classList.toggle('no-fx', ['mate','timeismoney','bannerspec','escale','studio','map2vector','promptbook','navi','shortcut','base','jitan','trace','conpass','tools','scripts'].indexOf(key) >= 0);
     box.classList.toggle('dark', !!c.dark); /* 作品の深掘りは白地、Tools だけ黒地 */
     ttl.textContent = c.title.replace(/<br>/g, ' ');
+    body.querySelectorAll('.c-fig').forEach(function(el){
+      if (!window.IntersectionObserver){ el.classList.add('go'); return; }
+      var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ el.classList.add('go'); io.disconnect(); } }); }, { threshold: .4 });
+      io.observe(el);
+    });
     var back = body.querySelector('.c-back'); if (back) back.addEventListener('click', function(){ close(); });
     /* デモ：Mac の画面の中で、実際のツールを縮小して動かす（中身は 1440×900 の画面として描き、枠に合わせて縮める） */
     body.querySelectorAll('.mac').forEach(function(d){
