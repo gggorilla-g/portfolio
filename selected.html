@@ -3629,6 +3629,7 @@ var CASEFX = (function(){
 /* 画面を1枚の像として写し取り、その像を一点へ向けて連続的に歪ませる。
    近いところほど先に落ちるので、落ちる途中で放射方向に伸び、横方向には細くなる。 */
 var PORTAL = (function(){
+  var OFF = true; /* 吸い込み（ブラックホール）の遷移は使わない */
   var active = false, raf = 0;
   var cv = document.getElementById('warp'), gl = null, prog = null, U = {}, tex = null, texB = null;
   var snaps = {}, snapBusy = false, caseSnaps = {};
@@ -3765,7 +3766,7 @@ var PORTAL = (function(){
   }
   /* 止まっているページを先に写しておく */
   function warmup(){
-    if (active || snapBusy || REDUCE || MOVE.on || !window.html2canvas) return;
+    if (OFF || active || snapBusy || REDUCE || MOVE.on || !window.html2canvas) return;
     var i = cur, s = snaps[i];
     if (!s || performance.now() - s.at > 8000){
       snapBusy = true;
@@ -3784,7 +3785,7 @@ var PORTAL = (function(){
   var idle = 0;
   deck.addEventListener('scroll', function(){ clearTimeout(idle); idle = setTimeout(warmup, 700); }, { passive: true });
   window.addEventListener('resize', function(){ snaps = {}; caseSnaps = {}; });
-  initGL();
+  if (!OFF) initGL();
   setTimeout(warmup, 4600);
 
   /* 写しから実物へは一瞬で差し替えず、上の写しを溶かして消す（写しと実物の細かな差を見せない） */
@@ -3799,7 +3800,7 @@ var PORTAL = (function(){
   function fallbackOpen(x, y, reveal){ reveal(); }
 
   function open(x, y, reveal, box, key){
-    if (REDUCE || !initGL()){ reveal(); return; }
+    if (OFF || REDUCE || !initGL()){ reveal(); return; }
     cancelAnimationFrame(raf); active = true;
     var cached = snaps[cur];
     var getDeck = cached && performance.now() - cached.at < 20000 ? Promise.resolve(cached.c) : withTimeout(pageShot(cur), 1200);
@@ -3815,7 +3816,7 @@ var PORTAL = (function(){
     }, function(){ active = false; reveal(); });
   }
   function close(box, done){
-    if (REDUCE || !initGL()){ done(); return; }
+    if (OFF || REDUCE || !initGL()){ done(); return; }
     cancelAnimationFrame(raf); active = true;
     var x = box._px || window.innerWidth / 2, y = box._py || window.innerHeight / 2;
     withTimeout(caseShot(box), 1500).then(function(img){
